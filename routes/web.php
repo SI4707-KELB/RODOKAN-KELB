@@ -8,13 +8,19 @@ use App\Http\Controllers\HomeController;
 Route::get('/', [HomeController::class, 'index']);
 
 Route::get('/login', function () {
-    return view('auth.login');
+    $hariIni = \App\Models\Laporan::whereDate('created_at', \Carbon\Carbon::today())->count();
+    $aktif = \App\Models\Laporan::whereIn('status', ['Menunggu', 'Diproses', 'Darurat', 'Ditindaklanjuti'])->count();
+    $selesai = \App\Models\Laporan::where('status', 'Selesai')->count();
+    return view('auth.login', compact('hariIni', 'aktif', 'selesai'));
 })->name('login');
 
 Route::post('/login', [WebAuthController::class, 'login']);
 
 Route::get('/register', function () {
-    return view('auth.register');
+    $hariIni = \App\Models\Laporan::whereDate('created_at', \Carbon\Carbon::today())->count();
+    $aktif = \App\Models\Laporan::whereIn('status', ['Menunggu', 'Diproses', 'Darurat', 'Ditindaklanjuti'])->count();
+    $selesai = \App\Models\Laporan::where('status', 'Selesai')->count();
+    return view('auth.register', compact('hariIni', 'aktif', 'selesai'));
 })->name('register');
 
 Route::post('/register', [WebAuthController::class, 'register']);
@@ -23,6 +29,7 @@ Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/laporan/buat', [\App\Http\Controllers\LaporanController::class, 'create'])->name('laporan.create');
 
     // Verifikasi Laporan Routes
     Route::prefix('verifikasi')->group(function () {
