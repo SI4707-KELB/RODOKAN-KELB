@@ -39,8 +39,9 @@ class DashboardController extends Controller
             ->get();
 
         // 4. Top Categories
-        $kategoriTerbanyak = Laporan::select('kategori', DB::raw('count(*) as total'))
-            ->groupBy('kategori')
+        $kategoriTerbanyak = Laporan::select('kategoris.nama as kategori', DB::raw('count(laporans.id) as total'))
+            ->join('kategoris', 'laporans.kategori_id', '=', 'kategoris.id')
+            ->groupBy('kategoris.nama')
             ->orderBy('total', 'desc')
             ->take(5)
             ->get();

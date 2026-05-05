@@ -22,7 +22,23 @@
 
             <div class="mb-12">
                 <h2 class="text-3xl font-bold mb-4 leading-tight">Bergabung dengan Komunitas Tanggap Keluhan</h2>
-                <p class="text-blue-100 text-sm leading-relaxed">Bersama membangun sistem pelaporan yang cepat, akurat, dan terpercaya untuk keselamatan masyarakat Jawa Barat</p>
+                <p class="text-blue-100 text-sm leading-relaxed mb-6">Bersama membangun sistem pelaporan yang cepat, akurat, dan terpercaya untuk keselamatan masyarakat Jawa Barat</p>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-3 gap-3 text-center mb-6">
+                    <div class="bg-blue-600/40 rounded-lg p-2 border border-blue-500/30">
+                        <div class="text-[10px] text-blue-200 mb-1">Laporan Hari Ini</div>
+                        <div class="text-lg font-bold">{{ $hariIni }}</div>
+                    </div>
+                    <div class="bg-blue-600/40 rounded-lg p-2 border border-blue-500/30">
+                        <div class="text-[10px] text-blue-200 mb-1">Aktif</div>
+                        <div class="text-lg font-bold">{{ $aktif }}</div>
+                    </div>
+                    <div class="bg-blue-600/40 rounded-lg p-2 border border-blue-500/30">
+                        <div class="text-[10px] text-blue-200 mb-1">Selesai</div>
+                        <div class="text-lg font-bold">{{ $selesai }}</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Features -->
@@ -71,14 +87,9 @@
             <h1 class="text-2xl font-bold text-slate-900 mb-2">Buat Akun RODOKAN</h1>
             <p class="text-sm text-slate-500 mb-8 leading-relaxed">Daftar untuk melaporkan Keluhan, memantau status, dan berpartisipasi dalam informasi publik</p>
 
-            <!-- Role Toggle -->
-            <div class="bg-slate-100 p-1 rounded-xl flex items-center mb-6 border border-slate-200/50">
-                <button type="button" class="w-1/2 py-2.5 text-[13px] font-semibold rounded-lg bg-white shadow-sm text-blue-600 border border-slate-200/50 transition-all text-center">Masyarakat</button>
-                <button type="button" class="w-1/2 py-2.5 text-[13px] font-semibold rounded-lg text-slate-500 hover:text-slate-700 transition-all text-center">Admin Pemerintah</button>
-            </div>
 
             <!-- Register Form -->
-            <form action="#" method="POST" class="space-y-4">
+            <form action="{{ route('register') }}" method="POST" class="space-y-4">
                 @csrf
                 
                 <!-- Nama Lengkap -->

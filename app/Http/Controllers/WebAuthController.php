@@ -19,7 +19,8 @@ class WebAuthController extends Controller
         $user = User::create([
             'name' => $validated['name'] ?? null,
             'email' => $validated['email'] ?? null,
-            'phone_number' => $validated['phone_number'] ?? null,
+            'city' => $validated['city'] ?? null,
+            'phone_number' => $validated['phone'] ?? null,
             'password' => Hash::make($validated['password']),
         ]);
 
