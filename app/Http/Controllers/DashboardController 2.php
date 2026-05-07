@@ -65,19 +65,24 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        return view('admin.dashboard.index', compact(
-            'totalLaporanHariIni',
-            'menungguVerifikasi',
-            'sedangDiproses',
-            'ditindaklanjuti',
-            'selesai',
-            'laporanDarurat',
-            'petaSebaran',
-            'daftarDarurat',
-            'kategoriTerbanyak',
-            'kecamatanTerbanyak',
-            'tren7Hari',
-            'laporanTerbaru'
-        ));
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'statistik' => [
+                    'total_hari_ini' => $totalLaporanHariIni,
+                    'menunggu_verifikasi' => $menungguVerifikasi,
+                    'sedang_diproses' => $sedangDiproses,
+                    'ditindaklanjuti' => $ditindaklanjuti,
+                    'selesai' => $selesai,
+                    'laporan_darurat' => $laporanDarurat,
+                ],
+                'peta_sebaran' => $petaSebaran,
+                'daftar_darurat' => $daftarDarurat,
+                'kategori_terbanyak' => $kategoriTerbanyak,
+                'kecamatan_terbanyak' => $kecamatanTerbanyak,
+                'tren_7_hari' => $tren7Hari,
+                'laporan_terbaru' => $laporanTerbaru,
+            ]
+        ]);
     }
 }
