@@ -9,6 +9,8 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+    // Dashboard Controller Class
+
     /**
      * Get all data for the dashboard.
      *

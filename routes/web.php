@@ -5,6 +5,7 @@ use App\Http\Controllers\WebAuthController;
 
 use App\Http\Controllers\HomeController;
 
+// Web Application Routes
 Route::get('/', [HomeController::class, 'index']);
 
 Route::get('/login', function () {

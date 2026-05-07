@@ -3,6 +3,7 @@
 @section('title', 'Manajemen Kategori Laporan - RODOKAN')
 
 @section('content')
+<!-- Admin Kategori View -->
 <style>
 /* Kategori Styles */
 .kategori-container {
