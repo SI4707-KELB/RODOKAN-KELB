@@ -3,6 +3,7 @@
 @section('title', 'Dashboard Pemerintah Kota Bandung - RODOKAN')
 
 @section('content')
+<!-- Admin Dashboard View -->
 <style>
 /* Custom Vanilla CSS matching the design */
 .dashboard-container {
