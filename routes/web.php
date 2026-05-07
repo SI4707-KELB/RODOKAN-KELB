@@ -52,4 +52,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         Route::get('/stats/data', [\App\Http\Controllers\AdminLaporanController::class, 'getStats'])->name('admin.laporan.stats');
         Route::get('/export/csv', [\App\Http\Controllers\AdminLaporanController::class, 'export'])->name('admin.laporan.export');
     });
+
+    // Admin Kategori Management
+    Route::prefix('kategori')->group(function () {
+        Route::get('/', [\App\Http\Controllers\AdminKategoriController::class, 'index'])->name('admin.kategori.index');
+        Route::get('/create', [\App\Http\Controllers\AdminKategoriController::class, 'create'])->name('admin.kategori.create');
+        Route::post('/', [\App\Http\Controllers\AdminKategoriController::class, 'store'])->name('admin.kategori.store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\AdminKategoriController::class, 'edit'])->name('admin.kategori.edit');
+        Route::put('/{id}', [\App\Http\Controllers\AdminKategoriController::class, 'update'])->name('admin.kategori.update');
+        Route::delete('/{id}', [\App\Http\Controllers\AdminKategoriController::class, 'destroy'])->name('admin.kategori.destroy');
+    });
 });
