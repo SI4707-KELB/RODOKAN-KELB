@@ -15,7 +15,7 @@
                 <p class="text-sm text-slate-500">Sampaikan laporan keluhan secara lengkap agar dapat diproses lebih cepat oleh tim tanggap darurat</p>
             </div>
 
-            <form action="#" method="POST" class="space-y-6">
+            <form action="{{ route('laporan.store') }}" method="POST" class="space-y-6" enctype="multipart/form-data">
                 @csrf
                 
                 <!-- Informasi Dasar -->
@@ -25,13 +25,19 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Judul Laporan <span class="text-red-500">*</span></label>
-                            <input type="text" placeholder="Contoh: Banjir di Jalan Soekarno-Hatta" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400">
+                            <input type="text" name="judul_laporan" value="{{ old('judul_laporan') }}" placeholder="Contoh: Banjir di Jalan Soekarno-Hatta" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400">
+                            @error('judul_laporan')
+                                <p class="text-[10px] text-red-500 mt-1.5 font-medium">{{ $message }}</p>
+                            @enderror
                             <p class="text-[10px] text-slate-400 mt-1.5">Buat judul yang jelas dan singkat</p>
                         </div>
                         
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Deskripsi Kejadian / Kronologi <span class="text-red-500">*</span></label>
-                            <textarea rows="4" placeholder="Jelaskan kronologi kejadian secara detail..." class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"></textarea>
+                            <textarea name="deskripsi" rows="4" placeholder="Jelaskan kronologi kejadian secara detail..." class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400">{{ old('deskripsi') }}</textarea>
+                            @error('deskripsi')
+                                <p class="text-[10px] text-red-500 mt-1.5 font-medium">{{ $message }}</p>
+                            @enderror
                             <p class="text-[10px] text-slate-400 mt-1.5">Minimal 50 karakter. Jelaskan apa yang terjadi, kapan, dan dampaknya.</p>
                         </div>
                     </div>
@@ -43,7 +49,7 @@
                     
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         <!-- Category Item 1 -->
-                        <label class="cursor-pointer">
+                        <label class="cursor-pointer relative">
                             <input type="radio" name="kategori" class="peer sr-only" value="1">
                             <div class="border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:ring-1 peer-checked:ring-blue-500">
                                 <div class="w-10 h-10 rounded-lg bg-blue-500 text-white flex items-center justify-center">
@@ -53,7 +59,7 @@
                             </div>
                         </label>
                         <!-- Category Item 2 -->
-                        <label class="cursor-pointer">
+                        <label class="cursor-pointer relative">
                             <input type="radio" name="kategori" class="peer sr-only" value="2">
                             <div class="border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:ring-1 peer-checked:ring-blue-500">
                                 <div class="w-10 h-10 rounded-lg bg-green-500 text-white flex items-center justify-center">
@@ -63,7 +69,7 @@
                             </div>
                         </label>
                         <!-- Category Item 3 -->
-                        <label class="cursor-pointer">
+                        <label class="cursor-pointer relative">
                             <input type="radio" name="kategori" class="peer sr-only" value="3">
                             <div class="border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:ring-1 peer-checked:ring-blue-500">
                                 <div class="w-10 h-10 rounded-lg bg-yellow-500 text-white flex items-center justify-center">
@@ -73,7 +79,7 @@
                             </div>
                         </label>
                         <!-- Category Item 4 -->
-                        <label class="cursor-pointer">
+                        <label class="cursor-pointer relative">
                             <input type="radio" name="kategori" class="peer sr-only" value="4">
                             <div class="border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:ring-1 peer-checked:ring-blue-500">
                                 <div class="w-10 h-10 rounded-lg bg-orange-500 text-white flex items-center justify-center">
@@ -83,7 +89,7 @@
                             </div>
                         </label>
                         <!-- Category Item 5 -->
-                        <label class="cursor-pointer">
+                        <label class="cursor-pointer relative">
                             <input type="radio" name="kategori" class="peer sr-only" value="5">
                             <div class="border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:ring-1 peer-checked:ring-blue-500">
                                 <div class="w-10 h-10 rounded-lg bg-red-600 text-white flex items-center justify-center">
@@ -93,7 +99,7 @@
                             </div>
                         </label>
                         <!-- Category Item 6 -->
-                        <label class="cursor-pointer">
+                        <label class="cursor-pointer relative">
                             <input type="radio" name="kategori" class="peer sr-only" value="6">
                             <div class="border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:ring-1 peer-checked:ring-blue-500">
                                 <div class="w-10 h-10 rounded-lg bg-slate-500 text-white flex items-center justify-center">
@@ -103,6 +109,9 @@
                             </div>
                         </label>
                     </div>
+                    @error('kategori')
+                        <p class="text-[10px] text-red-500 mt-2 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Waktu Kejadian -->
@@ -111,11 +120,17 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Tanggal Kejadian <span class="text-red-500">*</span></label>
-                            <input type="date" class="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-600">
+                            <input type="date" name="tanggal_kejadian" value="{{ old('tanggal_kejadian') }}" class="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-600">
+                            @error('tanggal_kejadian')
+                                <p class="text-[10px] text-red-500 mt-1.5 font-medium">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Waktu Kejadian <span class="text-red-500">*</span></label>
-                            <input type="time" class="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-600">
+                            <input type="time" name="waktu_kejadian" value="{{ old('waktu_kejadian') }}" class="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-600">
+                            @error('waktu_kejadian')
+                                <p class="text-[10px] text-red-500 mt-1.5 font-medium">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -131,8 +146,11 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                 </div>
-                                <input type="text" placeholder="Contoh: Jl. Soekarno-Hatta No. 123, Kec. Dayeuhkolot, Bandung" class="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400">
+                                <input type="text" name="alamat" value="{{ old('alamat') }}" placeholder="Contoh: Jl. Soekarno-Hatta No. 123, Kec. Dayeuhkolot, Bandung" class="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400">
                             </div>
+                            @error('alamat')
+                                <p class="text-[10px] text-red-500 mt-1.5 font-medium">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="flex items-center">
@@ -165,13 +183,17 @@
                 <div class="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
                     <h2 class="text-sm font-bold text-slate-800 mb-4">Upload Bukti Laporan</h2>
                     
-                    <div class="border-2 border-dashed border-slate-300 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors cursor-pointer group">
+                    <label for="foto_bukti" class="border-2 border-dashed border-slate-300 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors cursor-pointer group block">
                         <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-50 transition-colors mb-3">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                         </div>
                         <p class="text-sm font-semibold text-slate-700 mb-1">Klik untuk upload atau drag & drop</p>
                         <p class="text-[10px] text-slate-400">JPG atau PNG (Max 5MB per file, maksimal 3 foto)</p>
-                    </div>
+                        <input type="file" id="foto_bukti" name="foto_bukti[]" multiple accept="image/png, image/jpeg" class="hidden">
+                    </label>
+                    @error('foto_bukti')
+                        <p class="text-[10px] text-red-500 mt-2 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Tingkat Urgensi -->
@@ -179,32 +201,35 @@
                     <h2 class="text-sm font-bold text-slate-800 mb-4">Tingkat Urgensi <span class="text-red-500">*</span></h2>
                     
                     <div class="grid grid-cols-3 gap-3">
-                        <label class="cursor-pointer">
+                        <label class="cursor-pointer relative">
                             <input type="radio" name="urgensi" class="peer sr-only" value="rendah">
                             <div class="border border-slate-200 rounded-xl py-3 text-center hover:border-slate-300 transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:ring-1 peer-checked:ring-blue-500">
                                 <span class="text-xs font-semibold text-slate-700">Rendah</span>
                             </div>
                         </label>
-                        <label class="cursor-pointer">
+                        <label class="cursor-pointer relative">
                             <input type="radio" name="urgensi" class="peer sr-only" value="sedang">
                             <div class="border border-slate-200 rounded-xl py-3 text-center hover:border-slate-300 transition-all peer-checked:border-orange-500 peer-checked:bg-orange-50/50 peer-checked:ring-1 peer-checked:ring-orange-500">
                                 <span class="text-xs font-semibold text-slate-700">Sedang</span>
                             </div>
                         </label>
-                        <label class="cursor-pointer">
+                        <label class="cursor-pointer relative">
                             <input type="radio" name="urgensi" class="peer sr-only" value="tinggi">
                             <div class="border border-slate-200 rounded-xl py-3 text-center hover:border-slate-300 transition-all peer-checked:border-red-500 peer-checked:bg-red-50/50 peer-checked:ring-1 peer-checked:ring-red-500">
                                 <span class="text-xs font-semibold text-slate-700">Tinggi</span>
                             </div>
                         </label>
                     </div>
+                    @error('urgensi')
+                        <p class="text-[10px] text-red-500 mt-2 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Anonim Checkbox -->
                 <div class="bg-yellow-50 border border-yellow-100 rounded-xl p-4">
                     <div class="flex items-start">
                         <div class="flex items-center h-5">
-                            <input id="anonim" type="checkbox" class="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 cursor-pointer mt-0.5">
+                            <input id="anonim" name="anonim" value="1" type="checkbox" class="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 cursor-pointer mt-0.5" {{ old('anonim') ? 'checked' : '' }}>
                         </div>
                         <div class="ml-3 text-xs">
                             <label for="anonim" class="font-bold text-slate-800 cursor-pointer">Kirim laporan secara anonim</label>
@@ -229,7 +254,7 @@
         </div>
 
         <!-- Right Column: Sidebar Panels -->
-        <div class="hidden lg:block w-80 shrink-0 space-y-6 sticky top-24">
+        <div class="hidden lg:block w-80 shrink-0 space-y-6">
             
             <!-- Ringkasan Laporan -->
             <div class="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">

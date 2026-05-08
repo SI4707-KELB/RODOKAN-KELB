@@ -3,6 +3,36 @@
 @section('title', 'Login - RODOKAN')
 
 @section('content')
+@if ($errors->any())
+    <!-- Error Popup -->
+    <div id="error-popup" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] bg-white border-l-4 border-red-500 p-4 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-start gap-3 min-w-[320px] max-w-md transition-all duration-300">
+        <div class="mt-0.5 p-1.5 bg-red-100 rounded-full text-red-500 shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <div class="flex-1">
+            <h4 class="font-bold text-sm text-slate-800">Opps! Terjadi Kesalahan</h4>
+            <ul class="text-xs text-slate-500 mt-1 space-y-1 list-disc pl-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        <button onclick="document.getElementById('error-popup').style.display='none'" class="text-slate-400 hover:text-slate-600 shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+    <script>
+        setTimeout(() => {
+            const el = document.getElementById('error-popup');
+            if (el) {
+                el.style.opacity = '0';
+                el.style.transform = 'translate(-50%, -20px)';
+                setTimeout(() => el.style.display = 'none', 300);
+            }
+        }, 5000);
+    </script>
+@endif
+
 <div class="flex min-h-screen">
     <!-- Left Sidebar (Blue) -->
     <div class="hidden lg:flex lg:w-5/12 bg-blue-600 text-white flex-col justify-between p-12 relative overflow-hidden">
@@ -90,7 +120,7 @@
 
 
             <!-- Login Form -->
-            <form action="{{ route('login') }}" method="POST" class="space-y-5">
+            <form action="{{ route('login') }}" method="POST" class="space-y-5" onsubmit="document.getElementById('login-btn-text').classList.add('hidden'); document.getElementById('login-btn-spinner').classList.remove('hidden'); document.getElementById('login-btn').classList.add('opacity-80', 'cursor-not-allowed');">
                 @csrf
                 
                 <!-- Email -->
@@ -116,7 +146,7 @@
                             </svg>
                         </div>
                         <input type="password" id="password" name="password" class="block w-full pl-10 pr-10 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-slate-50 focus:bg-white" placeholder="Masukkan password" required>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" onclick="togglePassword('password')">
                             <svg class="h-4 w-4 text-slate-400 hover:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -140,8 +170,12 @@
 
                 <!-- Submit -->
                 <div>
-                    <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
-                        Masuk
+                    <button id="login-btn" type="submit" class="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                        <span id="login-btn-text">Masuk</span>
+                        <div id="login-btn-spinner" class="hidden flex items-center gap-2">
+                            <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <span>Memproses...</span>
+                        </div>
                     </button>
                 </div>
             </form>
@@ -188,4 +222,15 @@
         </div>
     </div>
 </div>
+
+<script>
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+    } else {
+        input.type = 'password';
+    }
+}
+</script>
 @endsection

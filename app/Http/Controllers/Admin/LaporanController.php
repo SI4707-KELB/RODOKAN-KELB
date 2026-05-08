@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Laporan;
 use App\Models\Kategori;
@@ -9,7 +10,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class AdminLaporanController extends Controller
+class LaporanController extends Controller
 {
     /**
      * Display a listing of all reports for admin.

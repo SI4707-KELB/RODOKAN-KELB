@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 
-class AdminKategoriController extends Controller
+class KategoriController extends Controller
 {
     /**
      * Display a listing of the resource.
