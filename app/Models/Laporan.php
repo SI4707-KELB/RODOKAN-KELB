@@ -15,8 +15,11 @@ class Laporan extends Model
         'user_id',
         'judul_laporan',
         'deskripsi',
-        'kategori',
+        'kategori_id',
         'kecamatan',
+        'alamat',
+        'waktu_kejadian',
+        'is_anonim',
         'status',
         'urgensi',
         'latitude',
@@ -30,6 +33,8 @@ class Laporan extends Model
 
     protected $casts = [
         'waktu_verifikasi' => 'datetime',
+        'waktu_kejadian' => 'datetime',
+        'is_anonim' => 'boolean',
     ];
 
     public function user()

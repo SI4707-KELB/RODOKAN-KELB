@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
@@ -47,7 +48,7 @@ class WebAuthController extends Controller
 
         if (! $user || ! Hash::check($validated['password'], $user->password)) {
             return back()->withErrors([
-                'email' => 'The provided credentials do not match our records.',
+                'email' => 'Email atau password yang Anda masukkan salah.',
             ])->onlyInput('email');
         }
 

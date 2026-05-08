@@ -5,7 +5,6 @@
 @section('content')
 <!-- Admin Dashboard View -->
 <style>
-/* Custom Vanilla CSS matching the design */
 .dashboard-container {
     padding: 24px 32px;
     font-family: 'Inter', sans-serif;
@@ -450,10 +449,7 @@ document.addEventListener('DOMContentLoaded', function() {
         @endif
     ];
 
-    if (labels.length === 0) {
-        labels.push('18 Apr', '19 Apr', '20 Apr', '21 Apr', '22 Apr', '23 Apr', '24 Apr');
-        dataPoints.push(45, 52, 38, 61, 55, 68, 74); // Dummy data to match mockup if empty
-    }
+    // No fallback dummy data as requested by user
 
     new Chart(ctx, {
         type: 'line',

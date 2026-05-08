@@ -20,6 +20,14 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
+        if (auth()->check() && auth()->user()->role !== 'admin') {
+            $laporanku = Laporan::where('user_id', auth()->id())->orderBy('created_at', 'desc')->get();
+            $totalLaporanku = $laporanku->count();
+            $laporanSelesai = $laporanku->where('status', 'Selesai')->count();
+            $laporanDiproses = $laporanku->whereIn('status', ['Menunggu', 'Diproses', 'Darurat', 'Ditindaklanjuti'])->count();
+            return view('user.dashboard.index', compact('laporanku', 'totalLaporanku', 'laporanSelesai', 'laporanDiproses'));
+        }
+
         // 1. Summary Statistics
         $totalLaporanHariIni = Laporan::whereDate('created_at', $today)->count();
         $menungguVerifikasi = Laporan::where('status', 'Menunggu')->count();
@@ -56,11 +64,22 @@ class DashboardController extends Controller
             ->get();
 
         // 6. Trend over last 7 days
-        $tren7Hari = Laporan::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
-            ->where('created_at', '>=', Carbon::now()->subDays(7))
+        $startDate = Carbon::today()->subDays(6); // 7 days including today
+        $trenData = Laporan::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+            ->where('created_at', '>=', $startDate)
             ->groupBy('date')
             ->orderBy('date', 'asc')
-            ->get();
+            ->get()
+            ->keyBy('date');
+
+        $tren7Hari = collect();
+        for ($i = 0; $i < 7; $i++) {
+            $date = $startDate->copy()->addDays($i)->format('Y-m-d');
+            $tren7Hari->push((object)[
+                'date' => $date,
+                'total' => isset($trenData[$date]) ? $trenData[$date]->total : 0
+            ]);
+        }
 
         // 7. Latest Reports
         $laporanTerbaru = Laporan::orderBy('created_at', 'desc')

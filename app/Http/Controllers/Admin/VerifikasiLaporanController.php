@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Laporan;
 use Carbon\Carbon;
@@ -25,12 +26,6 @@ class VerifikasiLaporanController extends Controller
             ->whereDate('waktu_verifikasi', $today)
             ->count();
 
-        // Calculate average verification time
-        // avg(waktu_verifikasi - created_at)
-        // Since sqlite or other DBs might not support raw time diff easily, we can use DB::raw or just simple avg if supported,
-        // or calculate it in PHP for simplicity. Let's use raw query for standard SQL if possible, 
-        // or calculate the average in hours from a subset of recent verifications.
-        // For simplicity, we assume an approximation or just return a static/calculated value for demonstration.
         $recentVerifications = Laporan::whereNotNull('waktu_verifikasi')
             ->orderBy('waktu_verifikasi', 'desc')
             ->take(100)
@@ -44,6 +39,11 @@ class VerifikasiLaporanController extends Controller
             $count++;
         }
         $rataRataWaktu = $count > 0 ? round($totalHours / $count, 1) : 0;
+
+        // Calculate totals for tabs
+        $totalMenunggu = $menungguVerifikasi;
+        $totalTerverifikasi = Laporan::whereIn('status', ['Terverifikasi', 'Diproses', 'Selesai'])->count();
+        $totalDitolak = Laporan::where('status', 'Ditolak')->count();
 
         // Fetch reports based on tab (filter)
         $tab = $request->query('tab', 'menunggu'); // menunggu, terverifikasi, ditolak
@@ -60,18 +60,46 @@ class VerifikasiLaporanController extends Controller
 
         $laporans = $query->paginate(10);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'statistik' => [
-                    'menunggu_verifikasi' => $menungguVerifikasi,
-                    'terverifikasi_hari_ini' => $terverifikasiHariIni,
-                    'ditolak_hari_ini' => $ditolakHariIni,
-                    'rata_rata_waktu_jam' => $rataRataWaktu,
-                ],
-                'laporans' => $laporans
-            ]
-        ]);
+        $laporans->getCollection()->transform(function ($laporan) {
+            $catClass = 'badge-category';
+            $catName = $laporan->kategori ?? 'Umum';
+            
+            if (stripos($catName, 'Infrastruktur') !== false) $catClass .= ' infrastruktur';
+            elseif (stripos($catName, 'Bencana') !== false) $catClass .= ' bencana';
+            elseif (stripos($catName, 'Pelayanan') !== false) $catClass .= ' pelayanan';
+
+            $laporan->catClass = $catClass;
+            $laporan->catName = $catName;
+
+            $laporan->urgencyClass = 'badge-urgency ' . strtolower($laporan->urgensi ?? 'low');
+            
+            $borderClass = 'border-menunggu';
+            if (in_array($laporan->status, ['Terverifikasi', 'Diproses', 'Selesai'])) {
+                $borderClass = 'border-terverifikasi';
+            } elseif ($laporan->status === 'Ditolak') {
+                $borderClass = 'border-ditolak';
+            }
+            $laporan->borderClass = $borderClass;
+
+            // Mock stats
+            $laporan->upvotes = rand(10, 200);
+            $laporan->comments = rand(0, 50);
+            $laporan->views = rand(100, 1000);
+
+            return $laporan;
+        });
+
+        return view('admin.verifikasi.index', compact(
+            'menungguVerifikasi',
+            'terverifikasiHariIni',
+            'ditolakHariIni',
+            'rataRataWaktu',
+            'totalMenunggu',
+            'totalTerverifikasi',
+            'totalDitolak',
+            'laporans',
+            'tab'
+        ));
     }
 
     /**
