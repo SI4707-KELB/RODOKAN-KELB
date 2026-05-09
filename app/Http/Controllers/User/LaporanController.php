@@ -77,4 +77,40 @@ class LaporanController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Laporan berhasil dikirim!');
     }
+
+    public function show($id)
+    {
+        $laporan = \App\Models\Laporan::with(['kategori', 'user', 'statusHistories', 'upvotes'])->findOrFail($id);
+        
+        $upvotesCount = $laporan->upvotes->count();
+        
+        // Ambil laporan terkait (berdasarkan kategori yang sama, maksimal 2)
+        $relatedLaporans = \App\Models\Laporan::where('kategori_id', $laporan->kategori_id)
+            ->where('id', '!=', $laporan->id)
+            ->inRandomOrder()
+            ->take(2)
+            ->get();
+
+        return view('user.laporan.show', compact('laporan', 'upvotesCount', 'relatedLaporans'));
+    }
+
+    public function user()
+    {
+        $laporans = \App\Models\Laporan::with('kategori')
+            ->where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('user.laporan.user', compact('laporans'));
+    }
+
+    public function public()
+    {
+        $laporans = \App\Models\Laporan::with(['kategori', 'user', 'upvotes'])
+            ->where('status', 'Terverifikasi')
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        return view('user.laporan.public', compact('laporans'));
+    }
 }

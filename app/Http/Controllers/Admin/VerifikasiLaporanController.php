@@ -103,6 +103,17 @@ class VerifikasiLaporanController extends Controller
     }
 
     /**
+     * Show detail verification page for a report
+     */
+    public function show($id)
+    {
+        $laporan = Laporan::with(['kategori', 'user', 'statusHistories', 'komentars', 'upvotes', 'evidences'])
+            ->findOrFail($id);
+
+        return view('admin.verifikasi.show', compact('laporan'));
+    }
+
+    /**
      * Verify a report
      */
     public function verifikasi(Request $request, $id)

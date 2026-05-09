@@ -51,4 +51,24 @@ class Laporan extends Model
     {
         return $this->belongsTo(User::class, 'admin_id');
     }
+
+    public function komentars()
+    {
+        return $this->hasMany(Komentar::class);
+    }
+
+    public function statusHistories()
+    {
+        return $this->hasMany(StatusHistory::class);
+    }
+
+    public function upvotes()
+    {
+        return $this->hasMany(Upvote::class);
+    }
+
+    public function evidences()
+    {
+        return $this->hasMany(LaporanEvidence::class);
+    }
 }
