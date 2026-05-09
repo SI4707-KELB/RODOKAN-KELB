@@ -35,6 +35,9 @@ Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     Route::get('/laporan/buat', [UserLaporanController::class, 'create'])->name('laporan.create');
     Route::post('/laporan/buat', [UserLaporanController::class, 'store'])->name('laporan.store');
+    Route::get('/laporan-saya', [UserLaporanController::class, 'user'])->name('laporan.saya');
+    Route::get('/laporan-publik', [UserLaporanController::class, 'public'])->name('laporan.publik');
+    Route::get('/laporan/{id}', [UserLaporanController::class, 'show'])->name('laporan.show');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -43,6 +46,7 @@ Route::middleware('auth')->group(function () {
         // Verifikasi Laporan Routes
         Route::prefix('verifikasi')->group(function () {
             Route::get('/', [VerifikasiLaporanController::class, 'index'])->name('verifikasi.index');
+            Route::get('/{id}', [VerifikasiLaporanController::class, 'show'])->name('verifikasi.show');
             Route::post('/{id}/verifikasi', [VerifikasiLaporanController::class, 'verifikasi'])->name('verifikasi.terima');
             Route::post('/{id}/tolak', [VerifikasiLaporanController::class, 'tolak'])->name('verifikasi.tolak');
         });
