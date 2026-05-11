@@ -106,11 +106,47 @@ class LaporanController extends Controller
 
     public function public()
     {
-        $laporans = \App\Models\Laporan::with(['kategori', 'user', 'upvotes'])
-            ->where('status', 'Terverifikasi')
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
+        // Data for dropdowns
+        $kategoris = \App\Models\Kategori::all();
+        $lokasis = \App\Models\Laporan::select('kecamatan')->distinct()->whereNotNull('kecamatan')->pluck('kecamatan');
 
-        return view('user.laporan.public', compact('laporans'));
+        // Start query
+        $query = \App\Models\Laporan::with(['kategori', 'user', 'upvotes']);
+
+        // Filter: Status Penanganan
+        if (request()->filled('status')) {
+            $query->where('status', request('status'));
+        } else {
+            // Default public statuses
+            $query->whereIn('status', ['Terverifikasi', 'Diproses', 'Ditindaklanjuti', 'Selesai']);
+        }
+
+        // Filter: Kategori Keluhan
+        if (request()->filled('kategori')) {
+            $query->where('kategori_id', request('kategori'));
+        }
+
+        // Filter: Lokasi (Kecamatan)
+        if (request()->filled('lokasi')) {
+            $query->where('kecamatan', request('lokasi'));
+        }
+
+        // Filter: Urutkan
+        if (request()->filled('sort')) {
+            if (request('sort') == 'terlama') {
+                $query->orderBy('created_at', 'asc');
+            } elseif (request('sort') == 'terpopuler') {
+                $query->withCount('upvotes')->orderBy('upvotes_count', 'desc');
+            } else {
+                $query->orderBy('created_at', 'desc');
+            }
+        } else {
+            // Default sort
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $laporans = $query->paginate(12)->withQueryString();
+
+        return view('user.laporan.public', compact('laporans', 'kategoris', 'lokasis'));
     }
 }
