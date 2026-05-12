@@ -190,10 +190,10 @@
                                 </div>
                                 <div>
                                     <h4 class="text-sm font-semibold text-gray-800">{{ $laporan->judul_laporan }}</h4>
-                                    <p class="text-xs {{ $laporan->kategori->nama == 'Bencana' ? 'text-red-600' : ($laporan->kategori->nama == 'Infrastruktur' ? 'text-blue-600' : 'text-orange-600') }} font-medium">↑ +{{ rand(5, 20) }} hari ini</p>
+                                    <p class="text-xs {{ $laporan->kategori->nama == 'Bencana' ? 'text-red-600' : ($laporan->kategori->nama == 'Infrastruktur' ? 'text-blue-600' : 'text-orange-600') }} font-medium">↑ {{ $laporan->komentars_count ?? 0 }} komentar</p>
                                 </div>
                             </div>
-                            <span class="text-gray-900 font-bold">{{ $laporan->trending_count }}</span>
+                            <span class="text-gray-900 font-bold">{{ $laporan->upvotes_count ?? 0 }}</span>
                         </div>
                         @endforeach
                     </div>
@@ -299,8 +299,8 @@
                                 <span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> {{ \Carbon\Carbon::parse($laporan->created_at)->diffForHumans() }}</span>
                             </div>
                             <div class="flex items-center gap-4 text-xs text-gray-400 font-medium">
-                                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.514"></path></svg> {{ rand(10, 50) }}</span>
-                                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03-8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg> {{ rand(2, 15) }}</span>
+                                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.514"></path></svg> {{ $laporan->upvotes_count ?? 0 }}</span>
+                                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03-8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg> {{ $laporan->komentars_count ?? 0 }}</span>
                             </div>
                         </div>
                         @endforeach

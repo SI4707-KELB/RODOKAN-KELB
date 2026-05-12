@@ -30,11 +30,24 @@ class DashboardController extends Controller
 
         // 1. Summary Statistics
         $totalLaporanHariIni = Laporan::whereDate('created_at', $today)->count();
+        $totalLaporanKemarin = Laporan::whereDate('created_at', Carbon::yesterday())->count();
+        if ($totalLaporanKemarin > 0) {
+            $trendTotalLaporan = round((($totalLaporanHariIni - $totalLaporanKemarin) / $totalLaporanKemarin) * 100);
+        } else {
+            $trendTotalLaporan = $totalLaporanHariIni > 0 ? 100 : 0;
+        }
+
         $menungguVerifikasi = Laporan::where('status', 'Menunggu')->count();
         $sedangDiproses = Laporan::where('status', 'Diproses')->count();
         $ditindaklanjuti = Laporan::where('status', 'Ditindaklanjuti')->count();
         $selesai = Laporan::where('status', 'Selesai')->count();
         $laporanDarurat = Laporan::where('status', 'Darurat')->count();
+
+        $trendMenunggu = Laporan::where('status', 'Menunggu')->whereDate('created_at', $today)->count() - Laporan::where('status', 'Menunggu')->whereDate('created_at', Carbon::yesterday())->count();
+        $trendDiproses = Laporan::where('status', 'Diproses')->whereDate('updated_at', $today)->count() - Laporan::where('status', 'Diproses')->whereDate('updated_at', Carbon::yesterday())->count();
+        $trendDitindaklanjuti = Laporan::where('status', 'Ditindaklanjuti')->whereDate('updated_at', $today)->count() - Laporan::where('status', 'Ditindaklanjuti')->whereDate('updated_at', Carbon::yesterday())->count();
+        $trendSelesai = Laporan::where('status', 'Selesai')->whereDate('updated_at', $today)->count() - Laporan::where('status', 'Selesai')->whereDate('updated_at', Carbon::yesterday())->count();
+        $trendDarurat = Laporan::where('status', 'Darurat')->whereDate('created_at', $today)->count() - Laporan::where('status', 'Darurat')->whereDate('created_at', Carbon::yesterday())->count();
 
         // 2. Data for Map
         $petaSebaran = Laporan::select('id', 'judul_laporan', 'status', 'latitude', 'longitude')
@@ -98,7 +111,13 @@ class DashboardController extends Controller
             'kategoriTerbanyak',
             'kecamatanTerbanyak',
             'tren7Hari',
-            'laporanTerbaru'
+            'laporanTerbaru',
+            'trendTotalLaporan',
+            'trendMenunggu',
+            'trendDiproses',
+            'trendDitindaklanjuti',
+            'trendSelesai',
+            'trendDarurat'
         ));
     }
 }

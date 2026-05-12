@@ -184,12 +184,17 @@
                     <h2 class="text-sm font-bold text-slate-800 mb-4">Upload Bukti Laporan</h2>
                     
                     <label for="foto_bukti" class="border-2 border-dashed border-slate-300 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors cursor-pointer group block">
-                        <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-50 transition-colors mb-3">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <div id="upload-placeholder" class="flex flex-col items-center">
+                            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-50 transition-colors mb-3">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            </div>
+                            <p class="text-sm font-semibold text-slate-700 mb-1">Klik untuk upload atau drag & drop</p>
+                            <p class="text-[10px] text-slate-400">JPG atau PNG (Max 5MB per file, maksimal 3 foto)</p>
                         </div>
-                        <p class="text-sm font-semibold text-slate-700 mb-1">Klik untuk upload atau drag & drop</p>
-                        <p class="text-[10px] text-slate-400">JPG atau PNG (Max 5MB per file, maksimal 3 foto)</p>
-                        <input type="file" id="foto_bukti" name="foto_bukti[]" multiple accept="image/png, image/jpeg" class="hidden">
+                        <div id="preview-container" class="hidden w-full flex flex-wrap gap-4 justify-center mt-4">
+                            <!-- Previews akan muncul di sini -->
+                        </div>
+                        <input type="file" id="foto_bukti" name="foto_bukti[]" multiple accept="image/png, image/jpeg" class="hidden" onchange="previewImages(event)">
                     </label>
                     @error('foto_bukti')
                         <p class="text-[10px] text-red-500 mt-2 font-medium">{{ $message }}</p>
@@ -342,4 +347,34 @@
         </div>
     </div>
 </div>
+</div>
+
+<script>
+    function previewImages(event) {
+        const previewContainer = document.getElementById('preview-container');
+        const uploadPlaceholder = document.getElementById('upload-placeholder');
+        const files = event.target.files;
+        
+        previewContainer.innerHTML = '';
+        
+        if (files.length > 0) {
+            uploadPlaceholder.classList.add('hidden');
+            previewContainer.classList.remove('hidden');
+            
+            Array.from(files).slice(0, 3).forEach(file => { // Max 3 preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'w-24 h-24 object-cover rounded-lg border border-slate-200 shadow-sm';
+                    previewContainer.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            });
+        } else {
+            uploadPlaceholder.classList.remove('hidden');
+            previewContainer.classList.add('hidden');
+        }
+    }
+</script>
 @endsection

@@ -15,19 +15,15 @@ class HomeController extends Controller
         $terverifikasi = Laporan::where('status', 'Terverifikasi')->count();
         $dalamProses = Laporan::whereIn('status', ['Diproses', 'Ditindaklanjuti'])->count();
 
-        // Trending Incidents (di sini kita simulasikan dengan mengambil laporan urgensi tinggi terbaru)
+        // Trending Incidents (berdasarkan upvotes terbanyak)
         $trendingIncidents = Laporan::with('kategori')->where('urgensi', 'Tinggi')
-                                    ->orderBy('created_at', 'desc')
+                                    ->withCount(['upvotes', 'komentars'])
+                                    ->orderBy('upvotes_count', 'desc')
                                     ->take(3)
-                                    ->get()
-                                    ->map(function($laporan) {
-                                        // Fake trending count for UI purposes
-                                        $laporan->trending_count = rand(10, 50);
-                                        return $laporan;
-                                    });
+                                    ->get();
 
         // Laporan Publik Terbaru
-        $laporanTerbaru = Laporan::with('kategori')->orderBy('created_at', 'desc')
+        $laporanTerbaru = Laporan::with('kategori')->withCount(['upvotes', 'komentars'])->orderBy('created_at', 'desc')
                                  ->take(3)
                                  ->get();
 

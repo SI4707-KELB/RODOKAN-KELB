@@ -15,16 +15,16 @@
     @include('layouts.filter')
 
     @if($laporans->count() > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="flex flex-col gap-5">
             @foreach($laporans as $laporan)
-                <a href="{{ route('laporan.show', $laporan->id) }}" class="group bg-white border border-slate-200/60 rounded-2xl overflow-hidden hover:shadow-xl hover:border-blue-200 transition-all duration-300 flex flex-col h-full">
+                <a href="{{ route('laporan.show', $laporan->id) }}" class="group bg-white border border-slate-200/60 rounded-2xl overflow-hidden hover:shadow-xl hover:border-blue-200 transition-all duration-300 flex flex-col md:flex-row items-stretch">
                     
                     <!-- Card Image -->
-                    <div class="h-40 bg-gradient-to-br from-slate-100 to-slate-50 relative overflow-hidden shrink-0">
+                    <div class="h-56 md:h-auto md:w-72 bg-gradient-to-br from-slate-100 to-slate-50 relative overflow-hidden shrink-0">
                         @if($laporan->foto)
-                            <img src="{{ asset('storage/' . $laporan->foto) }}" alt="Foto Kejadian" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <img src="{{ asset('storage/' . $laporan->foto) }}" alt="Foto Kejadian" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         @else
-                            <div class="w-full h-full flex items-center justify-center text-slate-300 bg-gradient-to-br from-slate-100 to-slate-50">
+                            <div class="absolute inset-0 w-full h-full flex items-center justify-center text-slate-300 bg-gradient-to-br from-slate-100 to-slate-50">
                                 <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             </div>
                         @endif
@@ -50,7 +50,7 @@
                     </div>
 
                     <!-- Card Content -->
-                    <div class="p-5 flex flex-col flex-1">
+                    <div class="p-6 flex flex-col flex-1 justify-center">
                         <!-- Category & Time -->
                         <div class="flex items-center gap-2 mb-3">
                             <span class="px-2.5 py-0.5 bg-red-50 text-red-600 text-[10px] font-bold rounded-lg">
@@ -62,12 +62,12 @@
                         </div>
                         
                         <!-- Title -->
-                        <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
+                        <h3 class="text-lg font-bold text-slate-800 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
                             {{ $laporan->judul_laporan }}
                         </h3>
 
                         <!-- Description -->
-                        <p class="text-xs text-slate-600 mb-4 line-clamp-2 flex-1">
+                        <p class="text-sm text-slate-600 mb-5 line-clamp-3 flex-1">
                             {{ $laporan->deskripsi }}
                         </p>
                         
