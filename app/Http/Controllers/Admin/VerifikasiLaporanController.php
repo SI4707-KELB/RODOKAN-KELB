@@ -48,7 +48,7 @@ class VerifikasiLaporanController extends Controller
         // Fetch reports based on tab (filter)
         $tab = $request->query('tab', 'menunggu'); // menunggu, terverifikasi, ditolak
 
-        $query = Laporan::with(['user', 'admin'])->orderBy('created_at', 'desc');
+        $query = Laporan::with(['user', 'admin'])->withCount(['upvotes', 'komentars'])->orderBy('created_at', 'desc');
 
         if ($tab === 'menunggu') {
             $query->where('status', 'Menunggu');
@@ -62,7 +62,7 @@ class VerifikasiLaporanController extends Controller
 
         $laporans->getCollection()->transform(function ($laporan) {
             $catClass = 'badge-category';
-            $catName = $laporan->kategori ?? 'Umum';
+            $catName = $laporan->kategori->nama ?? 'Umum';
             
             if (stripos($catName, 'Infrastruktur') !== false) $catClass .= ' infrastruktur';
             elseif (stripos($catName, 'Bencana') !== false) $catClass .= ' bencana';
@@ -81,10 +81,10 @@ class VerifikasiLaporanController extends Controller
             }
             $laporan->borderClass = $borderClass;
 
-            // Mock stats
-            $laporan->upvotes = rand(10, 200);
-            $laporan->comments = rand(0, 50);
-            $laporan->views = rand(100, 1000);
+            // Real stats from database
+            $laporan->upvotes = $laporan->upvotes_count ?? 0;
+            $laporan->comments = $laporan->komentars_count ?? 0;
+            $laporan->views = 0; // Views not tracked in db yet
 
             return $laporan;
         });

@@ -202,7 +202,12 @@
             <div class="stat-icon bg-blue-light">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
             </div>
-            <div class="stat-trend trend-up"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg> +12%</div>
+            <div class="stat-trend {{ $trendTotalLaporan >= 0 ? 'trend-up' : 'trend-down' }}">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $trendTotalLaporan >= 0 ? 'M5 10l7-7m0 0l7 7m-7-7v18' : 'M19 14l-7 7m0 0l-7-7m7 7V3' }}"></path>
+                </svg> 
+                {{ $trendTotalLaporan > 0 ? '+' : '' }}{{ $trendTotalLaporan }}%
+            </div>
             <div>
                 <div class="stat-value">{{ $totalLaporanHariIni ?? 0 }}</div>
                 <div class="stat-label">Total Laporan Hari Ini</div>
@@ -212,7 +217,12 @@
             <div class="stat-icon bg-orange-light">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
-            <div class="stat-trend trend-up"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg> +5</div>
+            <div class="stat-trend {{ $trendMenunggu >= 0 ? 'trend-up' : 'trend-down' }}">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $trendMenunggu >= 0 ? 'M5 10l7-7m0 0l7 7m-7-7v18' : 'M19 14l-7 7m0 0l-7-7m7 7V3' }}"></path>
+                </svg> 
+                {{ $trendMenunggu > 0 ? '+' : '' }}{{ $trendMenunggu }}
+            </div>
             <div>
                 <div class="stat-value">{{ $menungguVerifikasi ?? 0 }}</div>
                 <div class="stat-label">Menunggu Verifikasi</div>
@@ -222,7 +232,12 @@
             <div class="stat-icon bg-purple-light">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             </div>
-            <div class="stat-trend trend-down"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg> -3</div>
+            <div class="stat-trend {{ $trendDiproses >= 0 ? 'trend-up' : 'trend-down' }}">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $trendDiproses >= 0 ? 'M5 10l7-7m0 0l7 7m-7-7v18' : 'M19 14l-7 7m0 0l-7-7m7 7V3' }}"></path>
+                </svg> 
+                {{ $trendDiproses > 0 ? '+' : '' }}{{ $trendDiproses }}
+            </div>
             <div>
                 <div class="stat-value">{{ $sedangDiproses ?? 0 }}</div>
                 <div class="stat-label">Sedang Diproses</div>
@@ -232,7 +247,12 @@
             <div class="stat-icon bg-blue-light">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
-            <div class="stat-trend trend-up"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg> +8</div>
+            <div class="stat-trend {{ $trendDitindaklanjuti >= 0 ? 'trend-up' : 'trend-down' }}">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $trendDitindaklanjuti >= 0 ? 'M5 10l7-7m0 0l7 7m-7-7v18' : 'M19 14l-7 7m0 0l-7-7m7 7V3' }}"></path>
+                </svg> 
+                {{ $trendDitindaklanjuti > 0 ? '+' : '' }}{{ $trendDitindaklanjuti }}
+            </div>
             <div>
                 <div class="stat-value">{{ $ditindaklanjuti ?? 0 }}</div>
                 <div class="stat-label">Ditindaklanjuti</div>
@@ -242,7 +262,12 @@
             <div class="stat-icon bg-green-light">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             </div>
-            <div class="stat-trend trend-up"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg> +15</div>
+            <div class="stat-trend {{ $trendSelesai >= 0 ? 'trend-up' : 'trend-down' }}">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $trendSelesai >= 0 ? 'M5 10l7-7m0 0l7 7m-7-7v18' : 'M19 14l-7 7m0 0l-7-7m7 7V3' }}"></path>
+                </svg> 
+                {{ $trendSelesai > 0 ? '+' : '' }}{{ $trendSelesai }}
+            </div>
             <div>
                 <div class="stat-value">{{ $selesai ?? 0 }}</div>
                 <div class="stat-label">Selesai</div>
@@ -252,7 +277,12 @@
             <div class="stat-icon bg-red-light">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
             </div>
-            <div class="stat-trend trend-up"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg> +1</div>
+            <div class="stat-trend {{ $trendDarurat >= 0 ? 'trend-up' : 'trend-down' }}">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $trendDarurat >= 0 ? 'M5 10l7-7m0 0l7 7m-7-7v18' : 'M19 14l-7 7m0 0l-7-7m7 7V3' }}"></path>
+                </svg> 
+                {{ $trendDarurat > 0 ? '+' : '' }}{{ $trendDarurat }}
+            </div>
             <div>
                 <div class="stat-value" style="color: #ef4444;">{{ $laporanDarurat ?? 0 }}</div>
                 <div class="stat-label">Laporan Darurat</div>
