@@ -71,4 +71,9 @@ class Laporan extends Model
     {
         return $this->hasMany(LaporanEvidence::class);
     }
+
+    public function validasi()
+    {
+        return $this->hasOne(ValidasiLaporan::class);
+    }
 }

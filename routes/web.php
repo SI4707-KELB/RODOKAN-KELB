@@ -49,6 +49,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/{id}', [VerifikasiLaporanController::class, 'show'])->name('verifikasi.show');
             Route::post('/{id}/verifikasi', [VerifikasiLaporanController::class, 'verifikasi'])->name('verifikasi.terima');
             Route::post('/{id}/tolak', [VerifikasiLaporanController::class, 'tolak'])->name('verifikasi.tolak');
+            Route::get('/{id}/validasi', [VerifikasiLaporanController::class, 'getValidasi'])->name('verifikasi.getValidasi');
+            Route::post('/{id}/validasi/update', [VerifikasiLaporanController::class, 'updateValidasi'])->name('verifikasi.updateValidasi');
         });
     });
 });
