@@ -29,51 +29,42 @@
     <!-- Fixed Checklist Sidebar - Using portal-like fixed element -->
     <div class="verification-checklist-fixed bg-white rounded-2xl border border-slate-200/60 p-6 shadow-lg overflow-y-auto">
         <h3 class="text-lg font-bold text-slate-800 mb-4">Checklist Verifikasi</h3>
-        
-        <form class="space-y-3">
-            <label class="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                <span class="text-sm text-slate-700">Deskripsi laporan jelas dan lengkap</span>
-            </label>
-            
-            <label class="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                <span class="text-sm text-slate-700">Foto bukti tersedia</span>
-            </label>
-            
-            <label class="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                <span class="text-sm text-slate-700">Lokasi GPS tersedia</span>
-            </label>
-            
-            <label class="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                <span class="text-sm text-slate-700">Lokasi berada di Kota Bandung</span>
-            </label>
-            
-            <label class="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                <span class="text-sm text-slate-700">Kategori sesuai klasifikasi</span>
-            </label>
-            
-            <label class="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                <span class="text-sm text-slate-700">Tidak ada duplikasi laporan</span>
-            </label>
-            
-            <label class="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                <span class="text-sm text-slate-700">Bukti foto relevan dengan laporan</span>
-            </label>
-            
-            <label class="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                <span class="text-sm text-slate-700">Tingkat urgensi sesuai kondisi</span>
-            </label>
+
+        @php
+            $validasi = $laporan->validasi;
+            $items = $validasi ? $validasi->getValidationItems() : [];
+            $passed = $validasi ? $validasi->total_passed : 0;
+            $total = count($items);
+        @endphp
+
+        <form id="validationForm" class="space-y-3">
+            @foreach($items as $key => $label)
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        class="validation-check w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        data-field="{{ $key }}"
+                        {{ $validasi && $validasi->$key ? 'checked' : '' }}
+                    >
+                    <span class="text-sm text-slate-700">{{ $label }}</span>
+                </label>
+            @endforeach
 
             <div class="pt-2 pb-2 text-xs text-slate-600 border-t border-slate-100">
-                <span class="font-semibold">1/8</span> Item terverifikasi
+                <span class="font-semibold">
+                    <span id="passedCount">{{ $passed ?? 0 }}</span>/{{ $total }}
+                </span> Item terverifikasi
             </div>
+
+            @if($validasi && $validasi->status_validasi !== 'draft')
+                <div class="pt-2 text-xs text-slate-500 border-t border-slate-100">
+                    <strong>Progress:</strong><br>
+                    <div class="w-full bg-slate-200 rounded-full h-2 mt-2">
+                        <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all" style="width: {{ ($passed/$total)*100 }}%"></div>
+                    </div>
+                    <span id="progressText" class="text-xs">{{ round(($passed/$total)*100) }}% Lengkap</span>
+                </div>
+            @endif
         </form>
 
         <!-- Action Buttons inside Fixed Card -->
@@ -82,7 +73,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 Setujui
             </button>
-            
+
             <button onclick="showRejectModal({{ $laporan->id }})" class="w-full px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 text-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 Tolak Laporan
@@ -368,30 +359,77 @@
 let currentReportId = null;
 let currentAction = null;
 
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.validation-check');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateValidationStatus);
+    });
+});
+
+function updateValidationStatus() {
+    const checkboxes = document.querySelectorAll('.validation-check:checked');
+    const passedCount = checkboxes.length;
+    const total = document.querySelectorAll('.validation-check').length;
+
+    document.getElementById('passedCount').textContent = passedCount;
+
+    const percentage = (passedCount / total) * 100;
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+
+    if (progressBar) {
+        progressBar.style.width = percentage + '%';
+    }
+    if (progressText) {
+        progressText.textContent = Math.round(percentage) + '% Lengkap';
+    }
+
+    saveValidationData();
+}
+
+function saveValidationData() {
+    const reportId = {{ $laporan->id }};
+    const formData = {};
+
+    document.querySelectorAll('.validation-check').forEach(checkbox => {
+        formData[checkbox.dataset.field] = checkbox.checked;
+    });
+
+    fetch(`/verifikasi/${reportId}/validasi/update`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        },
+        body: JSON.stringify(formData)
+    })
+    .catch(error => console.error('Validation save error:', error));
+}
+
 function showVerifyModal(id) {
     currentReportId = id;
     currentAction = 'verify';
-    
+
     document.getElementById('modalTitle').textContent = 'Konfirmasi Verifikasi';
     document.getElementById('modalMessage').textContent = 'Apakah Anda yakin ingin memverifikasi laporan ini?';
     document.getElementById('rejectReasonContainer').classList.add('hidden');
     document.getElementById('confirmBtn').className = 'flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors';
     document.getElementById('confirmBtn').textContent = 'Verifikasi';
-    
+
     document.getElementById('confirmModal').classList.remove('hidden');
 }
 
 function showRejectModal(id) {
     currentReportId = id;
     currentAction = 'reject';
-    
+
     document.getElementById('modalTitle').textContent = 'Tolak Laporan';
     document.getElementById('modalMessage').textContent = 'Apakah Anda yakin ingin menolak laporan ini?';
     document.getElementById('rejectReasonContainer').classList.remove('hidden');
     document.getElementById('rejectReason').value = '';
     document.getElementById('confirmBtn').className = 'flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors';
     document.getElementById('confirmBtn').textContent = 'Tolak';
-    
+
     document.getElementById('confirmModal').classList.remove('hidden');
 }
 
@@ -476,7 +514,7 @@ function rejectReport(id, reason) {
     .then(data => {
         if (data.status === 'success') {
             closeModal();
-            showResultModal('error', 'Berhasil!', 'Laporan berhasil ditolak');
+            showResultModal('success', 'Berhasil!', 'Laporan berhasil ditolak');
         } else {
             closeModal();
             showResultModal('error', 'Gagal', data.message || 'Terjadi kesalahan');
@@ -497,7 +535,7 @@ function showResultModal(type, title, message) {
     const icon = document.getElementById('resultIcon');
     const titleEl = document.getElementById('resultTitle');
     const messageEl = document.getElementById('resultMessage');
-    
+
     if (type === 'success') {
         icon.className = 'w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5';
         icon.innerHTML = '<svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
@@ -505,10 +543,10 @@ function showResultModal(type, title, message) {
         icon.className = 'w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-5';
         icon.innerHTML = '<svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
     }
-    
+
     titleEl.textContent = title;
     messageEl.textContent = message;
-    
+
     document.getElementById('resultModal').classList.remove('hidden');
 }
 </script>

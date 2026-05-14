@@ -5,19 +5,24 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Laporan;
+use App\Models\ValidasiLaporan;
+use App\Services\ValidasiLaporanService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class VerifikasiLaporanController extends Controller
 {
-    /**
-     * Get data for verification page.
-     */
+    protected $validasiService;
+
+    public function __construct(ValidasiLaporanService $validasiService)
+    {
+        $this->validasiService = $validasiService;
+    }
+
     public function index(Request $request)
     {
         $today = Carbon::today();
 
-        // Stats
         $menungguVerifikasi = Laporan::where('status', 'Menunggu')->count();
         $terverifikasiHariIni = Laporan::whereIn('status', ['Terverifikasi', 'Diproses', 'Selesai'])
             ->whereDate('waktu_verifikasi', $today)
@@ -30,7 +35,7 @@ class VerifikasiLaporanController extends Controller
             ->orderBy('waktu_verifikasi', 'desc')
             ->take(100)
             ->get();
-        
+
         $totalHours = 0;
         $count = 0;
         foreach($recentVerifications as $laporan) {
@@ -40,15 +45,13 @@ class VerifikasiLaporanController extends Controller
         }
         $rataRataWaktu = $count > 0 ? round($totalHours / $count, 1) : 0;
 
-        // Calculate totals for tabs
         $totalMenunggu = $menungguVerifikasi;
         $totalTerverifikasi = Laporan::whereIn('status', ['Terverifikasi', 'Diproses', 'Selesai'])->count();
         $totalDitolak = Laporan::where('status', 'Ditolak')->count();
 
-        // Fetch reports based on tab (filter)
-        $tab = $request->query('tab', 'menunggu'); // menunggu, terverifikasi, ditolak
+        $tab = $request->query('tab', 'menunggu');
 
-        $query = Laporan::with(['user', 'admin'])->withCount(['upvotes', 'komentars'])->orderBy('created_at', 'desc');
+        $query = Laporan::with(['user', 'admin', 'validasi'])->withCount(['upvotes', 'komentars'])->orderBy('created_at', 'desc');
 
         if ($tab === 'menunggu') {
             $query->where('status', 'Menunggu');
@@ -63,7 +66,7 @@ class VerifikasiLaporanController extends Controller
         $laporans->getCollection()->transform(function ($laporan) {
             $catClass = 'badge-category';
             $catName = $laporan->kategori->nama ?? 'Umum';
-            
+
             if (stripos($catName, 'Infrastruktur') !== false) $catClass .= ' infrastruktur';
             elseif (stripos($catName, 'Bencana') !== false) $catClass .= ' bencana';
             elseif (stripos($catName, 'Pelayanan') !== false) $catClass .= ' pelayanan';
@@ -72,7 +75,7 @@ class VerifikasiLaporanController extends Controller
             $laporan->catName = $catName;
 
             $laporan->urgencyClass = 'badge-urgency ' . strtolower($laporan->urgensi ?? 'low');
-            
+
             $borderClass = 'border-menunggu';
             if (in_array($laporan->status, ['Terverifikasi', 'Diproses', 'Selesai'])) {
                 $borderClass = 'border-terverifikasi';
@@ -81,10 +84,13 @@ class VerifikasiLaporanController extends Controller
             }
             $laporan->borderClass = $borderClass;
 
-            // Real stats from database
             $laporan->upvotes = $laporan->upvotes_count ?? 0;
             $laporan->comments = $laporan->komentars_count ?? 0;
-            $laporan->views = 0; // Views not tracked in db yet
+            $laporan->views = 0;
+
+            if ($laporan->validasi) {
+                $laporan->validasi_percentage = $laporan->validasi->getProgressPercentage();
+            }
 
             return $laporan;
         });
@@ -102,25 +108,78 @@ class VerifikasiLaporanController extends Controller
         ));
     }
 
-    /**
-     * Show detail verification page for a report
-     */
     public function show($id)
     {
-        $laporan = Laporan::with(['kategori', 'user', 'statusHistories', 'komentars', 'upvotes', 'evidences'])
+        $laporan = Laporan::with(['kategori', 'user', 'statusHistories', 'komentars', 'upvotes', 'evidences', 'validasi'])
             ->findOrFail($id);
 
-        return view('admin.verifikasi.show', compact('laporan'));
+        if (!$laporan->validasi) {
+            $validasi = $this->validasiService->performAutoValidation($laporan);
+            $validasi->save();
+            $laporan->validasi = $validasi;
+        }
+
+        $validasiReport = $this->validasiService->getValidationReport($laporan);
+
+        return view('admin.verifikasi.show', compact('laporan', 'validasiReport'));
     }
 
-    /**
-     * Verify a report
-     */
+    public function getValidasi($id)
+    {
+        $laporan = Laporan::with('validasi')->findOrFail($id);
+
+        if (!$laporan->validasi) {
+            $validasi = $this->validasiService->performAutoValidation($laporan);
+            $validasi->save();
+            $laporan->validasi = $validasi;
+        }
+
+        $report = $this->validasiService->getValidationReport($laporan);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'validasi' => $laporan->validasi,
+                'report' => $report,
+            ]
+        ]);
+    }
+
+    public function updateValidasi(Request $request, $id)
+    {
+        $request->validate([
+            'deskripsi_lengkap' => 'boolean',
+            'foto_tersedia' => 'boolean',
+            'lokasi_gps' => 'boolean',
+            'lokasi_bandung' => 'boolean',
+            'kategori_sesuai' => 'boolean',
+            'tidak_duplikasi' => 'boolean',
+            'foto_relevan' => 'boolean',
+            'urgensi_sesuai' => 'boolean',
+        ]);
+
+        $laporan = Laporan::findOrFail($id);
+
+        if (!$laporan->validasi) {
+            $validasi = $this->validasiService->performAutoValidation($laporan);
+            $validasi->save();
+        } else {
+            $validasi = $laporan->validasi;
+        }
+
+        $this->validasiService->updateValidasiManual($validasi, $request->all());
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $this->validasiService->getValidationReport($laporan),
+        ]);
+    }
+
     public function verifikasi(Request $request, $id)
     {
         $request->validate([
             'catatan_verifikasi' => 'nullable|string',
-            'admin_id' => 'required|exists:users,id', // or get from auth()->id() if authentication is implemented
+            'admin_id' => 'required|exists:users,id',
         ]);
 
         $laporan = Laporan::findOrFail($id);
@@ -146,14 +205,11 @@ class VerifikasiLaporanController extends Controller
         ]);
     }
 
-    /**
-     * Reject a report
-     */
     public function tolak(Request $request, $id)
     {
         $request->validate([
             'alasan_penolakan' => 'required|string',
-            'admin_id' => 'required|exists:users,id', // or get from auth()->id()
+            'admin_id' => 'required|exists:users,id',
         ]);
 
         $laporan = Laporan::findOrFail($id);
@@ -179,3 +235,4 @@ class VerifikasiLaporanController extends Controller
         ]);
     }
 }
+
