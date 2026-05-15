@@ -1,3 +1,4 @@
+@import 'leaflet/dist/leaflet.css';
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -8,4 +9,32 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+#laporan-map {
+    background: #eff6ff;
+}
+
+#laporan-map .leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    box-shadow: 0 18px 45px rgb(15 23 42 / 18%);
+}
+
+#laporan-map .leaflet-popup-content {
+    margin: 12px 14px;
+    color: #334155;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.4;
+}
+
+.laporan-map-popup__title {
+    color: #111827;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.laporan-map-popup__meta {
+    color: #64748b;
+    font-size: 11px;
 }
