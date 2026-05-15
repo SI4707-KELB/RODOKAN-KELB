@@ -128,6 +128,17 @@
 
                 <!-- Peta Sebaran Laporan -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    @php
+                        $mapReports = $laporanMap->map(fn ($laporan) => [
+                            'title' => $laporan->judul_laporan,
+                            'category' => $laporan->kategori->nama ?? 'Lainnya',
+                            'status' => $laporan->status,
+                            'urgency' => $laporan->urgensi,
+                            'district' => $laporan->kecamatan,
+                            'lat' => (float) $laporan->latitude,
+                            'lng' => (float) $laporan->longitude,
+                        ])->values();
+                    @endphp
                     <div class="flex justify-between items-center mb-4">
                         <div class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-2">
                             LIVE STATUS
@@ -135,32 +146,12 @@
                         </div>
                     </div>
                     
-                    <!-- Map Placeholder -->
-                    <div class="bg-blue-50 rounded-xl h-64 w-full relative mb-6 border border-blue-100 overflow-hidden flex items-center justify-center">
-                        <svg class="absolute inset-0 w-full h-full text-blue-200 opacity-50" viewBox="0 0 100 100" preserveAspectRatio="none">
-                            <path d="M10,50 Q30,20 50,50 T90,50" stroke="currentColor" stroke-width="2" fill="none"></path>
-                            <path d="M20,70 Q40,40 60,70 T80,30" stroke="currentColor" stroke-width="1" fill="none"></path>
-                        </svg>
-                        
-                        <!-- Map abstract shape -->
-                        <div class="absolute w-3/4 h-3/4 border-2 border-blue-400 rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-60"></div>
-                        
-                        <!-- Dots -->
-                        <div class="absolute top-1/4 left-1/4 w-3 h-3 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.8)]"></div>
-                        <div class="absolute top-1/3 right-1/3 w-3 h-3 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.8)] animate-pulse"></div>
-                        <div class="absolute bottom-1/3 left-1/3 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
-                        <div class="absolute top-1/2 left-1/2 w-2.5 h-2.5 bg-yellow-500 rounded-full shadow-[0_0_10px_rgba(234,179,8,0.8)]"></div>
-                        <div class="absolute bottom-1/4 right-1/4 w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.8)]"></div>
-                        <div class="absolute top-1/4 right-1/4 w-2 h-2 bg-purple-500 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)]"></div>
-                        <div class="absolute top-1/2 right-1/3 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
-
-                        <!-- Controls -->
-                        <div class="absolute right-3 top-3 flex flex-col gap-2">
-                            <button class="bg-white p-1.5 rounded shadow-sm text-gray-600 hover:text-gray-900"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
-                            <button class="bg-white p-1.5 rounded shadow-sm text-gray-600 hover:text-gray-900"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
-                            <button class="bg-white p-1.5 rounded shadow-sm text-gray-600 hover:text-gray-900"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></button>
-                        </div>
-                    </div>
+                    <div
+                        id="laporan-map"
+                        class="rounded-xl h-64 w-full mb-6 border border-blue-100 overflow-hidden"
+                        data-reports="{{ $mapReports->toJson(JSON_HEX_APOS | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) }}"
+                        aria-label="Peta Sebaran Laporan Kota Bandung"
+                    ></div>
 
                     <h4 class="font-semibold text-gray-800 text-sm mb-1">Peta Sebaran Laporan</h4>
                     <p class="text-xs text-gray-400 mb-4">Kota Bandung, Jawa Barat</p>

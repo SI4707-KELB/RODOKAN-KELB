@@ -27,8 +27,9 @@ class HomeController extends Controller
                                  ->take(3)
                                  ->get();
 
-        // Peta Sebaran (contoh data marker)
-        $laporanMap = Laporan::whereNotNull('latitude')
+        // Peta Sebaran
+        $laporanMap = Laporan::with('kategori')
+                             ->whereNotNull('latitude')
                              ->whereNotNull('longitude')
                              ->get();
 
