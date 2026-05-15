@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RODOKAN - Dashboard Publik</title>
-
+    
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    
     <!-- Tailwind CSS (via Vite) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -50,7 +50,7 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
+        
         <!-- Emergency Alert -->
         <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start gap-4 shadow-sm">
             <div class="text-red-500 mt-0.5">
@@ -79,10 +79,10 @@
 
         <!-- Dashboard Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
+            
             <!-- Left Column (Span 7) -->
             <div class="lg:col-span-7 space-y-6">
-
+                
                 <!-- Filter & Pencarian -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
                     <h3 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -145,7 +145,7 @@
                             <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                         </div>
                     </div>
-
+                    
                     <div
                         id="laporan-map"
                         class="rounded-xl h-64 w-full mb-6 border border-blue-100 overflow-hidden"
@@ -155,7 +155,7 @@
 
                     <h4 class="font-semibold text-gray-800 text-sm mb-1">Peta Sebaran Laporan</h4>
                     <p class="text-xs text-gray-400 mb-4">Kota Bandung, Jawa Barat</p>
-
+                    
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-2 text-xs text-gray-600">
                         <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Bencana Alam</div>
                         <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Infrastruktur</div>
@@ -171,7 +171,7 @@
                     <h3 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                         <span class="text-orange-500">🔥</span> Trending Incidents
                     </h3>
-
+                    
                     <div class="space-y-3">
                         @foreach($trendingIncidents as $laporan)
                         <div class="flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-gray-50/50 border-l-4 {{ $laporan->kategori->nama == 'Bencana' ? 'border-l-red-500' : ($laporan->kategori->nama == 'Infrastruktur' ? 'border-l-blue-500' : 'border-l-orange-500') }}">
@@ -188,7 +188,7 @@
                         </div>
                         @endforeach
                     </div>
-
+                    
                     <a href="#" class="block text-center mt-4 text-xs font-medium text-blue-600 hover:text-blue-800">Lihat Semua Trending &gt;</a>
                 </div>
 
@@ -196,7 +196,7 @@
 
             <!-- Right Column (Span 5) -->
             <div class="lg:col-span-5 space-y-6">
-
+                
                 <!-- Stats Grid -->
                 <div class="grid grid-cols-2 gap-4">
                     <!-- Stat 1 -->
@@ -210,7 +210,7 @@
                         <h2 class="text-3xl font-bold text-gray-900 mb-1">{{ $totalLaporan }}</h2>
                         <p class="text-xs text-gray-500">Laporan Masuk</p>
                     </div>
-
+                    
                     <!-- Stat 2 -->
                     <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                         <div class="flex justify-between items-start mb-2">
@@ -221,7 +221,7 @@
                         <h2 class="text-3xl font-bold text-gray-900 mb-1">{{ $responAlert }}</h2>
                         <p class="text-xs text-gray-500">Respon Alert</p>
                     </div>
-
+                    
                     <!-- Stat 3 -->
                     <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                         <div class="flex justify-between items-start mb-2">
@@ -232,7 +232,7 @@
                         <h2 class="text-3xl font-bold text-gray-900 mb-1">{{ $terverifikasi }}</h2>
                         <p class="text-xs text-gray-500">Terverifikasi</p>
                     </div>
-
+                    
                     <!-- Stat 4 -->
                     <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                         <div class="flex justify-between items-start mb-2">
@@ -281,7 +281,7 @@
                                 @else
                                     <span class="bg-green-50 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded">Rendah</span>
                                 @endif
-
+                                
                                 <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded">{{ $laporan->kategori->nama }}</span>
                             </div>
                             <h4 class="font-semibold text-gray-900 text-sm mb-1">{{ $laporan->judul_laporan }}</h4>
@@ -296,7 +296,7 @@
                         </div>
                         @endforeach
                     </div>
-
+                    
                     <a href="#" class="block text-center mt-4 text-xs font-medium text-blue-600 hover:text-blue-800">Lihat Semua Laporan &gt;</a>
                 </div>
 

@@ -2,44 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Laporan;
+use Illuminate\Http\Request;
+
 class HomeController extends Controller
 {
     public function index()
     {
-        $laporanClass = \App\Models\Laporan::class;
-
-        if (!file_exists(app_path('Models/Laporan.php')) || !class_exists($laporanClass)) {
-            return view('welcome', [
-                'totalLaporan' => 0,
-                'responAlert' => 0,
-                'terverifikasi' => 0,
-                'dalamProses' => 0,
-                'trendingIncidents' => collect(),
-                'laporanTerbaru' => collect(),
-                'laporanMap' => collect(),
-            ]);
-        }
-
         // Statistik
-        $totalLaporan = $laporanClass::count();
-        $responAlert = $laporanClass::whereIn('status', ['Darurat'])->orWhere('urgensi', 'Tinggi')->count();
-        $terverifikasi = $laporanClass::where('status', 'Terverifikasi')->count();
-        $dalamProses = $laporanClass::whereIn('status', ['Diproses', 'Ditindaklanjuti'])->count();
+        $totalLaporan = Laporan::count();
+        $responAlert = Laporan::whereIn('status', ['Darurat'])->orWhere('urgensi', 'Tinggi')->count();
+        $terverifikasi = Laporan::where('status', 'Terverifikasi')->count();
+        $dalamProses = Laporan::whereIn('status', ['Diproses', 'Ditindaklanjuti'])->count();
 
         // Trending Incidents (berdasarkan upvotes terbanyak)
-        $trendingIncidents = $laporanClass::with('kategori')->where('urgensi', 'Tinggi')
+        $trendingIncidents = Laporan::with('kategori')->where('urgensi', 'Tinggi')
                                     ->withCount(['upvotes', 'komentars'])
                                     ->orderBy('upvotes_count', 'desc')
                                     ->take(3)
                                     ->get();
 
         // Laporan Publik Terbaru
-        $laporanTerbaru = $laporanClass::with('kategori')->withCount(['upvotes', 'komentars'])->orderBy('created_at', 'desc')
+        $laporanTerbaru = Laporan::with('kategori')->withCount(['upvotes', 'komentars'])->orderBy('created_at', 'desc')
                                  ->take(3)
                                  ->get();
 
         // Peta Sebaran
-        $laporanMap = $laporanClass::with('kategori')
+        $laporanMap = Laporan::with('kategori')
                              ->whereNotNull('latitude')
                              ->whereNotNull('longitude')
                              ->get();
