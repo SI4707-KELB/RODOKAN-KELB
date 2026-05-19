@@ -96,12 +96,75 @@ class LaporanController extends Controller
 
     public function user()
     {
-        $laporans = \App\Models\Laporan::with('kategori')
-            ->where('user_id', auth()->id())
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Data for dropdowns
+        $kategoris = \App\Models\Kategori::all();
+        $lokasis = \App\Models\Laporan::select('kecamatan')
+            ->distinct()
+            ->whereNotNull('kecamatan')
+            ->pluck('kecamatan');
 
-        return view('user.laporan.user', compact('laporans'));
+        // Stats for current user's reports
+        $totalLaporanku = \App\Models\Laporan::where('user_id', auth()->id())->count();
+        $laporanDiproses = \App\Models\Laporan::where('user_id', auth()->id())->where('status', 'Diproses')->count();
+        $laporanDitindaklanjuti = \App\Models\Laporan::where('user_id', auth()->id())->where('status', 'Ditindaklanjuti')->count();
+        $laporanSelesai = \App\Models\Laporan::where('user_id', auth()->id())->where('status', 'Selesai')->count();
+
+        // Start query for user's reports
+        $query = \App\Models\Laporan::with(['kategori', 'upvotes', 'komentars'])
+            ->where('user_id', auth()->id());
+
+        // Filter: Search (Cari judul laporan, lokasi, atau kategori)
+        if (request()->filled('search')) {
+            $search = request('search');
+            $query->where(function($q) use ($search) {
+                $q->where('judul_laporan', 'like', "%{$search}%")
+                  ->orWhere('kecamatan', 'like', "%{$search}%")
+                  ->orWhere('alamat', 'like', "%{$search}%")
+                  ->orWhereHas('kategori', function($qk) use ($search) {
+                      $qk->where('nama', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter: Status Penanganan
+        if (request()->filled('status')) {
+            $query->where('status', request('status'));
+        }
+
+        // Filter: Kategori Keluhan
+        if (request()->filled('kategori')) {
+            $query->where('kategori_id', request('kategori'));
+        }
+
+        // Filter: Lokasi (Kecamatan)
+        if (request()->filled('lokasi')) {
+            $query->where('kecamatan', request('lokasi'));
+        }
+
+        // Filter: Urutkan
+        if (request()->filled('sort')) {
+            if (request('sort') == 'terlama') {
+                $query->orderBy('created_at', 'asc');
+            } elseif (request('sort') == 'terpopuler') {
+                $query->withCount('upvotes')->orderBy('upvotes_count', 'desc');
+            } else {
+                $query->orderBy('created_at', 'desc');
+            }
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $laporans = $query->paginate(10)->withQueryString();
+
+        return view('user.laporan.user', compact(
+            'laporans', 
+            'kategoris', 
+            'lokasis', 
+            'totalLaporanku', 
+            'laporanDiproses', 
+            'laporanDitindaklanjuti', 
+            'laporanSelesai'
+        ));
     }
 
     public function public()
