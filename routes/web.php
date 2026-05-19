@@ -8,6 +8,7 @@ use App\Http\Controllers\User\LaporanController as UserLaporanController;
 use App\Http\Controllers\Admin\VerifikasiLaporanController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\KategoriController as AdminKategoriController;
+use App\Http\Controllers\KomentarController;
 
 // Web Application Routes
 Route::get('/', [HomeController::class, 'index']);
@@ -38,6 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/laporan-saya', [UserLaporanController::class, 'user'])->name('laporan.saya');
     Route::get('/laporan-publik', [UserLaporanController::class, 'public'])->name('laporan.publik');
     Route::get('/laporan/{id}', [UserLaporanController::class, 'show'])->name('laporan.show');
+    Route::post('/laporan/{id}/komentar', [KomentarController::class, 'store'])->name('komentar.store');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

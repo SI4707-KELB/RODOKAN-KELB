@@ -92,7 +92,7 @@ class LaporanController extends Controller
      */
     public function show($id)
     {
-        $laporan = Laporan::with(['user', 'admin', 'kategori'])->findOrFail($id);
+        $laporan = Laporan::with(['user', 'admin', 'kategori', 'komentars.user'])->findOrFail($id);
         $statuses = ['Menunggu', 'Terverifikasi', 'Diproses', 'Ditindaklanjuti', 'Selesai', 'Ditolak'];
 
         return view('admin.laporan.show', compact('laporan', 'statuses'));
@@ -103,7 +103,7 @@ class LaporanController extends Controller
      */
     public function edit($id)
     {
-        $laporan = Laporan::with(['user', 'admin'])->findOrFail($id);
+        $laporan = Laporan::with(['user', 'kategori', 'admin', 'komentars.user'])->findOrFail($id);
         $statuses = ['Menunggu', 'Terverifikasi', 'Diproses', 'Ditindaklanjuti', 'Selesai', 'Ditolak'];
         $admins = User::where('role', 'admin')->get();
 
