@@ -117,6 +117,78 @@
                     </div>
                 </div>
             @endif
+
+            <!-- Komentar & Tanggapan Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom d-flex align-items-center">
+                    <i class="bi bi-chat-left-text me-2"></i>
+                    <h5 class="mb-0">Komentar & Tanggapan ({{ $laporan->komentars->count() }})</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        @forelse($laporan->komentars as $komentar)
+                            @if($komentar->user->role === 'admin')
+                                <!-- Admin/Official Comment -->
+                                <div class="d-flex mb-3 p-3 rounded" style="background-color: #f0f8ff; border-left: 4px solid #0d6efd; border-top: 1px solid #e9ecef; border-right: 1px solid #e9ecef; border-bottom: 1px solid #e9ecef;">
+                                    <div class="flex-shrink-0">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm text-uppercase" style="width: 40px; height: 40px;">
+                                            {{ substr($komentar->user->name, 0, 2) }}
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="d-flex align-items-center mb-1 gap-2">
+                                            <h6 class="mb-0 fw-bold">{{ $komentar->user->name }}</h6>
+                                            <span class="badge bg-primary rounded-pill d-flex align-items-center gap-1 px-2" style="font-size: 0.65rem;">
+                                                <i class="bi bi-check-circle-fill"></i> Official
+                                            </span>
+                                        </div>
+                                        <p class="mb-1 text-dark" style="font-size: 0.9rem;">
+                                            {{ $komentar->isi_komentar }}
+                                        </p>
+                                        <small class="text-muted" style="font-size: 0.75rem;">{{ $komentar->created_at->format('d M Y, H:i') }} WIB</small>
+                                    </div>
+                                </div>
+                            @else
+                                <!-- User Comment -->
+                                <div class="d-flex mb-3 p-3 bg-light rounded border">
+                                    <div class="flex-shrink-0">
+                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold text-uppercase" style="width: 40px; height: 40px;">
+                                            {{ substr($komentar->user->name, 0, 2) }}
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <h6 class="mb-0 fw-bold">{{ $komentar->user->name }}</h6>
+                                        </div>
+                                        <p class="mb-1 text-muted" style="font-size: 0.9rem;">
+                                            {{ $komentar->isi_komentar }}
+                                        </p>
+                                        <small class="text-muted" style="font-size: 0.75rem;">{{ $komentar->created_at->format('d M Y, H:i') }} WIB</small>
+                                    </div>
+                                </div>
+                            @endif
+                        @empty
+                            <div class="text-center py-4">
+                                <p class="text-muted mb-0">Belum ada komentar atau tanggapan.</p>
+                            </div>
+                        @endforelse
+                    </div>
+
+                    <!-- Komentar Input Form -->
+                    <div class="border-top pt-3">
+                        <h6 class="fw-bold mb-3">Tulis Tanggapan</h6>
+                        <form action="{{ route('komentar.store', $laporan->id) }}" method="POST" class="d-flex flex-column flex-sm-row gap-2">
+                            @csrf
+                            <div class="flex-grow-1">
+                                <textarea name="komentar" required rows="3" class="form-control" placeholder="Bagikan informasi atau tanggapan Anda..." style="resize: none;"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center gap-2 px-4 h-auto mt-2 mt-sm-0 align-self-sm-stretch">
+                                <i class="bi bi-send-fill"></i> Kirim
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Right Column -->

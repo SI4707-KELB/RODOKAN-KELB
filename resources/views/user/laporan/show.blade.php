@@ -120,6 +120,76 @@
                 </div>
             </div>
 
+            <!-- Komentar & Tanggapan -->
+            <div class="bg-white border border-slate-200/60 rounded-xl p-6 md:p-8 shadow-sm">
+                <div class="flex items-center gap-2 mb-6">
+                    <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    <h2 class="text-base font-bold text-slate-800">Komentar & Tanggapan ({{ $laporan->komentars->count() }})</h2>
+                </div>
+
+                <div class="space-y-4 mb-8">
+                    @forelse($laporan->komentars as $komentar)
+                        @if($komentar->user->role === 'admin')
+                            <!-- Admin/Official Comment -->
+                            <div class="flex gap-4 p-4 bg-blue-50/50 rounded-xl border-l-4 border-l-blue-500 border-t border-b border-r border-blue-100">
+                                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm uppercase">
+                                    {{ substr($komentar->user->name, 0, 2) }}
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1 gap-1">
+                                        <div class="flex items-center gap-2">
+                                            <h4 class="text-sm font-bold text-slate-800">{{ $komentar->user->name }}</h4>
+                                            <span class="px-2 py-0.5 bg-blue-600 text-white text-[9px] font-bold rounded-full flex items-center gap-1">
+                                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                Official
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-slate-700 leading-relaxed mb-2">
+                                        {{ $komentar->isi_komentar }}
+                                    </p>
+                                    <span class="text-[10px] font-medium text-slate-500">{{ $komentar->created_at->format('d M Y, H:i') }} WIB</span>
+                                </div>
+                            </div>
+                        @else
+                            <!-- User Comment -->
+                            <div class="flex gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <div class="w-10 h-10 rounded-full bg-slate-300 flex items-center justify-center text-slate-600 font-bold text-sm shrink-0 uppercase">
+                                    {{ substr($komentar->user->name, 0, 2) }}
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1 gap-1">
+                                        <h4 class="text-sm font-bold text-slate-800">{{ $komentar->user->name }}</h4>
+                                    </div>
+                                    <p class="text-xs text-slate-600 leading-relaxed mb-2">
+                                        {{ $komentar->isi_komentar }}
+                                    </p>
+                                    <span class="text-[10px] font-medium text-slate-400">{{ $komentar->created_at->format('d M Y, H:i') }} WIB</span>
+                                </div>
+                            </div>
+                        @endif
+                    @empty
+                        <div class="text-center py-6">
+                            <p class="text-sm text-slate-400">Belum ada komentar atau tanggapan.</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                <!-- Komentar Input Form -->
+                <div class="border-t border-slate-100 pt-6">
+                    <h3 class="text-sm font-bold text-slate-800 mb-3">Tulis Tanggapan</h3>
+                    <form action="{{ route('komentar.store', $laporan->id) }}" method="POST" class="flex flex-col sm:flex-row gap-3">
+                        @csrf
+                        <div class="flex-1">
+                            <textarea name="komentar" required rows="3" class="w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none transition-all" placeholder="Bagikan informasi atau tanggapan Anda..."></textarea>
+                        </div>
+                        <button type="submit" class="sm:w-auto h-fit px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                            Kirim
+                        </button>
+                    </form>
+                </div>
+            </div>
 
         </div>
 

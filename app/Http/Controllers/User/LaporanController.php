@@ -80,7 +80,7 @@ class LaporanController extends Controller
 
     public function show($id)
     {
-        $laporan = \App\Models\Laporan::with(['kategori', 'user', 'statusHistories', 'upvotes'])->findOrFail($id);
+        $laporan = \App\Models\Laporan::with(['kategori', 'user', 'statusHistories', 'upvotes', 'komentars.user'])->findOrFail($id);
         
         $upvotesCount = $laporan->upvotes->count();
         
