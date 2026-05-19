@@ -17,7 +17,7 @@
     @if($laporans->count() > 0)
         <div class="flex flex-col gap-5">
             @foreach($laporans as $laporan)
-                <a href="{{ route('laporan.show', $laporan->id) }}" class="group bg-white border border-slate-200/60 rounded-2xl overflow-hidden hover:shadow-xl hover:border-blue-200 transition-all duration-300 flex flex-col md:flex-row items-stretch">
+                <div class="group bg-white border border-slate-200/60 rounded-2xl overflow-hidden hover:shadow-xl hover:border-blue-200 transition-all duration-300 flex flex-col md:flex-row items-stretch">
                     
                     <!-- Card Image -->
                     <div class="h-56 md:h-auto md:w-72 bg-gradient-to-br from-slate-100 to-slate-50 relative overflow-hidden shrink-0">
@@ -63,7 +63,9 @@
                         
                         <!-- Title -->
                         <h3 class="text-lg font-bold text-slate-800 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
-                            {{ $laporan->judul_laporan }}
+                            <a href="{{ route('laporan.show', $laporan->id) }}" class="hover:underline">
+                                {{ $laporan->judul_laporan }}
+                            </a>
                         </h3>
 
                         <!-- Description -->
@@ -79,9 +81,17 @@
                             </div>
                             
                             <!-- Upvotes -->
-                            <div class="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.646 7.23a2 2 0 01-1.789 1.106H9m0 0a2 2 0 100-4m0 4a2 2 0 110-4m0 4V5a2 2 0 114 0"></path></svg>
-                                <span>{{ $laporan->upvotes->count() }}</span>
+                            <div class="flex items-center gap-1 text-[11px] text-slate-500 font-medium z-10">
+                                @php
+                                    $hasUpvoted = auth()->check() && $laporan->upvotes->contains('user_id', auth()->id());
+                                @endphp
+                                <form action="{{ route('laporan.upvote', $laporan->id) }}" method="POST" class="m-0">
+                                    @csrf
+                                    <button type="submit" class="flex items-center gap-1 hover:text-blue-600 {{ $hasUpvoted ? 'text-blue-600 font-bold' : '' }}">
+                                        <svg class="w-3.5 h-3.5" fill="{{ $hasUpvoted ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.646 7.23a2 2 0 01-1.789 1.106H9m0 0a2 2 0 100-4m0 4a2 2 0 110-4m0 4V5a2 2 0 114 0"></path></svg>
+                                        <span>{{ $laporan->upvotes->count() }}</span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
 
@@ -102,7 +112,7 @@
                             </div>
                         @endif
                     </div>
-                </a>
+                </div>
             @endforeach
         </div>
 

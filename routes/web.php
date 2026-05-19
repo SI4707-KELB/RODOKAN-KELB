@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\VerifikasiLaporanController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\KategoriController as AdminKategoriController;
 use App\Http\Controllers\KomentarController;
+use App\Http\Controllers\UpvoteController;
 
 // Web Application Routes
 Route::get('/', [HomeController::class, 'index']);
@@ -36,6 +37,7 @@ Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     Route::get('/laporan/buat', [UserLaporanController::class, 'create'])->name('laporan.create');
     Route::post('/laporan/buat', [UserLaporanController::class, 'store'])->name('laporan.store');
+    Route::post('/laporan/{id}/upvote', [UpvoteController::class, 'toggle'])->name('laporan.upvote');
     Route::get('/laporan-saya', [UserLaporanController::class, 'user'])->name('laporan.saya');
     Route::get('/laporan-publik', [UserLaporanController::class, 'public'])->name('laporan.publik');
     Route::get('/laporan/{id}', [UserLaporanController::class, 'show'])->name('laporan.show');

@@ -16,14 +16,14 @@ class HomeController extends Controller
         $dalamProses = Laporan::whereIn('status', ['Diproses', 'Ditindaklanjuti'])->count();
 
         // Trending Incidents (berdasarkan upvotes terbanyak)
-        $trendingIncidents = Laporan::with('kategori')->where('urgensi', 'Tinggi')
+        $trendingIncidents = Laporan::with(['kategori', 'upvotes'])->where('urgensi', 'Tinggi')
                                     ->withCount(['upvotes', 'komentars'])
                                     ->orderBy('upvotes_count', 'desc')
                                     ->take(3)
                                     ->get();
 
         // Laporan Publik Terbaru
-        $laporanTerbaru = Laporan::with('kategori')->withCount(['upvotes', 'komentars'])->orderBy('created_at', 'desc')
+        $laporanTerbaru = Laporan::with(['kategori', 'upvotes'])->withCount(['upvotes', 'komentars'])->orderBy('created_at', 'desc')
                                  ->take(3)
                                  ->get();
 
