@@ -3,13 +3,43 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Services\DuplicateLaporanService;
 use Illuminate\Http\Request;
 
 class LaporanController extends Controller
 {
+    public function __construct(
+        protected DuplicateLaporanService $duplicateService,
+    ) {}
     public function create()
     {
         return view('user.laporan.create');
+    }
+
+    public function checkDuplicate(Request $request)
+    {
+        $validated = $request->validate([
+            'judul_laporan' => 'nullable|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'kategori' => 'nullable|exists:kategoris,id',
+            'alamat' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+        ]);
+
+        $similar = $this->duplicateService->findSimilar([
+            'judul_laporan' => $validated['judul_laporan'] ?? '',
+            'deskripsi' => $validated['deskripsi'] ?? '',
+            'kategori_id' => $validated['kategori'] ?? null,
+            'alamat' => $validated['alamat'] ?? '',
+            'latitude' => $validated['latitude'] ?? null,
+            'longitude' => $validated['longitude'] ?? null,
+        ]);
+
+        return response()->json([
+            'has_duplicates' => $similar->isNotEmpty(),
+            'duplicates' => $similar,
+        ]);
     }
 
     public function store(Request $request)

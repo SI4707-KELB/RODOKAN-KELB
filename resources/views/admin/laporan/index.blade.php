@@ -9,9 +9,11 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="h3">Manajemen Data Laporan</h1>
-                <a href="{{ route('admin.laporan.export', request()->query()) }}" class="btn btn-info">
-                    <i class="bi bi-download"></i> Export CSV
-                </a>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ route('admin.laporan.export.excel', request()->query()) }}" class="btn btn-success btn-sm">Export Excel</a>
+                    <a href="{{ route('admin.laporan.export.pdf', request()->query()) }}" class="btn btn-danger btn-sm">Export PDF</a>
+                    <a href="{{ route('admin.laporan.export', request()->query()) }}" class="btn btn-info btn-sm">Export CSV</a>
+                </div>
             </div>
         </div>
     </div>

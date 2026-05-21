@@ -15,7 +15,21 @@
                 <p class="text-sm text-slate-500">Sampaikan laporan keluhan secara lengkap agar dapat diproses lebih cepat oleh tim tanggap darurat</p>
             </div>
 
-            <form action="{{ route('laporan.store') }}" method="POST" class="space-y-6" enctype="multipart/form-data">
+            <!-- Duplicate Detection Alert -->
+            <div id="duplicate-alert" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-5">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-sm font-bold text-amber-800 mb-1">Kemungkinan Laporan Duplikat Terdeteksi</h3>
+                        <p class="text-xs text-amber-700 mb-3">Sistem menemukan laporan serupa. Periksa daftar berikut sebelum mengirim.</p>
+                        <ul id="duplicate-list" class="space-y-2"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <form action="{{ route('laporan.store') }}" method="POST" class="space-y-6" enctype="multipart/form-data" id="laporan-form">
                 @csrf
                 
                 <!-- Informasi Dasar -->
@@ -322,6 +336,15 @@
                 </div>
             </div>
 
+            <!-- Duplicate Detection (Sidebar) -->
+            <div id="duplicate-sidebar" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-5">
+                <div class="flex items-center gap-2 mb-3">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <h3 class="text-sm font-bold text-amber-800">Laporan Mirip</h3>
+                </div>
+                <ul id="duplicate-sidebar-list" class="space-y-2 text-[10px]"></ul>
+            </div>
+
             <!-- Tips Laporan Efektif -->
             <div class="bg-blue-50 border border-blue-100 rounded-xl p-5">
                 <div class="flex items-center gap-2 mb-3">
@@ -350,6 +373,79 @@
 </div>
 
 <script>
+    (function() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+        const form = document.getElementById('laporan-form');
+        const duplicateAlert = document.getElementById('duplicate-alert');
+        const duplicateList = document.getElementById('duplicate-list');
+        const duplicateSidebar = document.getElementById('duplicate-sidebar');
+        const duplicateSidebarList = document.getElementById('duplicate-sidebar-list');
+        let debounceTimer = null;
+
+        function renderDuplicates(duplicates) {
+            const html = duplicates.map(d => `
+                <li class="bg-white/80 border border-amber-100 rounded-lg p-3">
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="min-w-0">
+                            <p class="text-xs font-bold text-slate-800 truncate">${d.judul_laporan}</p>
+                            <p class="text-[10px] text-slate-500">${d.kategori} · ${d.alamat} · ${d.status}</p>
+                        </div>
+                        <span class="text-[10px] font-bold text-amber-700 shrink-0">${d.similarity}% mirip</span>
+                    </div>
+                    <a href="${d.url}" target="_blank" class="text-[10px] font-semibold text-blue-600 hover:underline mt-1 inline-block">Lihat laporan</a>
+                </li>
+            `).join('');
+
+            duplicateList.innerHTML = html;
+            duplicateSidebarList.innerHTML = html;
+            duplicateAlert.classList.remove('hidden');
+            duplicateSidebar.classList.remove('hidden');
+        }
+
+        function checkDuplicates() {
+            const judul = form.querySelector('[name="judul_laporan"]')?.value || '';
+            const deskripsi = form.querySelector('[name="deskripsi"]')?.value || '';
+            const kategori = form.querySelector('[name="kategori"]:checked')?.value || '';
+            const alamat = form.querySelector('[name="alamat"]')?.value || '';
+            const latitude = form.querySelector('[name="latitude"]')?.value || '';
+            const longitude = form.querySelector('[name="longitude"]')?.value || '';
+
+            if (judul.length < 5 && deskripsi.length < 20) {
+                duplicateAlert.classList.add('hidden');
+                duplicateSidebar.classList.add('hidden');
+                return;
+            }
+
+            fetch('{{ route('laporan.check-duplicate') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ judul_laporan: judul, deskripsi, kategori, alamat, latitude, longitude }),
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.has_duplicates && data.duplicates.length > 0) {
+                    renderDuplicates(data.duplicates);
+                } else {
+                    duplicateAlert.classList.add('hidden');
+                    duplicateSidebar.classList.add('hidden');
+                }
+            })
+            .catch(() => {});
+        }
+
+        ['input', 'change'].forEach(evt => {
+            form?.addEventListener(evt, (e) => {
+                if (!['judul_laporan', 'deskripsi', 'alamat', 'kategori', 'latitude', 'longitude'].includes(e.target.name)) return;
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(checkDuplicates, 600);
+            });
+        });
+    })();
+
     function previewImages(event) {
         const previewContainer = document.getElementById('preview-container');
         const uploadPlaceholder = document.getElementById('upload-placeholder');

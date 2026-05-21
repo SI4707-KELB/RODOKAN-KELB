@@ -3,15 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Laporan;
 use App\Models\Kategori;
+use App\Models\Laporan;
 use App\Models\User;
+use App\Services\LaporanExportService;
+use App\Services\LaporanStatusService;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
+    public function __construct(
+        protected LaporanStatusService $statusService,
+        protected LaporanExportService $exportService,
+    ) {}
     /**
      * Display a listing of all reports for admin.
      */
@@ -124,12 +130,22 @@ class LaporanController extends Controller
             'admin_id' => 'nullable|exists:users,id',
         ]);
 
-        $oldStatus = $laporan->status;
-        $laporan->update($validated);
+        $extra = collect($validated)->only(['catatan_verifikasi', 'alasan_penolakan', 'admin_id'])->filter()->all();
 
-        // Update waktu_verifikasi if status changed and it's first verification
-        if ($oldStatus === 'Menunggu' && $laporan->status !== 'Menunggu') {
-            $laporan->update(['waktu_verifikasi' => Carbon::now()]);
+        if ($laporan->status === 'Menunggu' && $validated['status'] !== 'Menunggu') {
+            $extra['waktu_verifikasi'] = Carbon::now();
+        }
+
+        if ($laporan->status === $validated['status']) {
+            $laporan->update($validated);
+        } else {
+            $this->statusService->updateStatus(
+                $laporan,
+                $validated['status'],
+                $validated['admin_id'] ?? auth()->id(),
+                $validated['catatan_verifikasi'] ?? $validated['alasan_penolakan'] ?? null,
+                $extra,
+            );
         }
 
         return redirect()->route('admin.laporan.show', $laporan->id)
@@ -159,11 +175,20 @@ class LaporanController extends Controller
             'status' => 'required|in:Menunggu,Terverifikasi,Diproses,Ditindaklanjuti,Selesai,Ditolak',
         ]);
 
-        Laporan::whereIn('id', $validated['ids'])->update([
-            'status' => $validated['status'],
-            'waktu_verifikasi' => Carbon::now(),
-            'admin_id' => auth()->id(),
-        ]);
+        $laporans = Laporan::whereIn('id', $validated['ids'])->get();
+
+        foreach ($laporans as $laporan) {
+            $this->statusService->updateStatus(
+                $laporan,
+                $validated['status'],
+                auth()->id(),
+                null,
+                [
+                    'waktu_verifikasi' => Carbon::now(),
+                    'admin_id' => auth()->id(),
+                ],
+            );
+        }
 
         return redirect()->route('admin.laporan.index')
             ->with('success', 'Laporan berhasil diperbarui secara massal');
@@ -219,44 +244,18 @@ class LaporanController extends Controller
         ]);
     }
 
-    /**
-     * Export reports to CSV.
-     */
     public function export(Request $request)
     {
-        $query = Laporan::with(['user', 'kategori']);
+        return $this->exportService->exportCsv($request);
+    }
 
-        // Apply same filters as index
-        if ($request->filled('status') && $request->status !== 'semua') {
-            $query->where('status', $request->status);
-        }
-        if ($request->filled('kategori')) {
-            $query->where('kategori_id', $request->kategori);
-        }
-        if ($request->filled('kecamatan')) {
-            $query->where('kecamatan', $request->kecamatan);
-        }
+    public function exportExcel(Request $request)
+    {
+        return $this->exportService->exportExcel($request);
+    }
 
-        $laporans = $query->get();
-
-        $csv = "ID,Judul,Pelapor,Email,Kategori,Kecamatan,Status,Urgensi,Tanggal Dibuat,Catatan\n";
-
-        foreach ($laporans as $laporan) {
-            $csv .= "\"{$laporan->id}\"";
-            $csv .= ",\"" . str_replace('"', '""', $laporan->judul_laporan) . "\"";
-            $csv .= ",\"" . str_replace('"', '""', $laporan->user->name ?? '-') . "\"";
-            $csv .= ",\"" . ($laporan->user->email ?? '-') . "\"";
-            $csv .= ",\"" . str_replace('"', '""', $laporan->kategori->nama ?? '-') . "\"";
-            $csv .= ",\"{$laporan->kecamatan}\"";
-            $csv .= ",\"{$laporan->status}\"";
-            $csv .= ",\"{$laporan->urgensi}\"";
-            $csv .= ",\"{$laporan->created_at->format('Y-m-d H:i')}\"";
-            $csv .= ",\"" . str_replace('"', '""', $laporan->catatan_verifikasi ?? '-') . "\"";
-            $csv .= "\n";
-        }
-
-        return response($csv, 200)
-            ->header('Content-Type', 'text/csv')
-            ->header('Content-Disposition', 'attachment; filename="laporan_' . Carbon::now()->format('Y-m-d') . '.csv"');
+    public function exportPdf(Request $request)
+    {
+        return $this->exportService->exportPdf($request);
     }
 }
