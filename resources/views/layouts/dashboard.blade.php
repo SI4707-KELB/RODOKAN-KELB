@@ -89,9 +89,12 @@
                 Statistik
             </a>
             @endif
-            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ $inactiveLink }}">
-                <svg class="w-5 h-5 {{ $inactiveIcon }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+            <a href="{{ route('notifications.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('notifications.*') ? $activeLink : $inactiveLink }}">
+                <svg class="w-5 h-5 {{ request()->routeIs('notifications.*') ? $activeIcon : $inactiveIcon }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                 Notifikasi
+                @if(($unreadNotificationCount ?? 0) > 0)
+                    <span class="ml-auto px-1.5 py-0.5 text-[10px] font-bold rounded-full {{ $isAdmin ? 'bg-white text-blue-800' : 'bg-red-500 text-white' }}">{{ $unreadNotificationCount > 9 ? '9+' : $unreadNotificationCount }}</span>
+                @endif
             </a>
             <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ $inactiveLink }}">
                 <svg class="w-5 h-5 {{ $inactiveIcon }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -125,11 +128,53 @@
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f8fafc] relative">
         <!-- Top Navigation -->
         <header class="h-16 flex items-center justify-end px-8 border-b border-slate-200/60 bg-white/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
-            <button class="relative p-2 text-slate-400 hover:text-slate-600 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-            </button>
+            <div class="relative" id="notification-dropdown">
+                <button type="button" id="notification-toggle" class="relative p-2 text-slate-400 hover:text-slate-600 transition-colors" aria-label="Notifikasi">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    @if(($unreadNotificationCount ?? 0) > 0)
+                        <span class="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-bold bg-red-500 text-white rounded-full border-2 border-white">{{ $unreadNotificationCount > 9 ? '9+' : $unreadNotificationCount }}</span>
+                    @endif
+                </button>
+                <div id="notification-panel" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50">
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50">
+                        <span class="text-sm font-bold text-slate-800">Notifikasi Status Laporan</span>
+                        @if(($unreadNotificationCount ?? 0) > 0)
+                        <form action="{{ route('notifications.read-all') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="text-[10px] font-semibold text-blue-600 hover:text-blue-700">Tandai dibaca</button>
+                        </form>
+                        @endif
+                    </div>
+                    <div class="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                        @forelse($navbarNotifications ?? [] as $notification)
+                            @php $data = $notification->data; @endphp
+                            <a href="{{ $data['url'] ?? route('notifications.index') }}" class="block px-4 py-3 hover:bg-slate-50 transition-colors {{ $notification->read_at ? '' : 'bg-blue-50/40' }}">
+                                <p class="text-xs font-semibold text-slate-800 leading-snug">{{ $data['message'] ?? 'Status laporan diperbarui' }}</p>
+                                <p class="text-[10px] text-slate-500 mt-1">{{ $notification->created_at->diffForHumans() }}</p>
+                            </a>
+                        @empty
+                            <div class="px-4 py-8 text-center text-xs text-slate-400">Belum ada notifikasi</div>
+                        @endforelse
+                    </div>
+                    <a href="{{ route('notifications.index') }}" class="block text-center text-xs font-semibold text-blue-600 py-3 border-t border-slate-100 hover:bg-slate-50">Lihat semua notifikasi</a>
+                </div>
+            </div>
         </header>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const toggle = document.getElementById('notification-toggle');
+                const panel = document.getElementById('notification-panel');
+                const wrapper = document.getElementById('notification-dropdown');
+                if (!toggle || !panel) return;
+                toggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    panel.classList.toggle('hidden');
+                });
+                document.addEventListener('click', (e) => {
+                    if (!wrapper.contains(e.target)) panel.classList.add('hidden');
+                });
+            });
+        </script>
 
         <!-- Content scrollable area -->
         <div class="flex-1 overflow-y-auto overflow-x-hidden">

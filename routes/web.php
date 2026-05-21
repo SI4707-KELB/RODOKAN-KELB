@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\VerifikasiLaporanController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\KategoriController as AdminKategoriController;
 use App\Http\Controllers\KomentarController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UpvoteController;
 
 // Web Application Routes
@@ -45,6 +46,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+
+    Route::post('/laporan/check-duplicate', [UserLaporanController::class, 'checkDuplicate'])->name('laporan.check-duplicate');
+
     // Admin Only Routes within Auth
     Route::middleware('admin')->group(function () {
         // Verifikasi Laporan Routes
@@ -71,7 +78,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         Route::post('/bulk-update', [AdminLaporanController::class, 'bulkUpdate'])->name('admin.laporan.bulk-update');
         Route::get('/stats/data', [AdminLaporanController::class, 'getStats'])->name('admin.laporan.stats');
         Route::get('/export/csv', [AdminLaporanController::class, 'export'])->name('admin.laporan.export');
+        Route::get('/export/excel', [AdminLaporanController::class, 'exportExcel'])->name('admin.laporan.export.excel');
+        Route::get('/export/pdf', [AdminLaporanController::class, 'exportPdf'])->name('admin.laporan.export.pdf');
     });
+
+    Route::get('/export/excel', [AdminLaporanController::class, 'exportExcel'])->name('admin.dashboard.export.excel');
+    Route::get('/export/pdf', [AdminLaporanController::class, 'exportPdf'])->name('admin.dashboard.export.pdf');
+    Route::get('/export/csv', [AdminLaporanController::class, 'export'])->name('admin.dashboard.export.csv');
 
     // Admin Kategori Management
     Route::prefix('kategori')->group(function () {

@@ -6,18 +6,17 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Laporan;
 use App\Models\ValidasiLaporan;
+use App\Services\LaporanStatusService;
 use App\Services\ValidasiLaporanService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class VerifikasiLaporanController extends Controller
 {
-    protected $validasiService;
-
-    public function __construct(ValidasiLaporanService $validasiService)
-    {
-        $this->validasiService = $validasiService;
-    }
+    public function __construct(
+        protected ValidasiLaporanService $validasiService,
+        protected LaporanStatusService $statusService,
+    ) {}
 
     public function index(Request $request)
     {
@@ -191,17 +190,22 @@ class VerifikasiLaporanController extends Controller
             ], 400);
         }
 
-        $laporan->update([
-            'status' => 'Terverifikasi',
-            'catatan_verifikasi' => $request->catatan_verifikasi,
-            'admin_id' => $request->admin_id,
-            'waktu_verifikasi' => Carbon::now(),
-        ]);
+        $laporan = $this->statusService->updateStatus(
+            $laporan,
+            'Terverifikasi',
+            $request->admin_id,
+            $request->catatan_verifikasi,
+            [
+                'catatan_verifikasi' => $request->catatan_verifikasi,
+                'admin_id' => $request->admin_id,
+                'waktu_verifikasi' => Carbon::now(),
+            ],
+        );
 
         return response()->json([
             'status' => 'success',
             'message' => 'Laporan berhasil diverifikasi',
-            'data' => $laporan
+            'data' => $laporan,
         ]);
     }
 
@@ -221,17 +225,22 @@ class VerifikasiLaporanController extends Controller
             ], 400);
         }
 
-        $laporan->update([
-            'status' => 'Ditolak',
-            'alasan_penolakan' => $request->alasan_penolakan,
-            'admin_id' => $request->admin_id,
-            'waktu_verifikasi' => Carbon::now(),
-        ]);
+        $laporan = $this->statusService->updateStatus(
+            $laporan,
+            'Ditolak',
+            $request->admin_id,
+            $request->alasan_penolakan,
+            [
+                'alasan_penolakan' => $request->alasan_penolakan,
+                'admin_id' => $request->admin_id,
+                'waktu_verifikasi' => Carbon::now(),
+            ],
+        );
 
         return response()->json([
             'status' => 'success',
             'message' => 'Laporan berhasil ditolak',
-            'data' => $laporan
+            'data' => $laporan,
         ]);
     }
 }
