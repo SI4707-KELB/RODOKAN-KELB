@@ -1,4 +1,5 @@
 @import 'leaflet/dist/leaflet.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.css';
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -11,20 +12,83 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-#laporan-map {
+#laporan-map,
+#laporan-location-map {
     background: #eff6ff;
 }
 
-#laporan-map .leaflet-popup-content-wrapper {
+#laporan-map .leaflet-popup-content-wrapper,
+#laporan-location-map .leaflet-popup-content-wrapper {
     border-radius: 12px;
     box-shadow: 0 18px 45px rgb(15 23 42 / 18%);
 }
 
-#laporan-map .leaflet-popup-content {
+#laporan-map .leaflet-popup-content,
+#laporan-location-map .leaflet-popup-content {
     margin: 12px 14px;
     color: #334155;
     font-family: Inter, ui-sans-serif, system-ui, sans-serif;
     line-height: 1.4;
+}
+
+.report-marker {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.report-marker__dot {
+    background: var(--marker-color, #3b82f6);
+    border: 3px solid #ffffff;
+    border-radius: 999px;
+    box-shadow: 0 8px 18px rgb(15 23 42 / 28%);
+    display: block;
+    height: 18px;
+    width: 18px;
+}
+
+.report-cluster {
+    align-items: center;
+    background: rgb(37 99 235 / 18%);
+    border-radius: 999px;
+    color: #ffffff;
+    display: flex;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-weight: 800;
+    justify-content: center;
+}
+
+.report-cluster span {
+    align-items: center;
+    background: #2563eb;
+    border: 3px solid #ffffff;
+    border-radius: 999px;
+    box-shadow: 0 14px 30px rgb(37 99 235 / 28%);
+    display: flex;
+    justify-content: center;
+}
+
+.report-cluster--small,
+.report-cluster--small span {
+    font-size: 12px;
+    height: 38px;
+    width: 38px;
+}
+
+.report-cluster--medium,
+.report-cluster--medium span {
+    font-size: 13px;
+    height: 46px;
+    width: 46px;
+}
+
+.report-cluster--large,
+.report-cluster--large span {
+    font-size: 14px;
+    height: 56px;
+    width: 56px;
 }
 
 .laporan-map-popup__title {

@@ -158,23 +158,18 @@
                             <label for="use_current_location" class="ml-2 text-xs font-medium text-slate-700 cursor-pointer">Gunakan lokasi saya saat ini</label>
                         </div>
 
-                        <!-- Map Placeholder -->
-                        <div class="w-full h-48 bg-slate-200 rounded-lg relative overflow-hidden flex items-center justify-center">
-                            <!-- SVG pattern to look like roads -->
-                            <svg class="absolute inset-0 w-full h-full text-slate-300" xmlns="http://www.w3.org/2000/svg">
-                                <defs>
-                                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                                    </pattern>
-                                </defs>
-                                <rect width="100%" height="100%" fill="url(#grid)" />
-                            </svg>
-                            <!-- Pin -->
-                            <div class="relative z-10 text-slate-600 flex flex-col items-center">
-                                <svg class="w-10 h-10 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                                <div class="w-3 h-3 bg-blue-500 border-2 border-white rounded-full absolute top-3"></div>
-                            </div>
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-200/50 to-transparent"></div>
+                        <input type="hidden" id="latitude" name="latitude" value="{{ old('latitude') }}">
+                        <input type="hidden" id="longitude" name="longitude" value="{{ old('longitude') }}">
+
+                        <div
+                            id="laporan-location-map"
+                            class="w-full h-56 rounded-lg border border-slate-200 overflow-hidden"
+                            aria-label="Peta lokasi laporan"
+                        ></div>
+
+                        <div class="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                            <span class="text-[11px] font-semibold text-slate-600">Koordinat terpilih</span>
+                            <span id="selected-coordinate" class="text-[11px] font-bold text-slate-800">Belum dipilih</span>
                         </div>
                     </div>
                 </div>
