@@ -37,7 +37,10 @@ const createBaseMap = (element, options = {}) => {
         maxBounds: L.latLngBounds(BANDUNG_AREA_BOUNDS).pad(0.4),
         maxBoundsViscosity: 0.7,
         scrollWheelZoom: options.scrollWheelZoom ?? false,
-        zoomControl: true,
+        zoomControl: options.zoomControl ?? true,
+        dragging: options.dragging ?? true,
+        doubleClickZoom: options.doubleClickZoom ?? true,
+        touchZoom: options.touchZoom ?? true,
     }).setView(options.center || BANDUNG_AREA_CENTER, options.zoom || 11);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -236,7 +239,43 @@ const initializeReportLocationPicker = () => {
     requestAnimationFrame(() => map.invalidateSize());
 };
 
+const initializeLoginDashboardMap = () => {
+    const element = document.getElementById('login-dashboard-map');
+
+    if (!element || element.dataset.leafletReady === 'true') {
+        return;
+    }
+
+    element.dataset.leafletReady = 'true';
+
+    const map = createBaseMap(element, {
+        center: [-6.9175, 107.6191],
+        zoom: 11,
+        scrollWheelZoom: false,
+        zoomControl: false,
+        dragging: false,
+        doubleClickZoom: false,
+        touchZoom: false,
+    });
+
+    [
+        { title: 'Banjir Gedebage', category: 'Bencana', status: 'Darurat', lat: -6.9574, lng: 107.6986 },
+        { title: 'Jalan rusak', category: 'Infrastruktur', status: 'Diproses', lat: -6.9351, lng: 107.6043 },
+        { title: 'Sampah menumpuk', category: 'Kebersihan', status: 'Terverifikasi', lat: -6.9039, lng: 107.6186 },
+    ].forEach((report) => {
+        L.marker([report.lat, report.lng], {
+            icon: createReportIcon(markerColorFor(report)),
+            title: report.title,
+        })
+            .addTo(map)
+            .bindPopup(popupContentFor(report));
+    });
+
+    requestAnimationFrame(() => map.invalidateSize());
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+    initializeLoginDashboardMap();
     initializeClusterReportMap();
     initializeReportLocationPicker();
 });

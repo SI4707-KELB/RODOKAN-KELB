@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard - RODOKAN')</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('images/logo-favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo-favicon.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
     <!-- Google Fonts: Inter -->
@@ -22,8 +25,7 @@
         $isAdmin = auth()->check() && auth()->user()->role === 'admin';
         $sidebarBg = $isAdmin ? 'bg-blue-800 border-r-0' : 'bg-white border-r border-slate-200';
         $logoText = $isAdmin ? 'text-white' : 'text-slate-800';
-        $logoIconBg = $isAdmin ? 'bg-white' : 'bg-transparent';
-        $logoIconColor = $isAdmin ? 'text-blue-800' : 'text-blue-600';
+        $logoIconBg = 'bg-white';
         $inactiveLink = $isAdmin ? 'text-white/80 hover:bg-white/10' : 'text-slate-600 hover:bg-slate-50';
         $activeLink = $isAdmin ? 'bg-white text-blue-800 font-semibold' : 'bg-blue-50 text-blue-600 font-semibold';
         $inactiveIcon = $isAdmin ? 'text-white/70' : 'text-slate-400';
@@ -35,10 +37,8 @@
         <!-- Logo -->
         <div class="h-20 flex items-center px-6 border-b {{ $isAdmin ? 'border-white/10' : 'border-slate-100' }}">
             <div class="flex items-center gap-3">
-                <div class="{{ $logoIconBg }} w-10 h-10 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6 {{ $logoIconColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
+                <div class="{{ $logoIconBg }} w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
+                    <img src="{{ asset('images/logo-mark.png') }}" alt="Logo RODOKAN" class="w-8 h-8 object-contain">
                 </div>
                 <div class="flex flex-col">
                     <span class="text-[17px] font-extrabold {{ $logoText }} tracking-tight leading-tight">RODOKAN</span>
