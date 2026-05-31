@@ -109,7 +109,7 @@ class VerifikasiLaporanController extends Controller
 
     public function show($id)
     {
-        $laporan = Laporan::with(['kategori', 'user', 'statusHistories', 'komentars', 'upvotes', 'evidences', 'validasi'])
+        $laporan = Laporan::with(['kategori', 'user', 'statusHistories', 'komentars.user', 'upvotes', 'evidences', 'validasi'])
             ->findOrFail($id);
 
         if (!$laporan->validasi) {
@@ -244,4 +244,3 @@ class VerifikasiLaporanController extends Controller
         ]);
     }
 }
-

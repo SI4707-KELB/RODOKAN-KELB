@@ -24,6 +24,8 @@ Route::get('/login', function () {
 })->name('login');
 
 Route::post('/login', [WebAuthController::class, 'login']);
+Route::get('/auth/google', [WebAuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [WebAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 Route::get('/register', function () {
     $hariIni = \App\Models\Laporan::whereDate('created_at', \Carbon\Carbon::today())->count();
