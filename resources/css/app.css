@@ -13,21 +13,30 @@
 }
 
 #laporan-map,
-#laporan-location-map {
+#laporan-location-map,
+#login-dashboard-map {
     background: #eff6ff;
 }
 
 #laporan-map .leaflet-popup-content-wrapper,
-#laporan-location-map .leaflet-popup-content-wrapper {
+#laporan-location-map .leaflet-popup-content-wrapper,
+#login-dashboard-map .leaflet-popup-content-wrapper {
     border-radius: 12px;
     box-shadow: 0 18px 45px rgb(15 23 42 / 18%);
 }
 
 #laporan-map .leaflet-popup-content,
-#laporan-location-map .leaflet-popup-content {
+#laporan-location-map .leaflet-popup-content,
+#login-dashboard-map .leaflet-popup-content {
     margin: 12px 14px;
     color: #334155;
     font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.4;
+}
+
+#login-dashboard-map .leaflet-control-attribution {
+    border-top-left-radius: 8px;
+    font-size: 9px;
     line-height: 1.4;
 }
 

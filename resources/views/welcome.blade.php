@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RODOKAN - Dashboard Publik</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('images/logo-favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo-favicon.png') }}">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,19 +27,17 @@
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
+                    <div class="w-9 h-9 bg-white rounded-lg flex items-center justify-center overflow-hidden border border-blue-100">
+                        <img src="{{ asset('images/logo-mark.png') }}" alt="Logo RODOKAN" class="w-8 h-8 object-contain">
                     </div>
                     <span class="font-bold text-xl tracking-tight text-gray-900">RODOKAN</span>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#" class="text-blue-600 font-medium">Dashboard</a>
-                    <a href="#" class="text-gray-500 hover:text-gray-900 font-medium transition">Laporan</a>
-                    <a href="#" class="text-gray-500 hover:text-gray-900 font-medium transition">Panduan</a>
+                    <a href="#dashboard" class="text-blue-600 font-medium">Dashboard</a>
+                    <a href="#laporan" class="text-gray-500 hover:text-gray-900 font-medium transition">Laporan</a>
+                    <a href="#panduan" class="text-gray-500 hover:text-gray-900 font-medium transition">Panduan</a>
                 </div>
 
                 <!-- Auth Buttons -->
@@ -49,7 +50,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main id="dashboard" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         <!-- Emergency Alert -->
         <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start gap-4 shadow-sm">
@@ -262,7 +263,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                             Laporkan keluhan Sekarang
                         </a>
-                        <a href="#" class="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-blue-600 border border-blue-600 py-3 rounded-lg font-medium transition">
+                        <a href="#panduan" class="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-blue-600 border border-blue-600 py-3 rounded-lg font-medium transition">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                             Lihat Panduan
                         </a>
@@ -315,11 +316,150 @@
                         @endforeach
                     </div>
                     
-                    <a href="#" class="block text-center mt-4 text-xs font-medium text-blue-600 hover:text-blue-800">Lihat Semua Laporan &gt;</a>
+                    <a href="#laporan" class="block text-center mt-4 text-xs font-medium text-blue-600 hover:text-blue-800">Lihat Semua Laporan &gt;</a>
                 </div>
 
             </div>
         </div>
+
+        <!-- Laporan -->
+        <section id="laporan" class="scroll-mt-24 mt-12">
+            <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-6">
+                <div>
+                    <p class="text-sm font-semibold text-blue-600 mb-2">Laporan Publik</p>
+                    <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Pantau laporan masyarakat terbaru</h2>
+                    <p class="text-gray-500 mt-2 max-w-2xl">Lihat keluhan yang masuk, status penanganan, kategori masalah, dan lokasi kejadian di wilayah Jawa Barat.</p>
+                </div>
+                <a href="{{ auth()->check() ? route('laporan.publik') : route('login') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-500/20 hover:bg-blue-700 transition">
+                    Buka Laporan Publik
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-gray-900">Daftar Laporan Terkini</h3>
+                        <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">{{ $totalLaporan }} laporan</span>
+                    </div>
+
+                    <div class="divide-y divide-gray-100">
+                        @forelse($laporanTerbaru->take(4) as $laporan)
+                            <article class="p-5 hover:bg-gray-50 transition">
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                    <div>
+                                        <div class="flex flex-wrap items-center gap-2 mb-2">
+                                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700">{{ $laporan->kategori->nama ?? 'Umum' }}</span>
+                                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $laporan->urgensi == 'Tinggi' ? 'bg-red-50 text-red-700' : ($laporan->urgensi == 'Sedang' ? 'bg-orange-50 text-orange-700' : 'bg-green-50 text-green-700') }}">{{ $laporan->urgensi }}</span>
+                                        </div>
+                                        <h4 class="font-bold text-gray-900">{{ $laporan->judul_laporan }}</h4>
+                                        <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ $laporan->deskripsi }}</p>
+                                    </div>
+                                    <span class="shrink-0 text-xs font-semibold rounded-full px-3 py-1 {{ in_array($laporan->status, ['Selesai', 'Terverifikasi']) ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-700' }}">{{ $laporan->status }}</span>
+                                </div>
+                                <div class="mt-4 flex flex-wrap items-center gap-4 text-xs text-gray-500">
+                                    <span class="flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                        {{ $laporan->kecamatan }}
+                                    </span>
+                                    <span class="flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        {{ \Carbon\Carbon::parse($laporan->created_at)->diffForHumans() }}
+                                    </span>
+                                    <span class="flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.9 9.9 0 01-4.255-.949L3 20l1.395-3.72A7.6 7.6 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                                        {{ $laporan->komentars_count ?? 0 }} komentar
+                                    </span>
+                                </div>
+                            </article>
+                        @empty
+                            <div class="p-8 text-center">
+                                <div class="w-12 h-12 mx-auto rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"></path></svg>
+                                </div>
+                                <p class="font-semibold text-gray-900">Belum ada laporan publik</p>
+                                <p class="text-sm text-gray-500 mt-1">Laporan terbaru akan muncul di sini setelah masyarakat mengirimkan keluhan.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="bg-blue-600 rounded-xl p-6 text-white shadow-sm shadow-blue-500/20">
+                    <h3 class="text-lg font-bold">Ringkasan Penanganan</h3>
+                    <p class="text-sm text-blue-100 mt-2">Data ringkas untuk membantu masyarakat melihat perkembangan laporan secara cepat.</p>
+                    <div class="mt-6 space-y-4">
+                        <div class="flex items-center justify-between border-b border-white/15 pb-3">
+                            <span class="text-sm text-blue-100">Total laporan</span>
+                            <strong class="text-2xl">{{ $totalLaporan }}</strong>
+                        </div>
+                        <div class="flex items-center justify-between border-b border-white/15 pb-3">
+                            <span class="text-sm text-blue-100">Terverifikasi</span>
+                            <strong class="text-2xl">{{ $terverifikasi }}</strong>
+                        </div>
+                        <div class="flex items-center justify-between border-b border-white/15 pb-3">
+                            <span class="text-sm text-blue-100">Dalam proses</span>
+                            <strong class="text-2xl">{{ $dalamProses }}</strong>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-blue-100">Respon alert</span>
+                            <strong class="text-2xl">{{ $responAlert }}</strong>
+                        </div>
+                    </div>
+                    <a href="{{ route('login') }}" class="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-white px-4 py-3 text-sm font-semibold text-blue-700 hover:bg-blue-50 transition">Buat Laporan Baru</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Panduan -->
+        <section id="panduan" class="scroll-mt-24 mt-12 mb-8">
+            <div class="bg-white border border-gray-100 rounded-xl shadow-sm p-6 md:p-8">
+                <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between mb-8">
+                    <div>
+                        <p class="text-sm font-semibold text-blue-600 mb-2">Panduan Pelaporan</p>
+                        <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Cara membuat laporan yang cepat diproses</h2>
+                        <p class="text-gray-500 mt-2 max-w-2xl">Lengkapi laporan dengan informasi yang jelas agar petugas mudah melakukan verifikasi dan tindak lanjut.</p>
+                    </div>
+                    <a href="{{ route('login') }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-blue-600 px-5 py-3 text-sm font-semibold text-blue-600 hover:bg-blue-50 transition">
+                        Mulai Melapor
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
+                        <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-gray-900">Tulis kronologi</h3>
+                        <p class="text-sm text-gray-500 mt-2">Jelaskan masalah, dampak, dan kapan kejadian berlangsung secara singkat.</p>
+                    </div>
+
+                    <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
+                        <div class="w-10 h-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l6-4 6 4 6-4v14l-6 4-6-4-6 4V7z"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-gray-900">Tentukan lokasi</h3>
+                        <p class="text-sm text-gray-500 mt-2">Pilih kecamatan dan alamat sedetail mungkin agar titik laporan akurat.</p>
+                    </div>
+
+                    <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
+                        <div class="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-gray-900">Unggah bukti</h3>
+                        <p class="text-sm text-gray-500 mt-2">Tambahkan foto kejadian yang relevan untuk mempercepat verifikasi.</p>
+                    </div>
+
+                    <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
+                        <div class="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-gray-900">Pilih urgensi</h3>
+                        <p class="text-sm text-gray-500 mt-2">Gunakan urgensi tinggi hanya untuk kondisi yang butuh respon cepat.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
 </body>

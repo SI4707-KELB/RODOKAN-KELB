@@ -43,9 +43,9 @@
         <div class="relative z-10">
             <!-- Logo -->
             <div class="flex items-center gap-2 mb-2">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                </svg>
+                <span class="w-10 h-10 rounded-xl bg-white flex items-center justify-center overflow-hidden">
+                    <img src="{{ asset('images/logo-mark.png') }}" alt="Logo RODOKAN" class="w-8 h-8 object-contain">
+                </span>
                 <span class="text-2xl font-bold tracking-wide">RODOKAN</span>
             </div>
             <p class="text-blue-100 text-sm mb-12">Sistem Pelaporan Keluhan Jawa Barat</p>
@@ -54,18 +54,12 @@
             <div class="bg-blue-500/30 backdrop-blur-sm border border-blue-400/30 rounded-2xl p-6 mb-8 shadow-lg">
                 <h3 class="font-semibold mb-4">Live Dashboard</h3>
                 
-                <!-- Mock Map Area -->
-                <div class="bg-blue-600/50 rounded-xl h-32 mb-4 relative flex items-center justify-center overflow-hidden">
-                    <div class="absolute w-2 h-2 bg-blue-300 rounded-full top-1/4 left-1/4 opacity-70"></div>
-                    <div class="absolute w-3 h-3 bg-blue-200 rounded-full bottom-1/3 right-1/3 opacity-50"></div>
-                    <!-- Pin Icon -->
-                    <svg class="w-8 h-8 text-white absolute" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    <!-- Ripple effect -->
-                    <div class="w-12 h-12 bg-white/20 rounded-full absolute animate-ping opacity-75"></div>
-                </div>
+                <!-- Live Map Area -->
+                <div
+                    id="login-dashboard-map"
+                    class="rounded-xl h-36 mb-4 overflow-hidden border border-white/15 shadow-inner"
+                    aria-label="Peta live dashboard laporan RODOKAN"
+                ></div>
 
                 <!-- Stats Grid -->
                 <div class="grid grid-cols-3 gap-3 text-center">
