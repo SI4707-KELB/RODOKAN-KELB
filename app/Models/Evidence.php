@@ -11,6 +11,8 @@ class Evidence extends Model
 
     protected $guarded = [];
 
+    protected $table = 'evidences';
+
     protected $casts = [
         'created_at' => 'datetime',
     ];

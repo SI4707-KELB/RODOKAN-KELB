@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
 use App\Http\Requests\StoreEvidenceRequest;
 use App\Models\Evidence;
 use App\Models\Laporan;
@@ -11,11 +11,6 @@ use Illuminate\Support\Facades\Storage;
 
 class EvidenceController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function store(StoreEvidenceRequest $request, $laporanId)
     {
         $laporan = Laporan::findOrFail($laporanId);
