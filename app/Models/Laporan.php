@@ -77,6 +77,12 @@ class Laporan extends Model
         return $this->hasMany(LaporanEvidence::class);
     }
 
+    // New evidence layering relation (separate Evidence model)
+    public function evidenceLayers()
+    {
+        return $this->hasMany(\App\Models\Evidence::class, 'report_id');
+    }
+
     public function validasi()
     {
         return $this->hasOne(ValidasiLaporan::class);

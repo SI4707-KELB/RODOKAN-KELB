@@ -45,6 +45,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/laporan-publik', [UserLaporanController::class, 'public'])->name('laporan.publik');
     Route::get('/laporan/{id}', [UserLaporanController::class, 'show'])->name('laporan.show');
     Route::post('/laporan/{id}/komentar', [KomentarController::class, 'store'])->name('komentar.store');
+    Route::post('/laporan/{id}/evidences', [\App\Http\Controllers\User\EvidenceController::class, 'store'])->name('laporan.evidence.store');
+    Route::delete('/laporan/{laporan}/evidences/{evidence}', [\App\Http\Controllers\User\EvidenceController::class, 'destroy'])->name('laporan.evidence.destroy');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

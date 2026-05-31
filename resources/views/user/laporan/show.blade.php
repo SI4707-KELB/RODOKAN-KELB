@@ -82,6 +82,84 @@
                         </div>
                     @endif
                 </div>
+
+                <!-- Evidence Layering -->
+                <div class="mt-6">
+                    <h2 class="text-sm font-bold text-slate-800 mb-3">Bukti Tambahan (Evidence Layering)</h2>
+
+                    <div class="grid grid-cols-1 gap-4">
+                        @if($evidenceLayers->isEmpty())
+                            <div class="text-sm text-slate-600">Belum ada bukti tambahan. Anda dapat menambahkan foto, video, atau dokumen untuk memperkuat laporan ini.</div>
+                        @else
+                            @foreach($evidenceLayers->sortByDesc('created_at') as $evidence)
+                                <div class="bg-white border border-slate-100 rounded-xl p-3 flex items-start gap-3">
+                                    <div class="w-20 h-20 shrink-0 overflow-hidden rounded">
+                                        @php
+                                            $ext = pathinfo($evidence->file_path, PATHINFO_EXTENSION);
+                                        @endphp
+                                        @if(in_array(strtolower($ext), ['jpg','jpeg','png']))
+                                            <img src="{{ asset('storage/' . $evidence->file_path) }}" class="w-full h-full object-cover">
+                                        @elseif(strtolower($ext) === 'mp4')
+                                            <video src="{{ asset('storage/' . $evidence->file_path) }}" class="w-full h-full" controls></video>
+                                        @elseif(strtolower($ext) === 'pdf')
+                                            <div class="w-full h-full flex items-center justify-center text-xs text-slate-500">PDF</div>
+                                        @else
+                                            <div class="w-full h-full flex items-center justify-center text-xs text-slate-500">File</div>
+                                        @endif
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="text-sm font-bold text-slate-800">{{ $evidence->user?->name ?? 'Anonim' }}</div>
+                                                <div class="text-[11px] text-slate-500">{{ ucfirst($evidence->evidence_type) }} • {{ $evidence->created_at->format('d M Y, H:i') }} WIB</div>
+                                            </div>
+                                            <div>
+                                                @if(auth()->check() && (auth()->id() === $evidence->user_id || auth()->user()->role === 'admin'))
+                                                    <form action="{{ route('laporan.evidence.destroy', ['laporan' => $laporan->id, 'evidence' => $evidence->id]) }}" method="POST" onsubmit="return confirm('Hapus bukti ini?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="text-xs text-red-600">Hapus</button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @if($evidence->description)
+                                            <p class="text-sm text-slate-700 mt-2">{{ $evidence->description }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="text-xs font-bold mb-2">Tambah Bukti</h3>
+                        @auth
+                            <form action="{{ route('laporan.evidence.store', $laporan->id) }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="mb-2">
+                                    <label class="form-label">Jenis Bukti</label>
+                                    <select name="evidence_type" class="form-select" required>
+                                        <option value="photo">Foto</option>
+                                        <option value="video">Video</option>
+                                        <option value="document">Dokumen (PDF)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">File Bukti</label>
+                                    <input type="file" name="file" class="form-control" required>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Keterangan (opsional)</label>
+                                    <textarea name="description" rows="2" class="form-control"></textarea>
+                                </div>
+                                <button class="btn btn-primary mt-2">Unggah Bukti</button>
+                            </form>
+                        @else
+                            <div class="text-sm text-slate-600">Silakan <a href="{{ route('login') }}" class="text-blue-600">masuk</a> untuk menambahkan bukti.</div>
+                        @endauth
+                    </div>
+                </div>
             </div>
 
             <!-- Lokasi Kejadian (Map) -->
