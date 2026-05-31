@@ -317,6 +317,49 @@
             </div>
 
             <!-- Laporan Terkait -->
+            
+            <!-- Donasi Laporan -->
+            <div class="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
+                <h3 class="text-sm font-bold text-slate-800 mb-4">Donasi untuk Laporan</h3>
+
+                <div class="space-y-3 mb-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-500">Total Donasi</span>
+                        <span class="text-sm font-bold text-slate-800">Rp {{ number_format($totalDonasi ?? 0, 0, ',', '.') }}</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Dukungan berbentuk dana untuk membantu penanganan atau pemulihan di lokasi kejadian.</p>
+                </div>
+
+                <form action="{{ route('laporan.donasi', $laporan->id) }}" method="POST" class="space-y-3">
+                    @csrf
+                    <div>
+                        <label class="text-[11px] font-medium text-slate-500">Nominal (Rp)</label>
+                        <input name="jumlah" type="number" min="1000" required class="w-full mt-1 border border-slate-200 rounded-lg p-2 text-sm" placeholder="Masukkan nominal, mis. 50000">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-medium text-slate-500">Pesan (opsional)</label>
+                        <textarea name="pesan" rows="2" class="w-full mt-1 border border-slate-200 rounded-lg p-2 text-sm" placeholder="Tinggalkan pesan dukungan..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg">Donasi Sekarang</button>
+                </form>
+
+                @if($laporan->donasis->count() > 0)
+                <div class="border-t border-slate-100 mt-4 pt-4">
+                    <h4 class="text-xs font-bold text-slate-800 mb-2">Donatur Terbaru</h4>
+                    <div class="space-y-3">
+                        @foreach($laporan->donasis->take(3) as $donasi)
+                            <div class="flex justify-between items-center text-xs text-slate-600">
+                                <div>
+                                    <span class="font-medium text-slate-800">{{ $donasi->user?->name ?? 'Anonim' }}</span>
+                                    <div class="text-[11px] text-slate-500">{{ $donasi->created_at->diffForHumans() }}</div>
+                                </div>
+                                <div class="font-bold text-slate-800">Rp {{ number_format($donasi->jumlah, 0, ',', '.') }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+            </div>
             @if($relatedLaporans->count() > 0)
             <div class="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
                 <div class="flex items-center gap-2 mb-4">
