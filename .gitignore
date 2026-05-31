@@ -24,3 +24,6 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+GOOGLE_CLIENT_ID=418984224425-oa7pamrf5bhp6n3egat10a96du77ioev.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=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
+GOOGLE_REDIRECT_URI="${APP_URL}/auth/google/callback"
