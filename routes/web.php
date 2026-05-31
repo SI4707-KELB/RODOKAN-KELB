@@ -51,6 +51,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 
     Route::post('/laporan/check-duplicate', [UserLaporanController::class, 'checkDuplicate'])->name('laporan.check-duplicate');
+    
+    // User Pengaturan
+    Route::get('/pengaturan', [\App\Http\Controllers\User\PengaturanController::class, 'index'])->name('user.pengaturan.index');
 
     // Admin Only Routes within Auth
     Route::middleware('admin')->group(function () {
