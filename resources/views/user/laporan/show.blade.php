@@ -72,7 +72,7 @@
                 <div>
                     <h2 class="text-sm font-bold text-slate-800 mb-3">Bukti Foto</h2>
                     @if($laporan->foto)
-                        <div class="w-full h-80 sm:h-[400px] rounded-xl overflow-hidden bg-slate-100 relative group border border-slate-200">
+                        <div class="w-full h-80 sm:h-100 rounded-xl overflow-hidden bg-slate-100 relative group border border-slate-200">
                             <img src="{{ asset('storage/' . $laporan->foto) }}" alt="Bukti Kejadian" class="w-full h-full object-cover">
                         </div>
                     @else
@@ -84,79 +84,146 @@
                 </div>
 
                 <!-- Evidence Layering -->
-                <div class="mt-6">
-                    <h2 class="text-sm font-bold text-slate-800 mb-3">Bukti Tambahan (Evidence Layering)</h2>
+                <div class="mt-6 rounded-2xl border border-slate-200/70 bg-linear-to-br from-slate-50 to-white p-5 shadow-sm">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-5">
+                        <div>
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 text-white text-[11px] font-semibold mb-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                                Evidence Layering
+                            </div>
+                            <h2 class="text-lg font-bold text-slate-900">Bukti Tambahan</h2>
+                            <p class="text-xs text-slate-500 mt-1">Semua bukti masuk ke laporan yang sama dan ditampilkan dari terbaru ke terlama.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-[11px] font-semibold">
+                            <span class="px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600">{{ $totalEvidences }} bukti</span>
+                            <span class="px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600">{{ $uniqueContributors }} kontributor</span>
+                        </div>
+                    </div>
 
-                    <div class="grid grid-cols-1 gap-4">
-                        @if($evidenceLayers->isEmpty())
-                            <div class="text-sm text-slate-600">Belum ada bukti tambahan. Anda dapat menambahkan foto, video, atau dokumen untuk memperkuat laporan ini.</div>
-                        @else
+                    @if($evidenceLayers->isEmpty())
+                        <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center">
+                            <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-800">Belum ada bukti tambahan</h3>
+                            <p class="mt-1 text-sm text-slate-500">Upload foto, video, atau dokumen untuk memperkuat laporan ini.</p>
+                        </div>
+                    @else
+                        <div class="space-y-3">
                             @foreach($evidenceLayers->sortByDesc('created_at') as $evidence)
-                                <div class="bg-white border border-slate-100 rounded-xl p-3 flex items-start gap-3">
-                                    <div class="w-20 h-20 shrink-0 overflow-hidden rounded">
-                                        @php
-                                            $ext = pathinfo($evidence->file_path, PATHINFO_EXTENSION);
-                                        @endphp
-                                        @if(in_array(strtolower($ext), ['jpg','jpeg','png']))
-                                            <img src="{{ asset('storage/' . $evidence->file_path) }}" class="w-full h-full object-cover">
-                                        @elseif(strtolower($ext) === 'mp4')
-                                            <video src="{{ asset('storage/' . $evidence->file_path) }}" class="w-full h-full" controls></video>
-                                        @elseif(strtolower($ext) === 'pdf')
-                                            <div class="w-full h-full flex items-center justify-center text-xs text-slate-500">PDF</div>
-                                        @else
-                                            <div class="w-full h-full flex items-center justify-center text-xs text-slate-500">File</div>
-                                        @endif
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <div class="text-sm font-bold text-slate-800">{{ $evidence->user?->name ?? 'Anonim' }}</div>
-                                                <div class="text-[11px] text-slate-500">{{ ucfirst($evidence->evidence_type) }} • {{ $evidence->created_at->format('d M Y, H:i') }} WIB</div>
-                                            </div>
-                                            <div>
+                                @php
+                                    $ext = strtolower(pathinfo($evidence->file_path, PATHINFO_EXTENSION));
+                                    $typeLabel = match($evidence->evidence_type) {
+                                        'photo' => 'Foto',
+                                        'video' => 'Video',
+                                        'document' => 'Dokumen',
+                                        default => ucfirst($evidence->evidence_type),
+                                    };
+                                @endphp
+                                <div class="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+                                    <div class="grid gap-0 md:grid-cols-[180px_1fr]">
+                                        <div class="relative min-h-40 bg-slate-100">
+                                            @if(in_array($ext, ['jpg','jpeg','png','webp']))
+                                                <img src="{{ asset('storage/' . $evidence->file_path) }}" alt="{{ $typeLabel }} bukti" class="h-full w-full object-cover">
+                                            @elseif($ext === 'mp4')
+                                                <video src="{{ asset('storage/' . $evidence->file_path) }}" class="h-full w-full object-cover" controls></video>
+                                            @elseif($ext === 'pdf')
+                                                <div class="flex h-full min-h-40 items-center justify-center bg-linear-to-br from-rose-50 to-white text-rose-500">
+                                                    <div class="text-center">
+                                                        <svg class="mx-auto mb-2 h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7V3m10 4V3M6 11h12M6 21h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                                        <div class="text-xs font-bold tracking-wide">PDF</div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div class="flex h-full min-h-40 items-center justify-center bg-slate-50 text-slate-400">
+                                                    <div class="text-center">
+                                                        <svg class="mx-auto mb-2 h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                                        <div class="text-xs font-bold tracking-wide">FILE</div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            <span class="absolute left-3 top-3 rounded-full bg-slate-900/80 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur">
+                                                {{ $typeLabel }}
+                                            </span>
+                                        </div>
+
+                                        <div class="flex flex-col gap-4 p-4 sm:p-5">
+                                            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                                <div>
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-600 text-[11px] font-bold uppercase ring-4 ring-blue-50">
+                                                            {{ substr($evidence->user?->name ?? 'A', 0, 2) }}
+                                                        </div>
+                                                        <div>
+                                                            <h3 class="text-sm font-bold text-slate-900">{{ $evidence->user?->name ?? 'Anonim' }}</h3>
+                                                            <p class="text-xs text-slate-500">Ditambahkan {{ $evidence->created_at->diffForHumans() }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-3 flex flex-wrap items-center gap-2 text-[11px] font-semibold">
+                                                        <span class="rounded-full bg-slate-100 px-2.5 py-1 text-slate-600">{{ $typeLabel }}</span>
+                                                        <span class="rounded-full bg-slate-100 px-2.5 py-1 text-slate-600">{{ $evidence->created_at->format('d M Y, H:i') }} WIB</span>
+                                                    </div>
+                                                </div>
+
                                                 @if(auth()->check() && (auth()->id() === $evidence->user_id || auth()->user()->role === 'admin'))
                                                     <form action="{{ route('laporan.evidence.destroy', ['laporan' => $laporan->id, 'evidence' => $evidence->id]) }}" method="POST" onsubmit="return confirm('Hapus bukti ini?');">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button class="text-xs text-red-600">Hapus</button>
+                                                        <button type="submit" class="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-3 py-1.5 text-[11px] font-bold text-rose-600 transition-colors hover:bg-rose-100">
+                                                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3m-4 0h14"></path></svg>
+                                                            Hapus
+                                                        </button>
                                                     </form>
                                                 @endif
                                             </div>
+
+                                            @if($evidence->description)
+                                                <p class="text-sm leading-relaxed text-slate-600">{{ $evidence->description }}</p>
+                                            @endif
                                         </div>
-                                        @if($evidence->description)
-                                            <p class="text-sm text-slate-700 mt-2">{{ $evidence->description }}</p>
-                                        @endif
                                     </div>
                                 </div>
                             @endforeach
-                        @endif
-                    </div>
+                        </div>
+                    @endif
 
-                    <div class="mt-4">
-                        <h3 class="text-xs font-bold mb-2">Tambah Bukti</h3>
+                    <div class="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <div class="mb-4">
+                            <h3 class="text-sm font-bold text-slate-900">Tambah Bukti</h3>
+                            <p class="mt-1 text-xs text-slate-500">Pilih jenis bukti, unggah file, lalu beri keterangan singkat bila perlu.</p>
+                        </div>
                         @auth
-                            <form action="{{ route('laporan.evidence.store', $laporan->id) }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('laporan.evidence.store', $laporan->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                                 @csrf
-                                <div class="mb-2">
-                                    <label class="form-label">Jenis Bukti</label>
-                                    <select name="evidence_type" class="form-select" required>
+                                <div>
+                                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Jenis Bukti</label>
+                                    <select name="evidence_type" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10" required>
                                         <option value="photo">Foto</option>
                                         <option value="video">Video</option>
                                         <option value="document">Dokumen (PDF)</option>
                                     </select>
                                 </div>
-                                <div class="mb-2">
-                                    <label class="form-label">File Bukti</label>
-                                    <input type="file" name="file" class="form-control" required>
+                                <div>
+                                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">File Bukti</label>
+                                    <input type="file" name="file" class="block w-full rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:border-blue-400 hover:bg-white" required>
+                                    <p class="mt-2 text-[11px] text-slate-400">Maksimal 10 MB. Foto: JPG/PNG, video: MP4, dokumen: PDF.</p>
                                 </div>
-                                <div class="mb-2">
-                                    <label class="form-label">Keterangan (opsional)</label>
-                                    <textarea name="description" rows="2" class="form-control"></textarea>
+                                <div>
+                                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Keterangan</label>
+                                    <textarea name="description" rows="3" class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-700 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10" placeholder="Contoh: kondisi jalan pada pukul 08.30, lokasi sudah difoto dari sisi utara."></textarea>
                                 </div>
-                                <button class="btn btn-primary mt-2">Unggah Bukti</button>
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <div class="text-[11px] text-slate-400">Bukti akan tampil di timeline terbaru dan bisa dilihat semua pengguna.</div>
+                                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        Unggah Bukti
+                                    </button>
+                                </div>
                             </form>
                         @else
-                            <div class="text-sm text-slate-600">Silakan <a href="{{ route('login') }}" class="text-blue-600">masuk</a> untuk menambahkan bukti.</div>
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                                Silakan <a href="{{ route('login') }}" class="font-semibold text-blue-600 hover:text-blue-700">masuk</a> untuk menambahkan bukti.
+                            </div>
                         @endauth
                     </div>
                 </div>
@@ -278,7 +345,7 @@
             <div class="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
                 <h3 class="text-sm font-bold text-slate-800 mb-6">Status Penanganan</h3>
                 
-                <div class="relative space-y-6 before:absolute before:inset-0 before:ml-4 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+                <div class="relative space-y-6 before:absolute before:inset-0 before:ml-4 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-slate-200 before:to-transparent">
                     
                     <!-- Laporan Diterima -->
                     <div class="relative flex items-start gap-4">
@@ -397,63 +464,80 @@
             <!-- Laporan Terkait -->
             
             <!-- Donasi Laporan -->
-            <div class="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
-                <h3 class="text-sm font-bold text-slate-800 mb-4">Donasi untuk Laporan</h3>
-
-                @if(session('success'))
-                    <div class="mb-3 p-3 bg-green-50 border border-green-100 text-sm text-green-700 rounded">{{ session('success') }}</div>
-                @endif
-
-                <div class="space-y-3 mb-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-500">Total Donasi</span>
-                        <span class="text-sm font-bold text-slate-800">Rp {{ number_format($totalDonasi ?? 0, 0, ',', '.') }}</span>
+            <div class="overflow-hidden rounded-2xl border border-emerald-200 bg-linear-to-br from-emerald-50 via-white to-white shadow-sm">
+                <div class="bg-linear-to-r from-emerald-600 to-teal-600 px-5 py-4 text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/20">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 11v-2m0 2a9 9 0 100-18 9 9 0 000 18z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold">Donasi untuk Laporan</h3>
+                            <p class="text-xs text-emerald-50/90">Bantu penanganan dengan dukungan dana langsung pada laporan ini.</p>
+                        </div>
                     </div>
-                    <p class="text-xs text-slate-500">Dukungan berbentuk dana untuk membantu penanganan atau pemulihan di lokasi kejadian.</p>
                 </div>
 
-                @if($laporan->donasis->count() === 0)
-                    <div class="mb-4 text-sm text-slate-600">
-                        Belum ada donasi untuk laporan ini. Jadilah yang pertama memberi dukungan.
-                    </div>
-                @endif
+                <div class="p-5">
+                    @if(session('success'))
+                        <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ session('success') }}</div>
+                    @endif
 
-                @auth
-                    <form action="{{ route('laporan.donasi', $laporan->id) }}" method="POST" class="space-y-3">
-                        @csrf
-                        <div>
-                            <label class="text-[11px] font-medium text-slate-500">Nominal (Rp)</label>
-                            <input name="jumlah" type="number" min="1000" required class="w-full mt-1 border border-slate-200 rounded-lg p-2 text-sm" placeholder="Masukkan nominal, mis. 50000">
+                    <div class="mb-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-medium uppercase tracking-wide text-slate-500">Total Donasi</span>
+                            <span class="text-lg font-extrabold text-slate-900">Rp {{ number_format($totalDonasi ?? 0, 0, ',', '.') }}</span>
                         </div>
-                        <div>
-                            <label class="text-[11px] font-medium text-slate-500">Pesan (opsional)</label>
-                            <textarea name="pesan" rows="2" class="w-full mt-1 border border-slate-200 rounded-lg p-2 text-sm" placeholder="Tinggalkan pesan dukungan..."></textarea>
-                        </div>
-                        <button type="submit" class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg">Donasi Sekarang</button>
-                    </form>
-                @else
-                    <div class="space-y-2">
-                        <p class="text-sm text-slate-600">Silakan masuk untuk memberikan donasi.</p>
-                        <a href="{{ route('login') }}" class="inline-block w-full text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold">Masuk / Daftar</a>
+                        <p class="mt-2 text-xs leading-relaxed text-slate-500">Jika belum ada donasi, Anda bisa menjadi kontributor pertama untuk membantu laporan ini.</p>
                     </div>
-                @endauth
 
-                @if($laporan->donasis->count() > 0)
-                <div class="border-t border-slate-100 mt-4 pt-4">
-                    <h4 class="text-xs font-bold text-slate-800 mb-2">Donatur Terbaru</h4>
-                    <div class="space-y-3">
-                        @foreach($laporan->donasis->take(3) as $donasi)
-                            <div class="flex justify-between items-center text-xs text-slate-600">
-                                <div>
-                                    <span class="font-medium text-slate-800">{{ $donasi->user?->name ?? 'Anonim' }}</span>
-                                    <div class="text-[11px] text-slate-500">{{ $donasi->created_at->diffForHumans() }}</div>
+                    @if($laporan->donasis->count() === 0)
+                        <div class="mb-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
+                            Belum ada donasi untuk laporan ini.
+                        </div>
+                    @endif
+
+                    @auth
+                        <form action="{{ route('laporan.donasi', $laporan->id) }}" method="POST" class="space-y-4">
+                            @csrf
+                            <div>
+                                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Nominal (Rp)</label>
+                                <div class="relative">
+                                    <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-400">Rp</span>
+                                    <input name="jumlah" type="number" min="1000" required class="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-700 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10" placeholder="50000">
                                 </div>
-                                <div class="font-bold text-slate-800">Rp {{ number_format($donasi->jumlah, 0, ',', '.') }}</div>
                             </div>
-                        @endforeach
-                    </div>
+                            <div>
+                                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Pesan (opsional)</label>
+                                <textarea name="pesan" rows="3" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10" placeholder="Tinggalkan pesan dukungan..."></textarea>
+                            </div>
+                            <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:-translate-y-0.5 hover:bg-emerald-700">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 11v-2m0 2a9 9 0 100-18 9 9 0 000 18z"></path></svg>
+                                Donasi Sekarang
+                            </button>
+                        </form>
+                    @else
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                            Silakan <a href="{{ route('login') }}" class="font-semibold text-blue-600 hover:text-blue-700">masuk</a> untuk memberikan donasi.
+                        </div>
+                    @endauth
+
+                    @if($laporan->donasis->count() > 0)
+                        <div class="mt-5 border-t border-slate-100 pt-4">
+                            <h4 class="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">Donatur Terbaru</h4>
+                            <div class="space-y-3">
+                                @foreach($laporan->donasis->take(3) as $donasi)
+                                    <div class="flex items-start justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3">
+                                        <div>
+                                            <div class="text-sm font-semibold text-slate-800">{{ $donasi->user?->name ?? 'Anonim' }}</div>
+                                            <div class="text-[11px] text-slate-500">{{ $donasi->created_at->diffForHumans() }}</div>
+                                        </div>
+                                        <div class="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-800 shadow-sm">Rp {{ number_format($donasi->jumlah, 0, ',', '.') }}</div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
-                @endif
             </div>
             @if($relatedLaporans->count() > 0)
             <div class="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
