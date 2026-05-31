@@ -3,335 +3,293 @@
 @section('title', 'Detail Laporan - Admin Dashboard')
 
 @section('content')
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h3">Detail Laporan</h1>
-                    <p class="text-muted">ID: #{{ $laporan->id }}</p>
-                </div>
-                <div>
-                    <a href="{{ route('admin.laporan.index') }}" class="btn btn-secondary me-2">
-                        <i class="bi bi-arrow-left"></i> Kembali
-                    </a>
-                    <a href="{{ route('admin.laporan.edit', $laporan->id) }}" class="btn btn-warning">
-                        <i class="bi bi-pencil"></i> Edit
-                    </a>
-                </div>
-            </div>
+@php
+    $statusClass = match($laporan->status) {
+        'Menunggu' => 'bg-amber-100 text-amber-700',
+        'Terverifikasi' => 'bg-blue-100 text-blue-700',
+        'Diproses' => 'bg-sky-100 text-sky-700',
+        'Ditindaklanjuti' => 'bg-indigo-100 text-indigo-700',
+        'Selesai' => 'bg-emerald-100 text-emerald-700',
+        'Ditolak' => 'bg-rose-100 text-rose-700',
+        'Darurat' => 'bg-red-100 text-red-700',
+        default => 'bg-slate-100 text-slate-700',
+    };
+
+    $urgensiClass = match(strtolower($laporan->urgensi ?? '')) {
+        'tinggi', 'darurat' => 'bg-red-100 text-red-700',
+        'sedang' => 'bg-amber-100 text-amber-700',
+        default => 'bg-emerald-100 text-emerald-700',
+    };
+
+    $kategoriClass = 'bg-orange-100 text-orange-700';
+
+    $evidenceItems = collect();
+    if (isset($laporan->evidenceLayers) && $laporan->evidenceLayers->count()) {
+        $evidenceItems = $laporan->evidenceLayers->map(fn ($evidence) => $evidence->path ?? $evidence->file ?? null)->filter()->values();
+    } elseif (isset($laporan->evidences) && $laporan->evidences->count()) {
+        $evidenceItems = $laporan->evidences->map(fn ($evidence) => $evidence->path ?? $evidence->file ?? null)->filter()->values();
+    } elseif (!empty($laporan->foto)) {
+        $evidenceItems = collect([$laporan->foto]);
+    }
+
+    $komentars = $laporan->komentars ?? collect();
+    $upvotesCount = method_exists($laporan, 'upvotes') ? $laporan->upvotes()->count() : 0;
+    $commentsCount = $komentars->count();
+    $viewsCount = $laporan->views ?? 0;
+    $sharesCount = $laporan->shares ?? 0;
+    $hasEvidence = $evidenceItems->isNotEmpty();
+    $hasLocation = $laporan->latitude && $laporan->longitude;
+
+    $mapReports = $hasLocation ? collect([[
+        'lat' => (float) $laporan->latitude,
+        'lng' => (float) $laporan->longitude,
+        'title' => $laporan->judul_laporan,
+        'category' => $laporan->kategori->nama ?? 'Laporan',
+        'status' => $laporan->status,
+        'urgency' => $laporan->urgensi,
+        'district' => $laporan->kecamatan ?? $laporan->alamat ?? '-',
+    ]]) : collect();
+
+    $checkItems = [
+        ['label' => 'Deskripsi laporan jelas dan lengkap', 'done' => !empty($laporan->deskripsi)],
+        ['label' => 'Foto bukti tersedia', 'done' => $hasEvidence],
+        ['label' => 'Lokasi GPS tersedia', 'done' => $hasLocation],
+        ['label' => 'Lokasi berada di Kota Bandung', 'done' => !empty($laporan->kecamatan)],
+        ['label' => 'Kategori sesuai', 'done' => !empty($laporan->kategori)],
+        ['label' => 'Tidak ada duplikasi laporan', 'done' => true],
+        ['label' => 'Bukti foto relevan dengan laporan', 'done' => $hasEvidence],
+        ['label' => 'Tingkat urgensi sesuai kondisi', 'done' => !empty($laporan->urgensi)],
+    ];
+    $verifiedCount = collect($checkItems)->where('done', true)->count();
+@endphp
+
+<div class="min-h-full bg-gradient-to-br from-slate-50 via-blue-50/50 to-blue-100/50">
+    <div class="mx-auto w-full max-w-[1120px] px-5 py-8 md:px-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Detail Verifikasi Laporan</h1>
+            <p class="mt-2 text-base font-medium text-slate-500">Tinjau dan verifikasi laporan dari masyarakat</p>
         </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="row">
-        <!-- Left Column -->
-        <div class="col-lg-8">
-            <!-- Laporan Info Card -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">{{ $laporan->judul_laporan }}</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <p class="mb-3">
-                                <strong>Status:</strong><br>
-                                <span class="badge badge-status-{{ strtolower(str_replace(' ', '-', $laporan->status)) }} p-2">
-                                    {{ $laporan->status }}
-                                </span>
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="mb-3">
-                                <strong>Urgensi:</strong><br>
-                                <span class="badge badge-urgensi-{{ strtolower($laporan->urgensi) }} p-2">
-                                    {{ $laporan->urgensi }}
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <p class="mb-3">
-                                <strong>Kategori:</strong><br>
-                                {{ $laporan->kategori->nama ?? '-' }}
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="mb-3">
-                                <strong>Kecamatan:</strong><br>
-                                {{ $laporan->kecamatan }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <strong>Deskripsi:</strong>
-                        <p class="mt-2">{{ $laporan->deskripsi }}</p>
-                    </div>
-
-                    @if($laporan->foto)
-                        <div class="mb-4">
-                            <strong>Foto Laporan:</strong>
-                            <div class="mt-2">
-                                <img src="{{ asset('storage/' . $laporan->foto) }}" alt="Foto Laporan" class="img-fluid rounded" style="max-width: 100%; max-height: 400px;">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,660px)_320px]">
+            <main class="space-y-6">
+                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div class="min-w-0">
+                            <h2 class="max-w-md break-words text-2xl font-extrabold leading-tight text-slate-800">{{ $laporan->judul_laporan }}</h2>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="rounded-full px-3 py-1 text-xs font-bold {{ $kategoriClass }}">{{ $laporan->kategori->nama ?? '-' }}</span>
+                                <span class="rounded-full px-3 py-1 text-xs font-bold {{ $urgensiClass }}">Urgensi: {{ $laporan->urgensi ?? '-' }}</span>
+                                <span class="rounded-full px-3 py-1 text-xs font-bold {{ $statusClass }}">{{ $laporan->status }}</span>
                             </div>
                         </div>
+                        <div class="shrink-0 text-3xl font-extrabold text-blue-600">RK-{{ str_pad($laporan->id, 4, '0', STR_PAD_LEFT) }}</div>
+                    </div>
+
+                    <div class="mt-5 border-t border-slate-100 pt-5">
+                        <div class="grid gap-4 text-sm text-slate-500 sm:grid-cols-2">
+                            <div class="flex items-center gap-2">
+                                <svg class="h-4 w-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                <span>Pelapor: <b class="font-bold text-slate-700">{{ $laporan->user->name ?? 'Anonim' }}</b></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="h-4 w-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"/></svg>
+                                <span>Waktu: <b class="font-bold text-slate-700">{{ $laporan->created_at->format('d M Y, H:i') }}</b></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="h-4 w-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <span>Kecamatan: <b class="font-bold text-slate-700">{{ $laporan->kecamatan ?? '-' }}</b></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="h-4 w-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l.8-3.2A7.5 7.5 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                <span>Interaksi: <b class="font-bold text-slate-700">{{ $upvotesCount }} upvotes, {{ $commentsCount }} komentar</b></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h3 class="text-lg font-extrabold text-slate-800">Deskripsi Laporan</h3>
+                    <p class="mt-4 break-words text-base leading-8 text-slate-600">{{ $laporan->deskripsi ?: 'Tidak ada deskripsi.' }}</p>
+                </section>
+
+                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div class="mb-5 flex items-center gap-3">
+                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <h3 class="text-lg font-extrabold text-slate-800">Bukti Foto Kejadian</h3>
+                        <span class="text-sm font-semibold text-slate-400">({{ $evidenceItems->count() }} foto)</span>
+                    </div>
+
+                    @if($hasEvidence)
+                        <div class="grid gap-4 {{ $evidenceItems->count() > 1 ? 'sm:grid-cols-2' : '' }}">
+                            @foreach($evidenceItems as $path)
+                                <a href="{{ asset('storage/' . $path) }}" target="_blank" class="group block overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+                                    <img src="{{ asset('storage/' . $path) }}" alt="Bukti laporan {{ $loop->iteration }}" class="h-80 w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]">
+                                </a>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="flex h-48 items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 text-sm font-semibold text-slate-400">Belum ada bukti foto</div>
                     @endif
+                </section>
 
-                    @if($laporan->latitude && $laporan->longitude)
-                        <div class="mb-4">
-                            <strong>Lokasi:</strong>
-                            <p class="mt-2">
-                                Latitude: {{ $laporan->latitude }}<br>
-                                Longitude: {{ $laporan->longitude }}
-                            </p>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            <!-- Catatan & Verifikasi Card -->
-            @if($laporan->catatan_verifikasi || $laporan->alasan_penolakan)
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white border-bottom">
-                        <h5 class="mb-0">Catatan Verifikasi</h5>
-                    </div>
-                    <div class="card-body">
-                        @if($laporan->catatan_verifikasi)
-                            <div class="mb-3">
-                                <strong>Catatan:</strong>
-                                <p class="mt-2">{{ $laporan->catatan_verifikasi }}</p>
+                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h3 class="text-lg font-extrabold text-slate-800">Lokasi Kejadian</h3>
+                    <div class="mt-5">
+                        @if($hasLocation)
+                            <div
+                                id="laporan-map"
+                                class="h-80 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
+                                data-reports="{{ $mapReports->toJson(JSON_HEX_APOS | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) }}"
+                            ></div>
+                            <div class="mt-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-700">
+                                <b>Alamat Lengkap:</b> {{ $laporan->alamat ?? ($laporan->kecamatan ?? '-') }}
                             </div>
-                        @endif
-
-                        @if($laporan->alasan_penolakan)
-                            <div>
-                                <strong>Alasan Penolakan:</strong>
-                                <p class="mt-2 text-danger">{{ $laporan->alasan_penolakan }}</p>
-                            </div>
+                        @else
+                            <div class="flex h-56 items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 text-sm font-semibold text-slate-400">Koordinat lokasi belum tersedia</div>
                         @endif
                     </div>
-                </div>
-            @endif
+                </section>
 
-            <!-- Komentar & Tanggapan Card -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white border-bottom d-flex align-items-center">
-                    <i class="bi bi-chat-left-text me-2"></i>
-                    <h5 class="mb-0">Komentar & Tanggapan ({{ $laporan->komentars->count() }})</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-4">
-                        @forelse($laporan->komentars as $komentar)
-                            @if($komentar->user->role === 'admin')
-                                <!-- Admin/Official Comment -->
-                                <div class="d-flex mb-3 p-3 rounded" style="background-color: #f0f8ff; border-left: 4px solid #0d6efd; border-top: 1px solid #e9ecef; border-right: 1px solid #e9ecef; border-bottom: 1px solid #e9ecef;">
-                                    <div class="flex-shrink-0">
-                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm text-uppercase" style="width: 40px; height: 40px;">
-                                            {{ substr($komentar->user->name, 0, 2) }}
-                                        </div>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <div class="d-flex align-items-center mb-1 gap-2">
-                                            <h6 class="mb-0 fw-bold">{{ $komentar->user->name }}</h6>
-                                            <span class="badge bg-primary rounded-pill d-flex align-items-center gap-1 px-2" style="font-size: 0.65rem;">
-                                                <i class="bi bi-check-circle-fill"></i> Official
-                                            </span>
-                                        </div>
-                                        <p class="mb-1 text-dark" style="font-size: 0.9rem;">
-                                            {{ $komentar->isi_komentar }}
-                                        </p>
-                                        <small class="text-muted" style="font-size: 0.75rem;">{{ $komentar->created_at->format('d M Y, H:i') }} WIB</small>
-                                    </div>
+                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div class="mb-5 flex items-center gap-3">
+                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l.8-3.2A7.5 7.5 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        <h3 class="text-lg font-extrabold text-slate-800">Tanggapan & Diskusi</h3>
+                        <span class="text-sm font-semibold text-slate-400">({{ $commentsCount }} komentar)</span>
+                    </div>
+
+                    <form action="{{ route('komentar.store', $laporan->id) }}" method="POST" class="mb-6 flex gap-4">
+                        @csrf
+                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        </div>
+                        <div class="flex-1">
+                            <textarea name="komentar" required rows="4" class="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100" placeholder="Tulis tanggapan Anda..."></textarea>
+                            <div class="mt-3 flex justify-end">
+                                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-blue-700">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                                    Kirim Tanggapan
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="space-y-4">
+                        @forelse($komentars as $komentar)
+                            @php $isAdminComment = ($komentar->user->role ?? null) === 'admin'; @endphp
+                            <div class="flex gap-4 rounded-xl {{ $isAdminComment ? 'border border-blue-200 bg-blue-50' : 'bg-slate-50' }} p-4">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full {{ $isAdminComment ? 'bg-blue-600' : 'bg-slate-400' }} text-white">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                 </div>
-                            @else
-                                <!-- User Comment -->
-                                <div class="d-flex mb-3 p-3 bg-light rounded border">
-                                    <div class="flex-shrink-0">
-                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold text-uppercase" style="width: 40px; height: 40px;">
-                                            {{ substr($komentar->user->name, 0, 2) }}
-                                        </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="font-extrabold text-slate-800">{{ $komentar->user->name ?? 'Pengguna' }}</span>
+                                        @if($isAdminComment)
+                                            <span class="rounded bg-blue-600 px-2 py-0.5 text-[10px] font-bold uppercase text-white">Admin</span>
+                                        @endif
+                                        <span class="text-xs font-semibold text-slate-400">{{ $komentar->created_at->diffForHumans() }}</span>
                                     </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <h6 class="mb-0 fw-bold">{{ $komentar->user->name }}</h6>
-                                        </div>
-                                        <p class="mb-1 text-muted" style="font-size: 0.9rem;">
-                                            {{ $komentar->isi_komentar }}
-                                        </p>
-                                        <small class="text-muted" style="font-size: 0.75rem;">{{ $komentar->created_at->format('d M Y, H:i') }} WIB</small>
-                                    </div>
+                                    <p class="mt-1 break-words text-sm leading-6 text-slate-600">{{ $komentar->isi_komentar }}</p>
                                 </div>
-                            @endif
+                            </div>
                         @empty
-                            <div class="text-center py-4">
-                                <p class="text-muted mb-0">Belum ada komentar atau tanggapan.</p>
-                            </div>
+                            <div class="rounded-xl bg-slate-50 px-4 py-8 text-center text-sm font-semibold text-slate-400">Belum ada komentar atau tanggapan.</div>
                         @endforelse
                     </div>
+                </section>
+            </main>
 
-                    <!-- Komentar Input Form -->
-                    <div class="border-top pt-3">
-                        <h6 class="fw-bold mb-3">Tulis Tanggapan</h6>
-                        <form action="{{ route('komentar.store', $laporan->id) }}" method="POST" class="d-flex flex-column flex-sm-row gap-2">
-                            @csrf
-                            <div class="flex-grow-1">
-                                <textarea name="komentar" required rows="3" class="form-control" placeholder="Bagikan informasi atau tanggapan Anda..." style="resize: none;"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center gap-2 px-4 h-auto mt-2 mt-sm-0 align-self-sm-stretch">
-                                <i class="bi bi-send-fill"></i> Kirim
-                            </button>
-                        </form>
+            <aside class="space-y-6">
+                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h3 class="text-lg font-extrabold text-slate-800">Checklist Verifikasi</h3>
+                    <div class="mt-6 space-y-5">
+                        @foreach($checkItems as $item)
+                            <label class="flex items-start gap-3 text-sm font-semibold leading-5 text-slate-600">
+                                <input type="checkbox" class="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600" @checked($item['done']) disabled>
+                                <span>{{ $item['label'] }}</span>
+                            </label>
+                        @endforeach
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Column -->
-        <div class="col-lg-4">
-            <!-- Pelapor Card -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">Informasi Pelapor</h5>
-                </div>
-                <div class="card-body">
-                    <p class="mb-3">
-                        <strong>Nama:</strong><br>
-                        {{ $laporan->user->name ?? 'Anonim' }}
-                    </p>
-                    <p class="mb-3">
-                        <strong>Email:</strong><br>
-                        {{ $laporan->user->email ?? '-' }}
-                    </p>
-                    <p class="mb-3">
-                        <strong>No. Telepon:</strong><br>
-                        {{ $laporan->user->phone_number ?? '-' }}
-                    </p>
-                    <p class="mb-0">
-                        <strong>Kota:</strong><br>
-                        {{ $laporan->user->city ?? '-' }}
-                    </p>
-                </div>
-            </div>
-
-            <!-- Admin Card -->
-            @if($laporan->admin)
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white border-bottom">
-                        <h5 class="mb-0">Admin Verifikasi</h5>
+                    <div class="mt-6 border-t border-slate-100 pt-4 text-sm text-slate-500">
+                        <b class="text-slate-800">{{ $verifiedCount }}/{{ count($checkItems) }}</b> item terverifikasi
                     </div>
-                    <div class="card-body">
-                        <p class="mb-3">
-                            <strong>Nama:</strong><br>
-                            {{ $laporan->admin->name }}
-                        </p>
-                        <p class="mb-0">
-                            <strong>Waktu Verifikasi:</strong><br>
-                            {{ $laporan->waktu_verifikasi ? $laporan->waktu_verifikasi->format('d/m/Y H:i') : '-' }}
-                        </p>
-                    </div>
-                </div>
-            @endif
+                </section>
 
-            <!-- Timeline Card -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">Timeline</h5>
-                </div>
-                <div class="card-body">
-                    <div class="timeline">
-                        <div class="timeline-item">
-                            <div class="timeline-marker">
-                                <i class="bi bi-plus-circle text-primary"></i>
-                            </div>
-                            <div class="timeline-content">
-                                <p class="mb-1"><strong>Laporan Dibuat</strong></p>
-                                <small class="text-muted">{{ $laporan->created_at->format('d/m/Y H:i') }}</small>
-                            </div>
+                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h3 class="text-lg font-extrabold text-slate-800">Tindak Lanjut</h3>
+                    <form action="{{ route('admin.laporan.update', $laporan->id) }}" method="POST" class="mt-5 space-y-4">
+                        @csrf
+                        @method('PUT')
+
+                        <div>
+                            <label class="mb-2 block text-sm font-bold text-slate-600">Status Penanganan</label>
+                            <select name="status" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100">
+                                @foreach($statuses ?? ['Menunggu', 'Terverifikasi', 'Diproses', 'Ditindaklanjuti', 'Selesai', 'Ditolak'] as $status)
+                                    <option value="{{ $status }}" @selected($laporan->status === $status)>{{ $status }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
-                        @if($laporan->waktu_verifikasi)
-                            <div class="timeline-item">
-                                <div class="timeline-marker">
-                                    <i class="bi bi-check-circle" style="color: {{ $laporan->status === 'Ditolak' ? 'red' : 'green' }};"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <p class="mb-1"><strong>{{ $laporan->status === 'Ditolak' ? 'Laporan Ditolak' : 'Laporan Diverifikasi' }}</strong></p>
-                                    <small class="text-muted">{{ $laporan->waktu_verifikasi->format('d/m/Y H:i') }}</small>
-                                </div>
-                            </div>
-                        @endif
+                        <div>
+                            <label class="mb-2 block text-sm font-bold text-slate-600">Instansi Tujuan</label>
+                            <input type="text" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100" placeholder="Contoh: Dinas PU Kota Bandung">
+                        </div>
 
-                        @if($laporan->updated_at && $laporan->updated_at != $laporan->created_at)
-                            <div class="timeline-item">
-                                <div class="timeline-marker">
-                                    <i class="bi bi-pencil-square text-warning"></i>
+                        <div>
+                            <label class="mb-2 block text-sm font-bold text-slate-600">Catatan Pemerintah</label>
+                            <textarea name="catatan_verifikasi" rows="4" class="w-full resize-none rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100" placeholder="Tulis catatan untuk instansi terkait...">{{ old('catatan_verifikasi', $laporan->catatan_verifikasi) }}</textarea>
+                        </div>
+
+                        <div class="grid gap-3">
+                            <button type="submit" name="status" value="Terverifikasi" class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-green-700">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                Setujui
+                            </button>
+                            <button type="submit" name="status" value="Ditolak" class="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-red-700">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                Tolak Laporan
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="rounded-2xl border border-blue-200 bg-blue-100/70 p-6 shadow-sm">
+                    <h3 class="text-base font-extrabold text-slate-800">Informasi Cepat</h3>
+                    <dl class="mt-5 space-y-3 text-sm">
+                        <div class="flex justify-between gap-4"><dt class="text-slate-600">Upvotes:</dt><dd class="font-extrabold text-slate-800">{{ $upvotesCount }}</dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-slate-600">Komentar:</dt><dd class="font-extrabold text-slate-800">{{ $commentsCount }}</dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-slate-600">Views:</dt><dd class="font-extrabold text-slate-800">{{ $viewsCount }}</dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-slate-600">Shares:</dt><dd class="font-extrabold text-slate-800">{{ $sharesCount }}</dd></div>
+                    </dl>
+                </section>
+
+                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h3 class="text-lg font-extrabold text-slate-800">Status Penanganan</h3>
+                    <div class="mt-6 space-y-0">
+                        @foreach([
+                            ['label' => 'Laporan Diterima', 'desc' => 'Laporan telah masuk ke sistem RODOKAN', 'date' => $laporan->created_at?->format('d M Y, H:i') . ' WIB', 'done' => true, 'color' => 'green'],
+                            ['label' => 'Menunggu Verifikasi', 'desc' => 'Laporan diverifikasi oleh admin', 'date' => $laporan->waktu_verifikasi?->format('d M Y, H:i') . ' WIB', 'done' => in_array($laporan->status, ['Terverifikasi', 'Diproses', 'Ditindaklanjuti', 'Selesai']), 'color' => 'amber'],
+                            ['label' => 'Diteruskan ke Instansi', 'desc' => $laporan->status === 'Ditindaklanjuti' || $laporan->status === 'Selesai' ? 'Instansi terkait menerima laporan' : '-', 'date' => '-', 'done' => in_array($laporan->status, ['Ditindaklanjuti', 'Selesai']), 'color' => 'slate'],
+                            ['label' => 'Dalam Penanganan', 'desc' => $laporan->status === 'Diproses' || $laporan->status === 'Selesai' ? 'Laporan sedang diproses' : '-', 'date' => '-', 'done' => in_array($laporan->status, ['Diproses', 'Selesai']), 'color' => 'slate'],
+                            ['label' => 'Selesai', 'desc' => $laporan->status === 'Selesai' ? 'Laporan selesai ditangani' : '-', 'date' => '-', 'done' => $laporan->status === 'Selesai', 'color' => 'slate'],
+                        ] as $step)
+                            <div class="relative flex gap-4 pb-7 last:pb-0">
+                                @if(!$loop->last)
+                                    <div class="absolute left-[15px] top-8 h-[calc(100%-2rem)] w-px bg-slate-200"></div>
+                                @endif
+                                <div class="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full {{ $step['done'] ? ($step['color'] === 'green' ? 'bg-green-500 text-white' : ($step['color'] === 'amber' ? 'bg-amber-500 text-white' : 'bg-slate-400 text-white')) : 'bg-slate-200 text-white' }}">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                 </div>
-                                <div class="timeline-content">
-                                    <p class="mb-1"><strong>Status Diubah</strong></p>
-                                    <small class="text-muted">{{ $laporan->updated_at->format('d/m/Y H:i') }}</small>
+                                <div class="{{ $step['done'] ? '' : 'opacity-55' }}">
+                                    <div class="text-sm font-extrabold text-slate-800">{{ $step['label'] }}</div>
+                                    <div class="mt-1 text-sm leading-5 text-slate-500">{{ $step['desc'] }}</div>
+                                    <div class="mt-2 text-xs font-semibold text-slate-400">{{ $step['date'] ?: '-' }}</div>
                                 </div>
                             </div>
-                        @endif
+                        @endforeach
                     </div>
-                </div>
-            </div>
+                </section>
+            </aside>
         </div>
     </div>
 </div>
-
-<style>
-    .badge-status-menunggu { background-color: #ffc107; color: #000; }
-    .badge-status-terverifikasi { background-color: #17a2b8; color: #fff; }
-    .badge-status-diproses { background-color: #007bff; color: #fff; }
-    .badge-status-ditindaklanjuti { background-color: #28a745; color: #fff; }
-    .badge-status-selesai { background-color: #6c757d; color: #fff; }
-    .badge-status-ditolak { background-color: #dc3545; color: #fff; }
-
-    .badge-urgensi-rendah { background-color: #28a745; }
-    .badge-urgensi-sedang { background-color: #ffc107; color: #000; }
-    .badge-urgensi-tinggi { background-color: #fd7e14; }
-    .badge-urgensi-darurat { background-color: #dc3545; }
-
-    .timeline {
-        position: relative;
-        padding-left: 0;
-    }
-
-    .timeline-item {
-        display: flex;
-        margin-bottom: 20px;
-        position: relative;
-    }
-
-    .timeline-item:not(:last-child)::before {
-        content: '';
-        position: absolute;
-        left: 12px;
-        top: 40px;
-        width: 2px;
-        height: 20px;
-        background-color: #dee2e6;
-    }
-
-    .timeline-marker {
-        flex-shrink: 0;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-    }
-
-    .timeline-content {
-        flex: 1;
-        margin-left: 15px;
-        margin-top: 5px;
-    }
-</style>
 @endsection

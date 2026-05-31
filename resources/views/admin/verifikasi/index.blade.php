@@ -19,7 +19,37 @@
 .header-subtitle {
     font-size: 14px;
     color: #64748b;
+}
+.header-bar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
     margin-bottom: 24px;
+}
+.manage-report-button {
+    align-items: center;
+    background: #2563eb;
+    border-radius: 10px;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 13px;
+    font-weight: 700;
+    gap: 8px;
+    padding: 10px 14px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+    white-space: nowrap;
+}
+.manage-report-button:hover {
+    background: #1d4ed8;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+.manage-report-button svg {
+    height: 16px;
+    width: 16px;
 }
 
 /* Stat Cards */
@@ -222,12 +252,21 @@
 /* Responsive */
 @media (max-width: 1024px) {
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .header-bar { flex-direction: column; }
 }
 </style>
 
 <div class="dashboard-container">
-    <div class="header-title">Verifikasi Laporan Warga</div>
-    <div class="header-subtitle">Tinjau dan verifikasi laporan yang masuk dari masyarakat Kota Bandung</div>
+    <div class="header-bar">
+        <div>
+            <div class="header-title">Verifikasi Laporan Warga</div>
+            <div class="header-subtitle">Tinjau dan verifikasi laporan yang masuk dari masyarakat Kota Bandung</div>
+        </div>
+        <a href="{{ route('admin.laporan.index') }}" class="manage-report-button">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10M4 18h10"></path></svg>
+            Manajemen Data Laporan
+        </a>
+    </div>
 
     <!-- Stats -->
     <div class="stats-grid">
@@ -352,16 +391,28 @@
                             </button>
                         </div>
                         @elseif($laporan->borderClass === 'border-terverifikasi')
-                        <div class="note-box terverifikasi">
-                            <div class="note-box-title">Catatan Verifikasi:</div>
-                            <div class="note-box-content">{{ $laporan->catatan_verifikasi ?? 'Laporan valid. Menunggu tindak lanjut dinas terkait.' }}</div>
-                            <div class="note-box-date">{{ $laporan->waktu_verifikasi ? $laporan->waktu_verifikasi->format('d M Y, H:i') : $laporan->updated_at->format('d M Y, H:i') }}</div>
+                        <div style="display: flex; gap: 16px; align-items: flex-start;">
+                            <div class="note-box terverifikasi" style="flex: 1;">
+                                <div class="note-box-title">Catatan Verifikasi:</div>
+                                <div class="note-box-content">{{ $laporan->catatan_verifikasi ?? 'Laporan valid. Menunggu tindak lanjut dinas terkait.' }}</div>
+                                <div class="note-box-date">{{ $laporan->waktu_verifikasi ? $laporan->waktu_verifikasi->format('d M Y, H:i') : $laporan->updated_at->format('d M Y, H:i') }}</div>
+                            </div>
+                            <a href="{{ route('verifikasi.show', $laporan->id) }}" class="btn-primary" style="text-decoration:none; white-space: nowrap; margin-top: 4px;">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                Tinjau
+                            </a>
                         </div>
                         @elseif($laporan->borderClass === 'border-ditolak')
-                        <div class="note-box ditolak">
-                            <div class="note-box-title">Alasan Penolakan:</div>
-                            <div class="note-box-content">{{ $laporan->alasan_penolakan ?? 'Laporan tidak sesuai dengan kriteria pelaporan.' }}</div>
-                            <div class="note-box-date">{{ $laporan->waktu_verifikasi ? $laporan->waktu_verifikasi->format('d M Y, H:i') : $laporan->updated_at->format('d M Y, H:i') }}</div>
+                        <div style="display: flex; gap: 16px; align-items: flex-start;">
+                            <div class="note-box ditolak" style="flex: 1;">
+                                <div class="note-box-title">Alasan Penolakan:</div>
+                                <div class="note-box-content">{{ $laporan->alasan_penolakan ?? 'Laporan tidak sesuai dengan kriteria pelaporan.' }}</div>
+                                <div class="note-box-date">{{ $laporan->waktu_verifikasi ? $laporan->waktu_verifikasi->format('d M Y, H:i') : $laporan->updated_at->format('d M Y, H:i') }}</div>
+                            </div>
+                            <a href="{{ route('verifikasi.show', $laporan->id) }}" class="btn-primary" style="text-decoration:none; white-space: nowrap; margin-top: 4px;">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                Tinjau
+                            </a>
                         </div>
                         @endif
 

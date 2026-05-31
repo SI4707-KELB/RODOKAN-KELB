@@ -3,17 +3,13 @@
 @section('title', 'Detail Verifikasi Laporan - RODOKAN')
 
 @section('content')
-<style>
-    /* Break out of overflow container for truly fixed positioning */
-    .verification-checklist-fixed {
-        position: fixed !important;
-        top: 6rem !important;
-        right: 2rem !important;
-        width: 20rem !important;
-        max-height: calc(100vh - 7.5rem) !important;
-        z-index: 9999 !important;
-    }
-</style>
+@php
+    $validasi = $laporan->validasi;
+    $items = $validasi ? $validasi->getValidationItems() : [];
+    $passed = $validasi ? $validasi->total_passed : 0;
+    $total = max(count($items), 1);
+    $progress = round(($passed / $total) * 100);
+@endphp
 
 <div class="p-8 max-w-7xl mx-auto pb-20">
     <!-- Header -->
@@ -26,64 +22,9 @@
         <p class="text-slate-500 mt-1">Tinjau dan verifikasi laporan dari masyarakat</p>
     </div>
 
-    <!-- Fixed Checklist Sidebar - Using portal-like fixed element -->
-    <div class="verification-checklist-fixed bg-white rounded-2xl border border-slate-200/60 p-6 shadow-lg overflow-y-auto">
-        <h3 class="text-lg font-bold text-slate-800 mb-4">Checklist Verifikasi</h3>
-
-        @php
-            $validasi = $laporan->validasi;
-            $items = $validasi ? $validasi->getValidationItems() : [];
-            $passed = $validasi ? $validasi->total_passed : 0;
-            $total = count($items);
-        @endphp
-
-        <form id="validationForm" class="space-y-3">
-            @foreach($items as $key => $label)
-                <label class="flex items-center gap-3 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        class="validation-check w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                        data-field="{{ $key }}"
-                        {{ $validasi && $validasi->$key ? 'checked' : '' }}
-                    >
-                    <span class="text-sm text-slate-700">{{ $label }}</span>
-                </label>
-            @endforeach
-
-            <div class="pt-2 pb-2 text-xs text-slate-600 border-t border-slate-100">
-                <span class="font-semibold">
-                    <span id="passedCount">{{ $passed ?? 0 }}</span>/{{ $total }}
-                </span> Item terverifikasi
-            </div>
-
-            @if($validasi && $validasi->status_validasi !== 'draft')
-                <div class="pt-2 text-xs text-slate-500 border-t border-slate-100">
-                    <strong>Progress:</strong><br>
-                    <div class="w-full bg-slate-200 rounded-full h-2 mt-2">
-                        <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all" style="width: {{ ($passed/$total)*100 }}%"></div>
-                    </div>
-                    <span id="progressText" class="text-xs">{{ round(($passed/$total)*100) }}% Lengkap</span>
-                </div>
-            @endif
-        </form>
-
-        <!-- Action Buttons inside Fixed Card -->
-        <div class="mt-4 pt-4 border-t border-slate-100 space-y-3">
-            <button onclick="showVerifyModal({{ $laporan->id }})" class="w-full px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 text-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                Setujui
-            </button>
-
-            <button onclick="showRejectModal({{ $laporan->id }})" class="w-full px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 text-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                Tolak Laporan
-            </button>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <!-- Main Content (Left & Center) -->
-        <div class="col-span-2 space-y-6">
+        <div class="lg:col-span-2 space-y-6 min-w-0">
             <!-- Report Header Card -->
             <div class="bg-white rounded-2xl border border-slate-200/60 p-6 shadow-sm">
                 <div class="flex items-start justify-between mb-4">
@@ -111,7 +52,7 @@
                                 {{ $laporan->kategori->nama ?? 'Lainnya' }}
                             </span>
                             <span class="px-2.5 py-1 {{ $urgencyColor }} text-xs font-bold rounded">
-                                Urgente {{ ucfirst($laporan->urgensi) }}
+                                Urgensi {{ ucfirst($laporan->urgensi) }}
                             </span>
                             <span class="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-bold rounded flex items-center gap-1">
                                 <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
@@ -145,7 +86,7 @@
             <!-- Description -->
             <div class="bg-white rounded-2xl border border-slate-200/60 p-6 shadow-sm">
                 <h3 class="text-lg font-bold text-slate-800 mb-4">Deskripsi Laporan</h3>
-                <p class="text-slate-700 leading-relaxed">{{ $laporan->deskripsi }}</p>
+                <p class="text-slate-700 leading-relaxed break-words">{{ $laporan->deskripsi }}</p>
             </div>
 
             <!-- Evidence Photos -->
@@ -191,12 +132,13 @@
 
                 <!-- Comment Input -->
                 <div class="mb-6 p-4 bg-slate-50 rounded-xl">
-                    <form class="flex gap-3">
+                    <form action="{{ route('komentar.store', $laporan->id) }}" method="POST" class="flex gap-3">
+                        @csrf
                         <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold uppercase">
                             {{ substr(auth()->user()->name ?? 'A', 0, 1) }}
                         </div>
                         <div class="flex-1">
-                            <textarea placeholder="Tulis tanggapan Anda..." rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            <textarea name="komentar" required placeholder="Tulis tanggapan Anda..." rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                             <div class="mt-2 text-right">
                                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 ml-auto">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
@@ -218,12 +160,12 @@
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2 mb-1">
                                         <p class="text-sm font-semibold text-slate-800">{{ $komentar->user->name ?? 'Unknown' }}</p>
-                                        @if($komentar->user->role === 'admin')
+                                        @if(($komentar->user->role ?? null) === 'admin')
                                             <span class="px-2 py-0.5 bg-blue-600 text-white text-xs font-semibold rounded">Admin</span>
                                         @endif
                                         <span class="text-xs text-slate-500">{{ $komentar->created_at->diffForHumans() }}</span>
                                     </div>
-                                    <p class="text-sm text-slate-700">{{ $komentar->konten }}</p>
+                                    <p class="text-sm text-slate-700 break-words">{{ $komentar->isi_komentar }}</p>
                                 </div>
                             </div>
                         @endforeach
@@ -235,25 +177,50 @@
         </div>
 
         <!-- Sidebar (Right) - Scrollable Content -->
-        <div class="col-span-1 space-y-6">
-            <!-- No Action Section -->
+        <div class="lg:col-span-1 space-y-6 min-w-0">
+            <!-- Checklist -->
             <div class="bg-white rounded-2xl border border-slate-200/60 p-6 shadow-sm">
-                <h4 class="font-bold text-slate-800 mb-3">Tidak Lanjut</h4>
-                <div class="space-y-2 text-sm">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="status" class="w-4 h-4">
-                        <span class="text-slate-700">Status Penanganan</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="status" class="w-4 h-4">
-                        <span class="text-slate-700">Iratan Tujuan</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="status" class="w-4 h-4">
-                        <span class="text-slate-700">Catatan Pemerintah</span>
-                    </label>
+                <h4 class="text-lg font-bold text-slate-800 mb-5">Checklist Verifikasi</h4>
+
+                <form id="validationForm" class="space-y-4">
+                    @foreach($items as $key => $label)
+                        <label class="flex items-start gap-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                class="validation-check mt-0.5 w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                                data-field="{{ $key }}"
+                                {{ $validasi && $validasi->$key ? 'checked' : '' }}
+                            >
+                            <span class="text-sm text-slate-700 leading-5">{{ $label }}</span>
+                        </label>
+                    @endforeach
+
+                    <div class="pt-4 text-sm text-slate-600 border-t border-slate-100">
+                        <span class="font-semibold text-slate-800">
+                            <span id="passedCount">{{ $passed ?? 0 }}</span>/{{ count($items) }}
+                        </span> item terverifikasi
+                    </div>
+
+                    <div class="pt-3 text-xs text-slate-500 border-t border-slate-100">
+                        <strong>Progress:</strong>
+                        <div class="w-full bg-slate-200 rounded-full h-2 mt-2 overflow-hidden">
+                            <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all" style="width: {{ $progress }}%"></div>
+                        </div>
+                        <span id="progressText" class="text-xs">{{ $progress }}% Lengkap</span>
+                    </div>
+                </form>
+
+                <div class="mt-5 pt-5 border-t border-slate-100 space-y-3">
+                    <button onclick="showVerifyModal({{ $laporan->id }})" class="w-full px-4 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 text-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        Setujui
+                    </button>
+
+                    <button onclick="showRejectModal({{ $laporan->id }})" class="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 text-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        Tolak Laporan
+                    </button>
                 </div>
-                <p class="text-xs text-slate-500 mt-3 italic">Tulis catatan untuk instansi terkait...</p>
             </div>
 
             <!-- Quick Info -->
@@ -285,11 +252,11 @@
                 <div class="space-y-3">
                     @php
                         $statuses = [
-                            ['label' => 'Laporan Diterima', 'icon' => '✓', 'color' => 'bg-green-500', 'date' => $laporan->created_at->format('d M Y, H:i')],
-                            ['label' => 'Menunggu Verifikasi', 'icon' => '⏳', 'color' => 'bg-yellow-500', 'date' => ''],
+                            ['label' => 'Laporan Diterima', 'icon' => 'check', 'color' => 'bg-green-500', 'date' => $laporan->created_at->format('d M Y, H:i')],
+                            ['label' => 'Menunggu Verifikasi', 'icon' => 'clock', 'color' => 'bg-yellow-500', 'date' => ''],
                         ];
                         if ($laporan->waktu_verifikasi) {
-                            $statuses[] = ['label' => 'Terverifikasi', 'icon' => '✓', 'color' => 'bg-green-500', 'date' => $laporan->waktu_verifikasi->format('d M Y, H:i')];
+                            $statuses[] = ['label' => 'Terverifikasi', 'icon' => 'check', 'color' => 'bg-green-500', 'date' => $laporan->waktu_verifikasi->format('d M Y, H:i')];
                         }
                     @endphp
                     
@@ -297,7 +264,11 @@
                         <div class="flex gap-3">
                             <div class="flex flex-col items-center">
                                 <div class="w-8 h-8 rounded-full {{ $status['color'] }} text-white flex items-center justify-center text-xs font-bold">
-                                    {{ $status['icon'] }}
+                                    @if($status['icon'] === 'clock')
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    @else
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                    @endif
                                 </div>
                                 <div class="w-0.5 h-6 bg-slate-200 mt-2"></div>
                             </div>
@@ -373,7 +344,7 @@ function updateValidationStatus() {
 
     document.getElementById('passedCount').textContent = passedCount;
 
-    const percentage = (passedCount / total) * 100;
+    const percentage = total > 0 ? (passedCount / total) * 100 : 0;
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
 
