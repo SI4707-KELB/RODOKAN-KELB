@@ -67,6 +67,11 @@ class Laporan extends Model
         return $this->hasMany(Upvote::class);
     }
 
+    public function donasis()
+    {
+        return $this->hasMany(Donasi::class);
+    }
+
     public function evidences()
     {
         return $this->hasMany(LaporanEvidence::class);
