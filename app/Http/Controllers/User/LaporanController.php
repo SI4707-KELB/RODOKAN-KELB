@@ -110,12 +110,17 @@ class LaporanController extends Controller
 
     public function show($id)
     {
-        $laporan = \App\Models\Laporan::with(['kategori', 'user', 'statusHistories', 'upvotes', 'komentars.user', 'donasis'])->findOrFail($id);
+        $laporan = \App\Models\Laporan::with(['kategori', 'user', 'statusHistories', 'upvotes', 'komentars.user', 'donasis', 'evidenceLayers.user'])->findOrFail($id);
         
         $upvotesCount = $laporan->upvotes->count();
 
         // Total donasi
         $totalDonasi = $laporan->donasis->sum('jumlah');
+
+        // Evidence stats
+        $totalEvidences = $laporan->evidenceLayers->count();
+        $uniqueContributors = $laporan->evidenceLayers->pluck('user_id')->unique()->filter()->count();
+        $latestEvidence = $laporan->evidenceLayers->sortByDesc('created_at')->first();
         
         // Ambil laporan terkait (berdasarkan kategori yang sama, maksimal 2)
         $relatedLaporans = \App\Models\Laporan::where('kategori_id', $laporan->kategori_id)
@@ -124,7 +129,8 @@ class LaporanController extends Controller
             ->take(2)
             ->get();
 
-        return view('user.laporan.show', compact('laporan', 'upvotesCount', 'relatedLaporans', 'totalDonasi'));
+        $evidenceLayers = $laporan->evidenceLayers;
+        return view('user.laporan.show', compact('laporan', 'upvotesCount', 'relatedLaporans', 'totalDonasi', 'totalEvidences', 'uniqueContributors', 'latestEvidence', 'evidenceLayers'));
     }
 
     public function user()
