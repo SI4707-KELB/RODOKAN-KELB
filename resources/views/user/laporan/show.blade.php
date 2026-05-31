@@ -322,6 +322,10 @@
             <div class="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
                 <h3 class="text-sm font-bold text-slate-800 mb-4">Donasi untuk Laporan</h3>
 
+                @if(session('success'))
+                    <div class="mb-3 p-3 bg-green-50 border border-green-100 text-sm text-green-700 rounded">{{ session('success') }}</div>
+                @endif
+
                 <div class="space-y-3 mb-4">
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-slate-500">Total Donasi</span>
@@ -330,18 +334,31 @@
                     <p class="text-xs text-slate-500">Dukungan berbentuk dana untuk membantu penanganan atau pemulihan di lokasi kejadian.</p>
                 </div>
 
-                <form action="{{ route('laporan.donasi', $laporan->id) }}" method="POST" class="space-y-3">
-                    @csrf
-                    <div>
-                        <label class="text-[11px] font-medium text-slate-500">Nominal (Rp)</label>
-                        <input name="jumlah" type="number" min="1000" required class="w-full mt-1 border border-slate-200 rounded-lg p-2 text-sm" placeholder="Masukkan nominal, mis. 50000">
+                @if($laporan->donasis->count() === 0)
+                    <div class="mb-4 text-sm text-slate-600">
+                        Belum ada donasi untuk laporan ini. Jadilah yang pertama memberi dukungan.
                     </div>
-                    <div>
-                        <label class="text-[11px] font-medium text-slate-500">Pesan (opsional)</label>
-                        <textarea name="pesan" rows="2" class="w-full mt-1 border border-slate-200 rounded-lg p-2 text-sm" placeholder="Tinggalkan pesan dukungan..."></textarea>
+                @endif
+
+                @auth
+                    <form action="{{ route('laporan.donasi', $laporan->id) }}" method="POST" class="space-y-3">
+                        @csrf
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">Nominal (Rp)</label>
+                            <input name="jumlah" type="number" min="1000" required class="w-full mt-1 border border-slate-200 rounded-lg p-2 text-sm" placeholder="Masukkan nominal, mis. 50000">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">Pesan (opsional)</label>
+                            <textarea name="pesan" rows="2" class="w-full mt-1 border border-slate-200 rounded-lg p-2 text-sm" placeholder="Tinggalkan pesan dukungan..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg">Donasi Sekarang</button>
+                    </form>
+                @else
+                    <div class="space-y-2">
+                        <p class="text-sm text-slate-600">Silakan masuk untuk memberikan donasi.</p>
+                        <a href="{{ route('login') }}" class="inline-block w-full text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold">Masuk / Daftar</a>
                     </div>
-                    <button type="submit" class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg">Donasi Sekarang</button>
-                </form>
+                @endauth
 
                 @if($laporan->donasis->count() > 0)
                 <div class="border-t border-slate-100 mt-4 pt-4">
