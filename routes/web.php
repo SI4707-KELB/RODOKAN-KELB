@@ -95,4 +95,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         Route::put('/{id}', [AdminKategoriController::class, 'update'])->name('admin.kategori.update');
         Route::delete('/{id}', [AdminKategoriController::class, 'destroy'])->name('admin.kategori.destroy');
     });
+
+    // Admin Pengaturan Management
+    Route::get('/pengaturan', [\App\Http\Controllers\Admin\PengaturanController::class, 'index'])->name('admin.pengaturan.index');
 });
