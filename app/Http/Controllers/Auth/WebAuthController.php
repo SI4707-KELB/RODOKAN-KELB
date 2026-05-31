@@ -10,6 +10,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class WebAuthController extends Controller
 {
@@ -50,6 +52,62 @@ class WebAuthController extends Controller
             return back()->withErrors([
                 'email' => 'Email atau password yang Anda masukkan salah.',
             ])->onlyInput('email');
+        }
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->intended('/dashboard');
+    }
+
+    public function redirectToGoogle(): RedirectResponse
+    {
+        if (! config('services.google.client_id') || ! config('services.google.client_secret') || ! config('services.google.redirect')) {
+            return redirect()
+                ->route('login')
+                ->withErrors(['email' => 'Login Google belum dikonfigurasi. Isi GOOGLE_CLIENT_ID dan GOOGLE_CLIENT_SECRET di file .env.']);
+        }
+
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback(Request $request): RedirectResponse
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+        } catch (\Throwable $exception) {
+            return redirect()
+                ->route('login')
+                ->withErrors(['email' => 'Login Google gagal. Silakan coba lagi.']);
+        }
+
+        if (! $googleUser->getEmail()) {
+            return redirect()
+                ->route('login')
+                ->withErrors(['email' => 'Akun Google tidak mengirimkan alamat email.']);
+        }
+
+        $user = User::where('google_id', $googleUser->getId())->first();
+
+        if (! $user) {
+            $user = User::where('email', $googleUser->getEmail())->first();
+        }
+
+        if ($user) {
+            $user->forceFill([
+                'google_id' => $user->google_id ?: $googleUser->getId(),
+                'avatar_url' => $googleUser->getAvatar(),
+                'email_verified_at' => $user->email_verified_at ?: now(),
+            ])->save();
+        } else {
+            $user = User::create([
+                'name' => $googleUser->getName() ?: $googleUser->getNickname(),
+                'email' => $googleUser->getEmail(),
+                'google_id' => $googleUser->getId(),
+                'avatar_url' => $googleUser->getAvatar(),
+                'email_verified_at' => now(),
+                'password' => Hash::make(Str::random(32)),
+            ]);
         }
 
         Auth::login($user);
