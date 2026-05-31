@@ -23,10 +23,7 @@
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                     Keamanan Akun
                 </button>
-                <button type="button" onclick="switchTab('notifikasi')" class="settings-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-slate-600 hover:bg-slate-50" data-target="notifikasi">
-                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                    Notifikasi
-                </button>
+
                 <button type="button" onclick="switchTab('kategori')" class="settings-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-slate-600 hover:bg-slate-50" data-target="kategori">
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     Kategori Laporan
@@ -177,83 +174,7 @@
                 </div>
             </div>
 
-            <!-- Notifikasi Panel -->
-            <div id="panel-notifikasi" class="settings-panel hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <h2 class="text-lg font-bold text-slate-800 mb-6">Preferensi Notifikasi</h2>
-                
-                <div class="space-y-6 divide-y divide-slate-100">
-                    <!-- Item -->
-                    <div class="flex items-center justify-between pt-2">
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-800">Laporan Baru Masuk</h3>
-                            <p class="text-xs text-slate-500 mt-1">Notifikasi saat ada laporan baru dari warga</p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                    <!-- Item -->
-                    <div class="flex items-center justify-between pt-6">
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-800">Laporan Darurat</h3>
-                            <p class="text-xs text-slate-500 mt-1">Notifikasi prioritas tinggi untuk laporan darurat</p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                    <!-- Item -->
-                    <div class="flex items-center justify-between pt-6">
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-800">Menunggu Verifikasi</h3>
-                            <p class="text-xs text-slate-500 mt-1">Pengingat laporan yang belum diverifikasi</p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                    <!-- Item -->
-                    <div class="flex items-center justify-between pt-6">
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-800">Komentar Warga</h3>
-                            <p class="text-xs text-slate-500 mt-1">Notifikasi saat warga mengomentari laporan</p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                    <!-- Item -->
-                    <div class="flex items-center justify-between pt-6">
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-800">Update Instansi</h3>
-                            <p class="text-xs text-slate-500 mt-1">Pemberitahuan saat instansi memperbarui status</p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                    <!-- Item -->
-                    <div class="flex items-center justify-between pt-6">
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-800">Laporan Selesai</h3>
-                            <p class="text-xs text-slate-500 mt-1">Notifikasi saat laporan ditandai selesai</p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-200 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                    <!-- Item -->
-                    <div class="flex items-center justify-between pt-6">
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-800">Rekap Harian</h3>
-                            <p class="text-xs text-slate-500 mt-1">Ringkasan laporan harian setiap pukul 17:00</p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+
 
             <!-- Kategori Laporan Panel -->
             <div id="panel-kategori" class="settings-panel hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
@@ -373,34 +294,162 @@
                 </div>
             </div>
 
-            <!-- Placeholder Panels for others -->
-            <div id="panel-status" class="settings-panel hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex items-center justify-center min-h-[300px]">
-                <div class="text-center">
-                    <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    <p class="text-slate-500 font-medium">Pengaturan Status Laporan akan segera hadir.</p>
+            <!-- Status Laporan Panel -->
+            <div id="panel-status" class="settings-panel hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-bold text-slate-800">Manajemen Status Laporan</h2>
+                    <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Tambah Status
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Status Item -->
+                    <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-800">Menunggu</h3>
+                                <p class="text-xs text-slate-500 mt-1">Laporan baru yang belum diverifikasi</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg">Default</span>
+                            <button class="text-slate-400 hover:text-blue-600 transition-colors p-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Status Item -->
+                    <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-800">Diproses</h3>
+                                <p class="text-xs text-slate-500 mt-1">Laporan sedang ditangani oleh instansi terkait</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button class="text-slate-400 hover:text-blue-600 transition-colors p-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Status Item -->
+                    <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-800">Selesai</h3>
+                                <p class="text-xs text-slate-500 mt-1">Laporan telah diselesaikan dan ditutup</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="px-3 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-lg">Final</span>
+                            <button class="text-slate-400 hover:text-blue-600 transition-colors p-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Status Item -->
+                    <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center text-red-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-800">Ditolak</h3>
+                                <p class="text-xs text-slate-500 mt-1">Laporan tidak valid atau tidak memenuhi syarat</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-lg">Final</span>
+                            <button class="text-slate-400 hover:text-blue-600 transition-colors p-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div id="panel-preferensi" class="settings-panel hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex items-center justify-center min-h-[300px]">
-                <div class="text-center">
-                    <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
-                    <p class="text-slate-500 font-medium">Preferensi Dashboard akan segera hadir.</p>
+            <!-- Preferensi Dashboard Panel -->
+            <div id="panel-preferensi" class="settings-panel hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-800 mb-6">Preferensi Tampilan Dashboard</h2>
+                
+                <div class="space-y-6">
+                    <div class="border border-slate-200 rounded-xl p-5">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4">Tema Tampilan</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="theme" class="peer sr-only" checked>
+                                <div class="rounded-xl border-2 border-slate-200 p-4 hover:border-blue-100 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all text-center">
+                                    <div class="w-full h-16 bg-slate-100 rounded-lg mb-3 shadow-inner flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                                    </div>
+                                    <span class="text-sm font-semibold text-slate-700 peer-checked:text-blue-700">Terang (Default)</span>
+                                </div>
+                            </label>
+                            
+                            <label class="cursor-pointer opacity-50 relative">
+                                <input type="radio" name="theme" class="peer sr-only" disabled>
+                                <div class="rounded-xl border-2 border-slate-200 p-4 transition-all text-center">
+                                    <div class="w-full h-16 bg-slate-800 rounded-lg mb-3 shadow-inner flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                                    </div>
+                                    <span class="text-sm font-semibold text-slate-700">Gelap</span>
+                                </div>
+                                <span class="absolute top-2 right-2 bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Segera</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="border border-slate-200 rounded-xl p-5">
+                        <div class="flex items-center justify-between mb-2">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-800">Animasi UI</h3>
+                                <p class="text-xs text-slate-500 mt-1">Aktifkan efek transisi dan animasi di seluruh sistem</p>
+                            </div>
+                            <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
+                                <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end pt-4">
+                        <button type="button" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
+                            Simpan Preferensi
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-@push('scripts')
 <script>
     function switchTab(tabId) {
         // Hide all panels
         document.querySelectorAll('.settings-panel').forEach(panel => {
             panel.classList.add('hidden');
+            panel.classList.remove('block');
         });
         
         // Show target panel
-        document.getElementById('panel-' + tabId).classList.remove('hidden');
+        const targetPanel = document.getElementById('panel-' + tabId);
+        if(targetPanel) {
+            targetPanel.classList.remove('hidden');
+            targetPanel.classList.add('block');
+        }
         
         // Update styling for all buttons
         document.querySelectorAll('.settings-tab-btn').forEach(btn => {
@@ -409,8 +458,10 @@
             
             // Reset icon colors
             const icon = btn.querySelector('svg');
-            icon.classList.remove('text-blue-600');
-            icon.classList.add('text-slate-400');
+            if(icon) {
+                icon.classList.remove('text-blue-600');
+                icon.classList.add('text-slate-400');
+            }
         });
         
         // Highlight active button
@@ -421,8 +472,10 @@
             
             // Highlight icon
             const activeIcon = activeBtn.querySelector('svg');
-            activeIcon.classList.remove('text-slate-400');
-            activeIcon.classList.add('text-blue-600');
+            if(activeIcon) {
+                activeIcon.classList.remove('text-slate-400');
+                activeIcon.classList.add('text-blue-600');
+            }
         }
     }
     
@@ -438,17 +491,20 @@
                 if (isGreen) {
                     this.classList.remove('bg-green-500');
                     this.classList.add('bg-slate-200');
-                    thumb.classList.remove('translate-x-5');
-                    thumb.classList.add('translate-x-0');
+                    if(thumb) {
+                        thumb.classList.remove('translate-x-5');
+                        thumb.classList.add('translate-x-0');
+                    }
                 } else {
                     this.classList.remove('bg-slate-200');
                     this.classList.add('bg-green-500');
-                    thumb.classList.remove('translate-x-0');
-                    thumb.classList.add('translate-x-5');
+                    if(thumb) {
+                        thumb.classList.remove('translate-x-0');
+                        thumb.classList.add('translate-x-5');
+                    }
                 }
             });
         });
     });
 </script>
-@endpush
 @endsection
