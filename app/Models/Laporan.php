@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\CrowdVerification;
 
 class Laporan extends Model
 {
@@ -86,5 +87,10 @@ class Laporan extends Model
     public function validasi()
     {
         return $this->hasOne(ValidasiLaporan::class);
+    }
+
+    public function crowdVerifications()
+    {
+        return $this->hasMany(CrowdVerification::class);
     }
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\WebAuthController;
 use App\Http\Controllers\User\LaporanController as UserLaporanController;
+use App\Http\Controllers\User\CrowdVerificationController;
 use App\Http\Controllers\User\DonasiController as UserDonasiController;
 use App\Http\Controllers\Admin\VerifikasiLaporanController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
@@ -43,6 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/laporan/buat', [UserLaporanController::class, 'store'])->name('laporan.store');
     Route::post('/laporan/{id}/upvote', [UpvoteController::class, 'toggle'])->name('laporan.upvote');
     Route::post('/laporan/{id}/donasi', [UserDonasiController::class, 'store'])->name('laporan.donasi');
+    Route::post('/laporan/{id}/crowd-verifikasi', [CrowdVerificationController::class, 'store'])->name('laporan.crowd_verifikasi');
     Route::get('/laporan-saya', [UserLaporanController::class, 'user'])->name('laporan.saya');
     Route::get('/laporan-publik', [UserLaporanController::class, 'public'])->name('laporan.publik');
     Route::get('/laporan/{id}', [UserLaporanController::class, 'show'])->name('laporan.show');
