@@ -5,6 +5,12 @@
 @section('content')
 <div class="p-8 max-w-7xl mx-auto pb-20">
 
+    @if(session('success') || session('error'))
+        <div class="mb-6 rounded-2xl border px-5 py-4 text-sm shadow-sm {{ session('success') ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-rose-200 bg-rose-50 text-rose-800' }}">
+            {{ session('success') ?? session('error') }}
+        </div>
+    @endif
+
     <div class="flex flex-col lg:flex-row gap-8 items-start">
         <!-- Left Column -->
         <div class="flex-1 w-full space-y-6">
@@ -533,6 +539,67 @@
                     <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                     Laporan Publik - Dapat dilihat semua orang
                 </div>
+            </div>
+
+            <!-- Crowd Verification -->
+            <div class="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-slate-800">Crowd Verification</h3>
+                    <span class="text-[11px] font-semibold text-slate-500">Publik</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-emerald-600">Valid</p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-700">{{ $crowdValidCount }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-rose-100 bg-rose-50 p-4">
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-rose-600">Tidak Valid</p>
+                        <p class="mt-2 text-2xl font-bold text-rose-700">{{ $crowdInvalidCount }}</p>
+                    </div>
+                </div>
+                <div class="text-sm text-slate-600 leading-relaxed mb-4">Bantu konfirmasi kebenaran laporan ini. Validasi akan membantu tim menilai laporan secara cepat.</div>
+                @auth
+                    @if(auth()->id() === $laporan->user_id)
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                            Anda tidak dapat memvalidasi laporan yang Anda buat sendiri.
+                        </div>
+                    @elseif($userCrowdVerification)
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 space-y-3">
+                            <div class="flex items-center gap-2">
+                                <span class="inline-flex h-7 items-center justify-center rounded-full px-3 text-[11px] font-bold {{ $userCrowdVerification->is_valid ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700' }}">{{ $userCrowdVerification->is_valid ? 'Valid' : 'Tidak Valid' }}</span>
+                                <span class="text-[11px] text-slate-500">Diverifikasi oleh Anda</span>
+                            </div>
+                            @if($userCrowdVerification->komentar)
+                                <p class="text-sm text-slate-700">"{{ $userCrowdVerification->komentar }}"</p>
+                            @endif
+                            <form action="{{ route('laporan.crowd_verifikasi', $laporan->id) }}" method="POST" class="grid gap-3 sm:grid-cols-2">
+                                @csrf
+                                <input type="hidden" name="is_valid" value="1">
+                                <button type="submit" class="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-700">Ubah jadi Valid</button>
+                            </form>
+                            <form action="{{ route('laporan.crowd_verifikasi', $laporan->id) }}" method="POST" class="grid gap-3 sm:grid-cols-2">
+                                @csrf
+                                <input type="hidden" name="is_valid" value="0">
+                                <button type="submit" class="w-full rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-rose-700">Ubah jadi Tidak Valid</button>
+                            </form>
+                        </div>
+                    @else
+                        <form action="{{ route('laporan.crowd_verifikasi', $laporan->id) }}" method="POST" class="space-y-3">
+                            @csrf
+                            <input type="hidden" name="is_valid" value="1">
+                            <button type="submit" class="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-700">Laporan Valid</button>
+                        </form>
+                        <form action="{{ route('laporan.crowd_verifikasi', $laporan->id) }}" method="POST" class="space-y-3">
+                            @csrf
+                            <input type="hidden" name="is_valid" value="0">
+                            <button type="submit" class="w-full rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-rose-700">Laporan Tidak Valid</button>
+                        </form>
+                    @endif
+                @else
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                        Silakan <a href="{{ route('login') }}" class="font-semibold text-blue-600 hover:text-blue-700">masuk</a> untuk memberikan verifikasi.
+                    </div>
+                @endauth
             </div>
 
             <!-- Tindakan Cepat -->

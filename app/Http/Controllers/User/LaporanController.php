@@ -110,7 +110,16 @@ class LaporanController extends Controller
 
     public function show($id)
     {
-        $laporan = \App\Models\Laporan::with(['kategori', 'user', 'statusHistories', 'upvotes', 'komentars.user', 'donasis', 'evidenceLayers.user'])->findOrFail($id);
+        $laporan = \App\Models\Laporan::with([
+            'kategori',
+            'user',
+            'statusHistories',
+            'upvotes',
+            'komentars.user',
+            'donasis',
+            'evidenceLayers.user',
+            'crowdVerifications.user',
+        ])->findOrFail($id);
         
         $upvotesCount = $laporan->upvotes->count();
 
@@ -121,6 +130,11 @@ class LaporanController extends Controller
         $totalEvidences = $laporan->evidenceLayers->count();
         $uniqueContributors = $laporan->evidenceLayers->pluck('user_id')->unique()->filter()->count();
         $latestEvidence = $laporan->evidenceLayers->sortByDesc('created_at')->first();
+
+        $crowdVerifications = $laporan->crowdVerifications;
+        $crowdValidCount = $crowdVerifications->where('is_valid', true)->count();
+        $crowdInvalidCount = $crowdVerifications->where('is_valid', false)->count();
+        $userCrowdVerification = auth()->check() ? $crowdVerifications->firstWhere('user_id', auth()->id()) : null;
         
         // Ambil laporan terkait (berdasarkan kategori yang sama, maksimal 2)
         $relatedLaporans = \App\Models\Laporan::where('kategori_id', $laporan->kategori_id)
@@ -130,7 +144,19 @@ class LaporanController extends Controller
             ->get();
 
         $evidenceLayers = $laporan->evidenceLayers;
-        return view('user.laporan.show', compact('laporan', 'upvotesCount', 'relatedLaporans', 'totalDonasi', 'totalEvidences', 'uniqueContributors', 'latestEvidence', 'evidenceLayers'));
+        return view('user.laporan.show', compact(
+            'laporan',
+            'upvotesCount',
+            'relatedLaporans',
+            'totalDonasi',
+            'totalEvidences',
+            'uniqueContributors',
+            'latestEvidence',
+            'evidenceLayers',
+            'crowdValidCount',
+            'crowdInvalidCount',
+            'userCrowdVerification',
+        ));
     }
 
     public function user()
