@@ -11,9 +11,12 @@
             
             <!-- Card Utama -->
             <div class="bg-white border border-slate-200/60 rounded-xl p-6 md:p-8 shadow-sm">
-                <!-- Tags -->
-                <div class="flex flex-wrap items-center gap-2 mb-4">
-                    <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">
+                <!-- Tags & ID -->
+                <div class="flex flex-wrap items-center gap-3 mb-3">
+                    <span class="text-sm font-bold text-blue-600">
+                        #RODOKAN-{{ \Carbon\Carbon::parse($laporan->created_at)->format('Y') }}-{{ str_pad($laporan->id, 4, '0', STR_PAD_LEFT) }}
+                    </span>
+                    <span class="px-2.5 py-1 bg-blue-50 text-blue-600 border border-blue-100 text-[11px] font-bold rounded-md">
                         {{ $laporan->kategori->nama ?? 'Lainnya' }}
                     </span>
                     
@@ -22,49 +25,95 @@
                             'Menunggu' => 'bg-slate-100 text-slate-700',
                             'Terverifikasi' => 'bg-green-100 text-green-700',
                             'Ditolak' => 'bg-red-100 text-red-700',
-                            'Diproses' => 'bg-blue-100 text-blue-700',
-                            'Ditindaklanjuti' => 'bg-purple-100 text-purple-700',
-                            'Darurat' => 'bg-orange-100 text-orange-700',
-                            'Selesai' => 'bg-emerald-100 text-emerald-700',
-                            default => 'bg-slate-100 text-slate-700',
+                            'Diproses' => 'bg-blue-50 text-blue-600 border-blue-100',
+                            'Dalam Penanganan' => 'bg-blue-50 text-blue-600 border-blue-100',
+                            'Selesai' => 'bg-emerald-50 text-emerald-600 border-emerald-100',
+                            default => 'bg-slate-50 text-slate-600',
                         };
+                        $statusText = $laporan->status;
+                        if ($statusText == 'Diproses') $statusText = 'Dalam Penanganan';
                     @endphp
-                    <span class="px-3 py-1 {{ $statusColor }} text-xs font-bold rounded-full">
-                        {{ $laporan->status }}
+                    <span class="px-2.5 py-1 {{ $statusColor }} border text-[11px] font-bold rounded-md">
+                        {{ $statusText }}
+                    </span>
+
+                    <span class="ml-auto flex items-center gap-1.5 text-green-600 text-[11px] font-bold">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        Terverifikasi
                     </span>
                 </div>
 
+                @if($laporan->urgensi == 'Tinggi')
+                <div class="mb-4">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-600 border border-red-200 text-xs font-bold rounded-md">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"></path></svg>
+                        Mendesak
+                    </span>
+                </div>
+                @endif
+
                 <!-- Judul & Info Singkat -->
-                <h1 class="text-2xl font-bold text-slate-800 mb-2 leading-tight">
+                <h1 class="text-2xl font-bold text-slate-800 mb-3 leading-tight">
                     {{ $laporan->judul_laporan }}
                 </h1>
                 
-                <div class="space-y-1 mb-6">
-                    <div class="text-xs font-semibold text-blue-600">ID Laporan: #RODOKAN-{{ \Carbon\Carbon::parse($laporan->created_at)->format('Y') }}-{{ str_pad($laporan->id, 4, '0', STR_PAD_LEFT) }}</div>
-                    
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-[11px] text-slate-500 font-medium pt-1">
-                        <div class="flex items-center gap-1.5">
-                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            <span class="truncate">{{ $laporan->alamat ?? ($laporan->kecamatan . ', Bandung, Jawa Barat') }}</span>
+                <div class="flex items-center gap-4 text-xs text-slate-500 font-medium mb-8">
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span>{{ $laporan->created_at->format('d F Y, H:i') }} WIB</span>
+                    </div>
+                    <div class="w-1 h-1 rounded-full bg-slate-300"></div>
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        <span>{{ number_format(($laporan->id * 17) % 3000 + 100) }} views</span>
+                    </div>
+                </div>
+
+                <!-- Grey Info Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 bg-slate-50 border border-slate-100 rounded-xl p-5">
+                    <div>
+                        <p class="text-[10px] text-slate-500 mb-1">Dilaporkan oleh</p>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            <span class="text-xs font-bold text-slate-800 truncate">{{ $laporan->is_anonim ? 'Anonim' : ($laporan->user->name ?? 'Pengguna') }}</span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <div class="flex items-center gap-1.5">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                <span>{{ $laporan->waktu_kejadian ? $laporan->waktu_kejadian->format('d F Y') : $laporan->created_at->format('d F Y') }}</span>
-                            </div>
-                            <div class="flex items-center gap-1.5">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span>{{ $laporan->waktu_kejadian ? $laporan->waktu_kejadian->format('H:i') : $laporan->created_at->format('H:i') }} WIB</span>
-                            </div>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-500 mb-1">Lokasi Kejadian</p>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                            <span class="text-xs font-bold text-slate-800 truncate">{{ $laporan->kecamatan }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-500 mb-1">Waktu Kejadian</p>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="text-xs font-bold text-slate-800 truncate">{{ $laporan->waktu_kejadian ? $laporan->waktu_kejadian->format('d M Y, H:i') : $laporan->created_at->format('d M Y, H:i') }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-500 mb-1">Instansi Terkait</p>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            <span class="text-xs font-bold text-slate-800 truncate">BPBD Kota Bandung</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Deskripsi -->
-                <div class="border-t border-slate-100 pt-6 mb-8">
-                    <h2 class="text-sm font-bold text-slate-800 mb-3">Deskripsi Kejadian</h2>
-                    <div class="text-sm text-slate-600 leading-relaxed space-y-4">
-                        {!! nl2br(e($laporan->deskripsi)) !!}
+                <div class="space-y-6 mb-8">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-800 mb-2">Ringkasan Kejadian</h2>
+                        <div class="text-sm text-slate-600 leading-relaxed">
+                            {{ Str::limit($laporan->deskripsi, 250) }}
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-800 mb-2">Kronologi Lengkap</h2>
+                        <div class="text-sm text-slate-600 leading-relaxed space-y-4">
+                            {!! nl2br(e($laporan->deskripsi)) !!}
+                        </div>
                     </div>
                 </div>
 
@@ -270,49 +319,87 @@
                 
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-500">Pelapor</span>
-                        <span class="text-xs font-bold text-slate-800">{{ $laporan->is_anonim ? 'Anonim' : ($laporan->user->name ?? 'Anonim') }}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-500">Instansi</span>
-                        <span class="text-xs font-bold text-slate-800">BPBD Bandung</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-500">Tingkat Urgensi</span>
-                        <span class="px-2 py-0.5 {{ $laporan->urgensi == 'Tinggi' ? 'bg-red-100 text-red-700' : ($laporan->urgensi == 'Sedang' ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-700') }} text-[10px] font-bold rounded">
-                            {{ $laporan->urgensi }}
+                        <span class="text-xs text-slate-500">Kategori</span>
+                        <span class="px-2 py-1 bg-red-50 text-red-600 border border-red-100 text-[10px] font-bold rounded">
+                            {{ $laporan->kategori->nama ?? 'Bencana Alam' }}
                         </span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-500">Dukungan</span>
-                        <span class="text-xs font-bold text-slate-800">{{ $upvotesCount }}</span>
+                        <span class="text-xs text-slate-500">Tingkat Urgensi</span>
+                        <span class="px-2 py-1 {{ $laporan->urgensi == 'Tinggi' ? 'bg-red-50 text-red-600 border border-red-100' : ($laporan->urgensi == 'Sedang' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-slate-50 text-slate-600 border border-slate-100') }} text-[10px] font-bold rounded flex items-center gap-1">
+                            @if($laporan->urgensi == 'Tinggi')
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"></path></svg>
+                            Mendesak
+                            @else
+                            {{ $laporan->urgensi }}
+                            @endif
+                        </span>
                     </div>
-
+                    <div class="flex flex-col gap-1.5 pt-1">
+                        <span class="text-xs text-slate-500">Instansi Penanganan</span>
+                        <span class="text-sm font-bold text-slate-800">BPBD Kota Bandung</span>
+                    </div>
+                    <div class="flex flex-col gap-1.5 pt-2 border-t border-slate-100">
+                        <span class="text-xs text-slate-500">Status Saat Ini</span>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-1 bg-blue-50 text-blue-600 border border-blue-100 text-[10px] font-bold rounded">
+                                {{ $laporan->status == 'Diproses' ? 'Dalam Penanganan' : $laporan->status }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-100">
+                        <span class="text-xs text-slate-500">Komentar</span>
+                        <span class="text-xs font-bold text-slate-800">{{ $laporan->komentars->count() }}</span>
+                    </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-500">Dilihat</span>
-                        <span class="text-xs font-bold text-slate-800">142 kali</span>
+                        <span class="text-xs text-slate-500">Dukungan</span>
+                        <span class="text-xs font-bold text-slate-800">{{ $upvotesCount ?? $laporan->upvotes->count() }}</span>
                     </div>
                 </div>
+            </div>
 
-                <div class="border-t border-slate-100 mt-6 pt-5 space-y-3">
+            <!-- Interaksi Publik -->
+            <div class="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
+                <h3 class="text-sm font-bold text-slate-800 mb-4">Interaksi Publik</h3>
+                <div class="space-y-3">
                     @php
                         $hasUpvoted = auth()->check() && $laporan->upvotes->contains('user_id', auth()->id());
                     @endphp
                     <form action="{{ route('laporan.upvote', $laporan->id) }}" method="POST" class="w-full">
                         @csrf
-                        <button type="submit" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-colors {{ $hasUpvoted ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm' : 'bg-blue-50 hover:bg-blue-100 text-blue-600' }}">
+                        <button type="submit" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-colors bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-sm">
                             <svg class="w-4 h-4" fill="{{ $hasUpvoted ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path></svg>
-                            {{ $hasUpvoted ? 'Telah Didukung' : 'Dukung Laporan' }}
+                            Dukung ({{ $upvotesCount ?? $laporan->upvotes->count() }})
                         </button>
                     </form>
-                    <button class="w-full flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                        Bagikan
-                    </button>
-                    <button class="w-full flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
-                        Simpan
-                    </button>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button class="w-full flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition-colors shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
+                            Simpan
+                        </button>
+                        <button class="w-full flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition-colors shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                            Bagikan
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2 text-[10px] text-slate-500">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    Laporan Publik - Dapat dilihat semua orang
+                </div>
+            </div>
+
+            <!-- Tindakan Cepat -->
+            <div class="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
+                <h3 class="text-sm font-bold text-slate-800 mb-4">Tindakan Cepat</h3>
+                <div class="space-y-3">
+                    <a href="{{ route('laporan.create') }}" class="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm">
+                        Laporkan Kejadian Serupa
+                    </a>
+                    <a href="{{ route('laporan.public') }}" class="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 rounded-lg text-xs font-bold transition-colors">
+                        Lihat Laporan Lainnya
+                    </a>
                 </div>
             </div>
 
