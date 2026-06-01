@@ -94,7 +94,7 @@
                 <svg class="w-5 h-5 {{ request()->routeIs('notifications.*') ? $activeIcon : $inactiveIcon }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                 Notifikasi
                 @if(($unreadNotificationCount ?? 0) > 0)
-                    <span class="ml-auto px-1.5 py-0.5 text-[10px] font-bold rounded-full {{ $isAdmin ? 'bg-white text-blue-800' : 'bg-red-500 text-white' }}">{{ $unreadNotificationCount > 9 ? '9+' : $unreadNotificationCount }}</span>
+                    <span class="ml-auto px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-red-500 text-white">{{ $unreadNotificationCount > 99 ? '99+' : $unreadNotificationCount }}</span>
                 @endif
             </a>
             <a href="{{ $isAdmin ? route('admin.pengaturan.index') : route('user.pengaturan.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('admin.pengaturan.index') || request()->routeIs('user.pengaturan.index') ? $activeLink : $inactiveLink }}">
