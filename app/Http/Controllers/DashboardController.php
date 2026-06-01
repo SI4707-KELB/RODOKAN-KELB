@@ -99,6 +99,13 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
+        // 8. Report Comparison (Region vs Category)
+        $perbandinganWilayahKategori = Laporan::select('kecamatan', 'kategoris.nama as kategori', DB::raw('count(laporans.id) as total'))
+            ->join('kategoris', 'laporans.kategori_id', '=', 'kategoris.id')
+            ->whereNotNull('kecamatan')
+            ->groupBy('kecamatan', 'kategoris.nama')
+            ->get();
+
         return view('admin.dashboard.index', compact(
             'totalLaporanHariIni',
             'menungguVerifikasi',
@@ -112,6 +119,7 @@ class DashboardController extends Controller
             'kecamatanTerbanyak',
             'tren7Hari',
             'laporanTerbaru',
+            'perbandinganWilayahKategori',
             'trendTotalLaporan',
             'trendMenunggu',
             'trendDiproses',
