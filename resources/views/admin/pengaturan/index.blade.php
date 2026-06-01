@@ -23,6 +23,10 @@
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                     Keamanan Akun
                 </button>
+                <button type="button" onclick="switchTab('notifikasi')" class="settings-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-slate-600 hover:bg-slate-50" data-target="notifikasi">
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    Notifikasi
+                </button>
 
                 <button type="button" onclick="switchTab('kategori')" class="settings-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-slate-600 hover:bg-slate-50" data-target="kategori">
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -174,7 +178,89 @@
                 </div>
             </div>
 
+            <!-- Notifikasi Panel -->
+            <div id="panel-notifikasi" class="settings-panel hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-800 mb-6">Preferensi Notifikasi</h2>
+                
+                <div class="space-y-2">
+                    <!-- Item 1 -->
+                    <div class="bg-slate-50/50 hover:bg-slate-50 rounded-xl p-4 flex items-center justify-between transition-colors">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Laporan Baru Masuk</h3>
+                            <p class="text-xs text-slate-500 mt-1">Notifikasi saat ada laporan baru dari warga</p>
+                        </div>
+                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
+                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                        </button>
+                    </div>
 
+                    <!-- Item 2 -->
+                    <div class="bg-slate-50/50 hover:bg-slate-50 rounded-xl p-4 flex items-center justify-between transition-colors">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Laporan Darurat</h3>
+                            <p class="text-xs text-slate-500 mt-1">Notifikasi prioritas tinggi untuk laporan darurat</p>
+                        </div>
+                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
+                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                        </button>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div class="bg-slate-50/50 hover:bg-slate-50 rounded-xl p-4 flex items-center justify-between transition-colors">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Menunggu Verifikasi</h3>
+                            <p class="text-xs text-slate-500 mt-1">Pengingat laporan yang belum diverifikasi</p>
+                        </div>
+                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
+                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                        </button>
+                    </div>
+
+                    <!-- Item 4 -->
+                    <div class="bg-slate-50/50 hover:bg-slate-50 rounded-xl p-4 flex items-center justify-between transition-colors">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Komentar Warga</h3>
+                            <p class="text-xs text-slate-500 mt-1">Notifikasi saat warga mengomentari laporan</p>
+                        </div>
+                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
+                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                        </button>
+                    </div>
+
+                    <!-- Item 5 -->
+                    <div class="bg-slate-50/50 hover:bg-slate-50 rounded-xl p-4 flex items-center justify-between transition-colors">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Update Instansi</h3>
+                            <p class="text-xs text-slate-500 mt-1">Pemberitahuan saat instansi memperbarui status</p>
+                        </div>
+                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
+                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                        </button>
+                    </div>
+
+                    <!-- Item 6 -->
+                    <div class="bg-slate-50/50 hover:bg-slate-50 rounded-xl p-4 flex items-center justify-between transition-colors">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Laporan Selesai</h3>
+                            <p class="text-xs text-slate-500 mt-1">Notifikasi saat laporan ditandai selesai</p>
+                        </div>
+                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-200 transition-colors duration-200 ease-in-out focus:outline-none">
+                            <span class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                        </button>
+                    </div>
+
+                    <!-- Item 7 -->
+                    <div class="bg-slate-50/50 hover:bg-slate-50 rounded-xl p-4 flex items-center justify-between transition-colors">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Rekap Harian</h3>
+                            <p class="text-xs text-slate-500 mt-1">Ringkasan laporan harian setiap pukul 17:00</p>
+                        </div>
+                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
+                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <!-- Kategori Laporan Panel -->
             <div id="panel-kategori" class="settings-panel hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
