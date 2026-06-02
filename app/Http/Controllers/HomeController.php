@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Laporan;
+use App\Services\BmkgService;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(BmkgService $bmkg)
     {
         // Statistik
         $totalLaporan = Laporan::count();
@@ -33,6 +34,10 @@ class HomeController extends Controller
                              ->whereNotNull('longitude')
                              ->get();
 
+        // BMKG Data
+        $gempa = $bmkg->getLatestEarthquake();
+        $cuaca = $bmkg->getWeather();
+
         return view('welcome', compact(
             'totalLaporan',
             'responAlert',
@@ -40,7 +45,9 @@ class HomeController extends Controller
             'dalamProses',
             'trendingIncidents',
             'laporanTerbaru',
-            'laporanMap'
+            'laporanMap',
+            'gempa',
+            'cuaca'
         ));
     }
 }

@@ -216,40 +216,110 @@
 
                 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <h3 class="text-lg font-extrabold text-slate-800">Tindak Lanjut</h3>
-                    <form action="{{ route('admin.laporan.update', $laporan->id) }}" method="POST" class="mt-5 space-y-4">
-                        @csrf
-                        @method('PUT')
 
-                        <div>
-                            <label class="mb-2 block text-sm font-bold text-slate-600">Status Penanganan</label>
-                            <select name="status" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100">
-                                @foreach($statuses ?? ['Menunggu', 'Terverifikasi', 'Diproses', 'Ditindaklanjuti', 'Selesai', 'Ditolak'] as $status)
-                                    <option value="{{ $status }}" @selected($laporan->status === $status)>{{ $status }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                    @php
+                        $currentStep = match($laporan->status) {
+                            'Menunggu' => 1,
+                            'Terverifikasi' => 2,
+                            'Ditindaklanjuti' => 3,
+                            'Diproses' => 4,
+                            'Selesai' => 5,
+                            'Ditolak' => -1,
+                            default => 0,
+                        };
+                    @endphp
 
-                        <div>
-                            <label class="mb-2 block text-sm font-bold text-slate-600">Instansi Tujuan</label>
-                            <input type="text" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100" placeholder="Contoh: Dinas PU Kota Bandung">
+                    @if($currentStep === -1)
+                        <div class="mt-5 rounded-xl bg-rose-50 border border-rose-200 px-5 py-4 text-sm">
+                            <span class="font-bold text-rose-700">Laporan ditolak.</span>
+                            @if($laporan->alasan_penolakan)
+                                <p class="text-rose-600 mt-1">{{ $laporan->alasan_penolakan }}</p>
+                            @endif
                         </div>
+                    @elseif($currentStep === 5)
+                        <div class="mt-5 rounded-xl bg-emerald-50 border border-emerald-200 px-5 py-4 text-sm">
+                            <span class="font-bold text-emerald-700">Laporan selesai diproses.</span>
+                        </div>
+                    @else
+                        @if($currentStep === 1)
+                            <form action="{{ route('admin.laporan.update', $laporan->id) }}" method="POST" class="mt-5 space-y-4">
+                                @csrf
+                                @method('PUT')
 
-                        <div>
-                            <label class="mb-2 block text-sm font-bold text-slate-600">Catatan Pemerintah</label>
-                            <textarea name="catatan_verifikasi" rows="4" class="w-full resize-none rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100" placeholder="Tulis catatan untuk instansi terkait...">{{ old('catatan_verifikasi', $laporan->catatan_verifikasi) }}</textarea>
-                        </div>
+                                <div>
+                                    <label class="mb-2 block text-sm font-bold text-slate-600">Catatan Verifikasi</label>
+                                    <textarea name="catatan_verifikasi" rows="3" class="w-full resize-none rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100" placeholder="Tulis catatan verifikasi...">{{ old('catatan_verifikasi') }}</textarea>
+                                </div>
 
-                        <div class="grid gap-3">
-                            <button type="submit" name="status" value="Terverifikasi" class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-green-700">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                Setujui
-                            </button>
-                            <button type="submit" name="status" value="Ditolak" class="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-red-700">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                Tolak Laporan
-                            </button>
-                        </div>
-                    </form>
+                                <div class="grid gap-3">
+                                    <button type="submit" name="status" value="Terverifikasi" class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-green-700">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        Setujui & Lanjutkan
+                                    </button>
+                                    <button type="submit" name="status" value="Ditolak" class="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-red-700">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        Tolak Laporan
+                                    </button>
+                                </div>
+                            </form>
+                        @elseif($currentStep === 2)
+                            <form action="{{ route('admin.laporan.forward', $laporan->id) }}" method="POST" class="mt-5 space-y-4">
+                                @csrf
+                                <div>
+                                    <label class="mb-2 block text-sm font-bold text-slate-600">Pilih Instansi Tujuan</label>
+                                    <select name="instansi_id" required class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100">
+                                        <option value="">-- Pilih Instansi --</option>
+                                        @foreach($instansis as $instansi)
+                                            <option value="{{ $instansi->id }}" @selected(($laporan->instansi_id ?? 0) === $instansi->id)>{{ $instansi->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="mb-2 block text-sm font-bold text-slate-600">Catatan untuk Instansi</label>
+                                    <textarea name="catatan" rows="3" class="w-full resize-none rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100" placeholder="Tulis catatan untuk instansi terkait...">{{ old('catatan') }}</textarea>
+                                </div>
+                                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-indigo-700 w-full">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                                    Teruskan ke Instansi
+                                </button>
+                            </form>
+                        @elseif($currentStep === 3)
+                            <form action="{{ route('admin.laporan.update', $laporan->id) }}" method="POST" class="mt-5 space-y-4">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" name="status" value="Diproses">
+                                <div>
+                                    <label class="mb-2 block text-sm font-bold text-slate-600">Catatan Proses</label>
+                                    <textarea name="catatan_verifikasi" rows="3" class="w-full resize-none rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" placeholder="Tulis catatan penanganan...">{{ old('catatan_verifikasi') }}</textarea>
+                                </div>
+                                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-sky-700 w-full">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    Proses Laporan
+                                </button>
+                            </form>
+                        @elseif($currentStep === 4)
+                            <form action="{{ route('admin.laporan.update', $laporan->id) }}" method="POST" class="mt-5 space-y-4">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" name="status" value="Selesai">
+                                <div>
+                                    <label class="mb-2 block text-sm font-bold text-slate-600">Catatan Penyelesaian</label>
+                                    <textarea name="catatan_verifikasi" rows="3" class="w-full resize-none rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100" placeholder="Tulis catatan penyelesaian...">{{ old('catatan_verifikasi') }}</textarea>
+                                </div>
+                                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-emerald-700 w-full">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    Selesaikan Laporan
+                                </button>
+                            </form>
+                        @endif
+
+                        @if($laporan->instansi)
+                            <div class="mt-5 rounded-xl bg-indigo-50 border border-indigo-100 px-4 py-3 text-sm">
+                                <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Instansi Terkait</span>
+                                <p class="font-bold text-slate-800 mt-1">{{ $laporan->instansi->nama }}</p>
+                            </div>
+                        @endif
+                    @endif
                 </section>
 
                 <section class="rounded-2xl border border-blue-200 bg-blue-100/70 p-6 shadow-sm">
@@ -268,7 +338,7 @@
                         @foreach([
                             ['label' => 'Laporan Diterima', 'desc' => 'Laporan telah masuk ke sistem RODOKAN', 'date' => $laporan->created_at?->format('d M Y, H:i') . ' WIB', 'done' => true, 'color' => 'green'],
                             ['label' => 'Menunggu Verifikasi', 'desc' => 'Laporan diverifikasi oleh admin', 'date' => $laporan->waktu_verifikasi?->format('d M Y, H:i') . ' WIB', 'done' => in_array($laporan->status, ['Terverifikasi', 'Diproses', 'Ditindaklanjuti', 'Selesai']), 'color' => 'amber'],
-                            ['label' => 'Diteruskan ke Instansi', 'desc' => $laporan->status === 'Ditindaklanjuti' || $laporan->status === 'Selesai' ? 'Instansi terkait menerima laporan' : '-', 'date' => '-', 'done' => in_array($laporan->status, ['Ditindaklanjuti', 'Selesai']), 'color' => 'slate'],
+                            ['label' => 'Diteruskan ke Instansi', 'desc' => ($laporan->status === 'Ditindaklanjuti' || $laporan->status === 'Selesai') ? ($laporan->instansi ? $laporan->instansi->nama : 'Instansi terkait menerima laporan') : '-', 'date' => '-', 'done' => in_array($laporan->status, ['Ditindaklanjuti', 'Selesai']), 'color' => 'slate'],
                             ['label' => 'Dalam Penanganan', 'desc' => $laporan->status === 'Diproses' || $laporan->status === 'Selesai' ? 'Laporan sedang diproses' : '-', 'date' => '-', 'done' => in_array($laporan->status, ['Diproses', 'Selesai']), 'color' => 'slate'],
                             ['label' => 'Selesai', 'desc' => $laporan->status === 'Selesai' ? 'Laporan selesai ditangani' : '-', 'date' => '-', 'done' => $laporan->status === 'Selesai', 'color' => 'slate'],
                         ] as $step)

@@ -22,7 +22,7 @@
 <body class="bg-gray-50 text-gray-800 antialiased selection:bg-blue-500 selection:text-white">
 
     <!-- Navbar -->
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-[1000]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
@@ -35,9 +35,9 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#dashboard" class="text-blue-600 font-medium">Dashboard</a>
-                    <a href="#laporan" class="text-gray-500 hover:text-gray-900 font-medium transition">Laporan</a>
-                    <a href="#panduan" class="text-gray-500 hover:text-gray-900 font-medium transition">Panduan</a>
+                    <a href="#dashboard" data-nav="dashboard" class="text-blue-600 font-medium">Dashboard</a>
+                    <a href="#laporan" data-nav="laporan" class="text-gray-500 hover:text-gray-900 font-medium transition">Laporan</a>
+                    <a href="#panduan" data-nav="panduan" class="text-gray-500 hover:text-gray-900 font-medium transition">Panduan</a>
                 </div>
 
                 <!-- Auth Buttons -->
@@ -50,33 +50,36 @@
     </nav>
 
     <!-- Main Content -->
-    <main id="dashboard" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main id="dashboard" class="scroll-mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- Emergency Alert -->
-        <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start gap-4 shadow-sm">
-            <div class="text-red-500 mt-0.5">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        @php
+            $isGempaSignifikan = $gempa && (float) ($gempa['Magnitude'] ?? 0) >= 4.5;
+            $weatherCode = $cuaca['current']['weather_code'] ?? 0;
+        @endphp
+
+        @if($isGempaSignifikan)
+        <div class="bg-red-100 border-l-4 border-l-red-600 p-4 mb-6 flex items-start gap-3">
+            <div class="text-red-600 mt-0.5 shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
             </div>
-            <div class="flex-1">
-                <h3 class="text-red-700 font-bold mb-1">Peringatan Darurat</h3>
-                <p class="text-red-600 text-sm mb-2">Banjir hingga ketinggian 2 meter di Kecamatan Gedebage, Kota Bandung. Hujan diproyeksi turunlah dalam beberapa waktu.</p>
-                <div class="flex items-center gap-4 text-xs text-red-500">
-                    <span class="flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        Kec. Gedebage, Kota Bandung
-                    </span>
-                    <span class="flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        10 menit lalu
-                    </span>
-                </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-red-800 mb-0.5">Peringatan Gempa Bumi — BMKG</p>
+                <p class="text-sm text-red-700 leading-relaxed">
+                    Gempa M {{ number_format((float) $gempa['Magnitude'], 1) }}, {{ $gempa['Wilayah'] ?? '-' }}.
+                    Kedalaman {{ $gempa['Kedalaman'] ?? '-' }}.
+                    @if(!empty($gempa['Potensi']) && $gempa['Potensi'] !== '-')
+                        {{ $gempa['Potensi'] }}.
+                    @endif
+                </p>
+                @if(!empty($gempa['Dirasakan']) && $gempa['Dirasakan'] !== '-')
+                    <p class="text-xs text-red-600 mt-1">Dirasakan: {{ $gempa['Dirasakan'] }}</p>
+                @endif
+                <p class="text-xs text-red-500 mt-1">{{ $gempa['Tanggal'] ?? '-' }}, {{ $gempa['Jam'] ?? '-' }} &middot; Sumber BMKG</p>
             </div>
-            <button class="text-red-400 hover:text-red-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
         </div>
+        @endif
 
         <!-- Dashboard Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -254,6 +257,92 @@
                         <p class="text-xs text-gray-500">Dalam Proses</p>
                     </div>
                 </div>
+
+                @if($cuaca)
+                @php
+                    $wmoMain = [
+                        0 => 'Cerah', 1 => 'Cerah Berawan', 2 => 'Berawan', 3 => 'Berawan Tebal',
+                        45 => 'Berkabut', 51 => 'Gerimis', 61 => 'Hujan', 80 => 'Hujan Lokal',
+                        95 => 'Badai Petir',
+                    ];
+                    $code = $cuaca['current']['weather_code'] ?? 0;
+                    $temp = $cuaca['current']['temperature_2m'] ?? '-';
+
+                    $tz = 'Asia/Jakarta';
+                    $now = \Carbon\Carbon::now($tz)->minute(0)->second(0);
+                    $hourly = $cuaca['hourly'] ?? [];
+                    $hourlyTimes = $hourly['time'] ?? [];
+                    $nextHours = [];
+                    if (count($hourlyTimes) > 0) {
+                        $lastIdx = count($hourlyTimes) - 1;
+                        $nowIndex = null;
+                        foreach ($hourlyTimes as $i => $t) {
+                            $h = \Carbon\Carbon::parse($t, $tz);
+                            if ($h->gte($now)) {
+                                $nowIndex = $i;
+                                break;
+                            }
+                        }
+                        if ($nowIndex === null) $nowIndex = 0;
+                        $endIdx = min($nowIndex + 5, $lastIdx);
+                        for ($i = $nowIndex; $i <= $endIdx; $i++) {
+                            $nextHours[] = [
+                                'time' => $hourly['time'][$i] ?? '',
+                                'temp' => $hourly['temperature_2m'][$i] ?? '-',
+                                'code' => $hourly['weather_code'][$i] ?? 0,
+                                'rain' => $hourly['precipitation_probability'][$i] ?? 0,
+                                'wind' => $hourly['wind_speed_10m'][$i] ?? 0,
+                            ];
+                        }
+                    }
+                @endphp
+                <div class="bg-white border border-slate-200 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-slate-800">Cuaca Bandung</h3>
+                        <span class="text-xs text-slate-400">Sekarang</span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-bold text-slate-900">{{ $temp }}°C</span>
+                        <span class="text-sm text-slate-500">{{ $wmoMain[$code] ?? 'Cerah' }}</span>
+                    </div>
+                    @if(!empty($nextHours))
+                    <div class="mt-4 pt-3 border-t border-slate-100">
+                        <p class="text-xs font-semibold text-slate-500 mb-3">Prakiraan Per Jam</p>
+                        <div class="space-y-1.5">
+                            @foreach($nextHours as $h)
+                            @php
+                                $hTime = \Carbon\Carbon::parse($h['time'], $tz);
+                                $wmoIcon = match((int) $h['code']) {
+                                    0 => '○', 1 => '◑', 2 => '◐', 3 => '●',
+                                    45, 48 => '≡', 51,53,55 => 'ᐧ', 61,63,65,80,81,82 => 'ᨗ',
+                                    95,96,99 => '⚡', default => '○',
+                                };
+                            @endphp
+                            <div class="flex items-center gap-3 py-2 px-3 rounded-lg {{ $loop->first ? 'bg-blue-50' : 'hover:bg-slate-50' }}">
+                                <div class="w-12 text-xs font-medium {{ $loop->first ? 'text-blue-600' : 'text-slate-500' }}">{{ $loop->first ? 'Sekarang' : $hTime->format('H:i') }}</div>
+                                <div class="w-6 text-center text-sm">{{ $wmoIcon }}</div>
+                                <div class="w-10 text-sm font-semibold text-slate-800">{{ $h['temp'] }}°</div>
+                                <div class="flex-1 text-xs text-slate-600">{{ $wmoMain[$h['code']] ?? '-' }}</div>
+                                <div class="w-14 text-right text-xs {{ ($h['rain'] ?? 0) > 50 ? 'text-blue-600 font-semibold' : 'text-slate-400' }}">{{ $h['rain'] ?? 0 }}%</div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                    <div class="mt-3 pt-3 border-t border-slate-100 grid grid-cols-2 gap-1 text-center text-xs">
+                        @foreach(array_slice($cuaca['daily']['time'] ?? [], 0, 2) as $i => $day)
+                        @php
+                            $max = $cuaca['daily']['temperature_2m_max'][$i] ?? '-';
+                            $min = $cuaca['daily']['temperature_2m_min'][$i] ?? '-';
+                        @endphp
+                        <div>
+                            <div class="text-slate-500 font-medium">{{ \Carbon\Carbon::parse($day)->format('D') }}</div>
+                            <div class="text-slate-800 font-semibold mt-0.5">{{ $max }}° / {{ $min }}°</div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
 
                 <!-- Aksi Cepat -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">

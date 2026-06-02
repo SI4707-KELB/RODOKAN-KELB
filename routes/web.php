@@ -55,8 +55,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{id}', [NotificationController::class, 'show'])->name('notifications.show');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::post('/notifications/delete-all', [NotificationController::class, 'destroyAll'])->name('notifications.delete-all');
 
     Route::post('/laporan/check-duplicate', [UserLaporanController::class, 'checkDuplicate'])->name('laporan.check-duplicate');
     
@@ -84,7 +87,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         Route::get('/', [AdminLaporanController::class, 'index'])->name('admin.laporan.index');
         Route::get('/{id}', [AdminLaporanController::class, 'show'])->name('admin.laporan.show');
         Route::get('/{id}/edit', [AdminLaporanController::class, 'edit'])->name('admin.laporan.edit');
-        Route::put('/{id}', [AdminLaporanController::class, 'update'])->name('admin.laporan.update');
+            Route::put('/{id}', [AdminLaporanController::class, 'update'])->name('admin.laporan.update');
+            Route::post('/{id}/forward', [AdminLaporanController::class, 'forwardToInstansi'])->name('admin.laporan.forward');
         Route::delete('/{id}', [AdminLaporanController::class, 'destroy'])->name('admin.laporan.destroy');
         Route::post('/bulk-update', [AdminLaporanController::class, 'bulkUpdate'])->name('admin.laporan.bulk-update');
         Route::get('/stats/data', [AdminLaporanController::class, 'getStats'])->name('admin.laporan.stats');

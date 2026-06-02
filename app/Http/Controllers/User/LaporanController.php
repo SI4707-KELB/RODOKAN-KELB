@@ -113,6 +113,7 @@ class LaporanController extends Controller
         $laporan = \App\Models\Laporan::with([
             'kategori',
             'user',
+            'instansi',
             'statusHistories',
             'upvotes',
             'komentars.user',

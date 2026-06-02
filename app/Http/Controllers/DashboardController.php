@@ -25,7 +25,8 @@ class DashboardController extends Controller
             $totalLaporanku = $laporanku->count();
             $laporanSelesai = $laporanku->where('status', 'Selesai')->count();
             $laporanDiproses = $laporanku->whereIn('status', ['Menunggu', 'Diproses', 'Darurat', 'Ditindaklanjuti'])->count();
-            return view('user.dashboard.index', compact('laporanku', 'totalLaporanku', 'laporanSelesai', 'laporanDiproses'));
+            $partisipasiSkor = min($totalLaporanku * 10, 100);
+            return view('user.dashboard.index', compact('laporanku', 'totalLaporanku', 'laporanSelesai', 'laporanDiproses', 'partisipasiSkor'));
         }
 
         // 1. Summary Statistics

@@ -240,18 +240,26 @@
                 </div>
                 
                 <div class="text-center mb-5">
-                    <div class="text-[3.5rem] font-extrabold text-blue-600 leading-none mb-1">87</div>
+                    <div class="text-[3.5rem] font-extrabold text-blue-600 leading-none mb-1">{{ $partisipasiSkor }}</div>
                     <div class="text-xs font-medium text-slate-500">dari 100 poin</div>
                 </div>
 
                 <div class="w-full bg-slate-100 rounded-full h-1.5 mb-5 overflow-hidden">
-                    <div class="bg-blue-600 h-1.5 rounded-full relative" style="width: 87%">
+                    <div class="bg-blue-600 h-1.5 rounded-full relative" style="width: {{ $partisipasiSkor }}%">
                         <div class="absolute inset-0 bg-white/20"></div>
                     </div>
                 </div>
                 
                 <p class="text-[11px] text-center text-slate-500 px-2 leading-relaxed">
-                    Anda termasuk dalam top 15% kontributor aktif
+                    @if($totalLaporanku === 0)
+                        Belum ada laporan. Ayo buat laporan pertama Anda!
+                    @elseif($totalLaporanku < 5)
+                        Anda telah membuat {{ $totalLaporanku }} laporan. Teruslah berkontribusi!
+                    @elseif($totalLaporanku < 10)
+                        Anda telah membuat {{ $totalLaporanku }} laporan. Kontribusi Anda cukup aktif!
+                    @else
+                        Anda telah membuat {{ $totalLaporanku }} laporan. Kontributor yang sangat aktif!
+                    @endif
                 </p>
             </div>
 

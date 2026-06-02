@@ -27,6 +27,7 @@ class Laporan extends Model
         'longitude',
         'foto',
         'admin_id',
+        'instansi_id',
         'catatan_verifikasi',
         'alasan_penolakan',
         'waktu_verifikasi',
@@ -51,6 +52,11 @@ class Laporan extends Model
     public function admin()
     {
         return $this->belongsTo(User::class, 'admin_id');
+    }
+
+    public function instansi()
+    {
+        return $this->belongsTo(Instansi::class);
     }
 
     public function komentars()

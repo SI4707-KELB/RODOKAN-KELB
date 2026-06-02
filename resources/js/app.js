@@ -190,6 +190,26 @@ const initializeReportLocationPicker = () => {
     });
 
     let marker = null;
+    let geocodeTimer = null;
+
+    const reverseGeocode = (latLng) => {
+        const alamatInput = document.getElementById('alamat');
+        if (!alamatInput) return;
+
+        clearTimeout(geocodeTimer);
+        geocodeTimer = setTimeout(() => {
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latLng.lat}&lon=${latLng.lng}&addressdetails=1&accept-language=id`, {
+                headers: { 'Accept': 'application/json' }
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data?.display_name) {
+                        alamatInput.value = data.display_name;
+                    }
+                })
+                .catch(() => {});
+        }, 300);
+    };
 
     const setSelectedLocation = (latLng, zoom = 15) => {
         if (!marker) {
@@ -210,6 +230,7 @@ const initializeReportLocationPicker = () => {
         longitudeInput.value = latLng.lng.toFixed(8);
         coordinateOutput.textContent = coordinateText(latLng);
         map.setView(latLng, Math.max(map.getZoom(), zoom));
+        reverseGeocode(latLng);
     };
 
     if (hasInitialCoordinate) {
@@ -274,8 +295,60 @@ const initializeLoginDashboardMap = () => {
     requestAnimationFrame(() => map.invalidateSize());
 };
 
+const initializeScrollSpy = () => {
+    const navLinks = document.querySelectorAll('[data-nav]');
+    if (navLinks.length === 0) return;
+
+    const header = document.querySelector('nav');
+    const headerHeight = header?.offsetHeight || 80;
+
+    const sections = [...navLinks].map((link) => {
+        return document.getElementById(link.getAttribute('data-nav'));
+    }).filter(Boolean);
+
+    const visibilityMap = new Map();
+
+    const setActiveSection = (activeId) => {
+        navLinks.forEach((link) => {
+            const isActive = link.getAttribute('data-nav') === activeId;
+            link.className = isActive
+                ? 'text-blue-600 font-medium'
+                : 'text-gray-500 hover:text-gray-900 font-medium transition';
+        });
+    };
+
+    const updateActiveSection = () => {
+        let bestId = null;
+        let maxRatio = 0;
+
+        visibilityMap.forEach((ratio, id) => {
+            if (ratio > maxRatio) {
+                maxRatio = ratio;
+                bestId = id;
+            }
+        });
+
+        if (bestId) {
+            setActiveSection(bestId);
+        }
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            visibilityMap.set(entry.target.id, entry.intersectionRatio);
+        });
+        updateActiveSection();
+    }, {
+        rootMargin: `-${headerHeight + 10}px 0px -40% 0px`,
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+    });
+
+    sections.forEach((section) => observer.observe(section));
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     initializeLoginDashboardMap();
     initializeClusterReportMap();
     initializeReportLocationPicker();
+    initializeScrollSpy();
 });
