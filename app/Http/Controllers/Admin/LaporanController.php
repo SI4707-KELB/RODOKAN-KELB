@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Instansi;
 use App\Models\Kategori;
 use App\Models\Laporan;
 use App\Models\User;
@@ -98,10 +99,11 @@ class LaporanController extends Controller
      */
     public function show($id)
     {
-        $laporan = Laporan::with(['user', 'admin', 'kategori', 'komentars.user'])->findOrFail($id);
+        $laporan = Laporan::with(['user', 'admin', 'kategori', 'komentars.user', 'instansi'])->findOrFail($id);
         $statuses = ['Menunggu', 'Terverifikasi', 'Diproses', 'Ditindaklanjuti', 'Selesai', 'Ditolak'];
+        $instansis = Instansi::orderBy('nama')->get();
 
-        return view('admin.laporan.show', compact('laporan', 'statuses'));
+        return view('admin.laporan.show', compact('laporan', 'statuses', 'instansis'));
     }
 
     /**
@@ -109,11 +111,12 @@ class LaporanController extends Controller
      */
     public function edit($id)
     {
-        $laporan = Laporan::with(['user', 'kategori', 'admin', 'komentars.user'])->findOrFail($id);
+        $laporan = Laporan::with(['user', 'kategori', 'admin', 'instansi', 'komentars.user'])->findOrFail($id);
         $statuses = ['Menunggu', 'Terverifikasi', 'Diproses', 'Ditindaklanjuti', 'Selesai', 'Ditolak'];
         $admins = User::where('role', 'admin')->get();
+        $instansis = Instansi::orderBy('nama')->get();
 
-        return view('admin.laporan.edit', compact('laporan', 'statuses', 'admins'));
+        return view('admin.laporan.edit', compact('laporan', 'statuses', 'admins', 'instansis'));
     }
 
     /**
@@ -128,7 +131,27 @@ class LaporanController extends Controller
             'catatan_verifikasi' => 'nullable|string|max:500',
             'alasan_penolakan' => 'nullable|string|max:500',
             'admin_id' => 'nullable|exists:users,id',
+            'instansi_id' => 'nullable|exists:instansis,id',
         ]);
+
+        $allowedTransitions = [
+            'Menunggu' => ['Terverifikasi', 'Ditolak'],
+            'Terverifikasi' => [],
+            'Ditindaklanjuti' => ['Diproses'],
+            'Diproses' => ['Selesai'],
+            'Selesai' => [],
+            'Ditolak' => [],
+        ];
+
+        $currentStatus = $laporan->status;
+        $newStatus = $validated['status'];
+
+        if ($currentStatus !== $newStatus) {
+            $allowed = $allowedTransitions[$currentStatus] ?? [];
+            if (!in_array($newStatus, $allowed, true)) {
+                return back()->withErrors(["Tidak dapat mengubah status dari \"{$currentStatus}\" ke \"{$newStatus}\". Harap ikuti alur yang benar."])->withInput();
+            }
+        }
 
         $extra = collect($validated)->only(['catatan_verifikasi', 'alasan_penolakan', 'admin_id'])->filter()->all();
 
@@ -150,6 +173,40 @@ class LaporanController extends Controller
 
         return redirect()->route('admin.laporan.show', $laporan->id)
             ->with('success', 'Laporan berhasil diperbarui');
+    }
+
+    /**
+     * Forward a report to a specific agency (instansi).
+     */
+    public function forwardToInstansi(Request $request, $id)
+    {
+        $laporan = Laporan::findOrFail($id);
+
+        if ($laporan->status !== 'Terverifikasi') {
+            return back()->withErrors(['Laporan harus diverifikasi terlebih dahulu sebelum diteruskan ke instansi.']);
+        }
+
+        $validated = $request->validate([
+            'instansi_id' => 'required|exists:instansis,id',
+            'catatan' => 'nullable|string|max:500',
+        ]);
+
+        $instansi = Instansi::findOrFail($validated['instansi_id']);
+
+        $laporan->update([
+            'instansi_id' => $instansi->id,
+        ]);
+
+        $this->statusService->updateStatus(
+            $laporan,
+            'Ditindaklanjuti',
+            auth()->id(),
+            $validated['catatan'] ?? 'Diteruskan ke ' . $instansi->nama,
+            ['instansi_id' => $instansi->id],
+        );
+
+        return redirect()->route('admin.laporan.show', $laporan->id)
+            ->with('success', "Laporan diteruskan ke {$instansi->nama}");
     }
 
     /**

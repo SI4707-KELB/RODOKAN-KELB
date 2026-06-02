@@ -96,6 +96,19 @@
                             <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
                         @enderror
                     </div>
+
+                    <div>
+                        <label for="instansi_id" class="mb-2 block text-sm font-bold text-slate-700">Instansi Tujuan</label>
+                        <select id="instansi_id" name="instansi_id" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100">
+                            <option value="">Pilih Instansi</option>
+                            @foreach($instansis as $instansi)
+                                <option value="{{ $instansi->id }}" @selected((int) old('instansi_id', $laporan->instansi_id) === $instansi->id)>{{ $instansi->nama }}</option>
+                            @endforeach
+                        </select>
+                        @error('instansi_id')
+                            <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <div>

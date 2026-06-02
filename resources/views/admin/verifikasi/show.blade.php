@@ -9,6 +9,17 @@
     $passed = $validasi ? $validasi->total_passed : 0;
     $total = max(count($items), 1);
     $progress = round(($passed / $total) * 100);
+
+    $hasLocation = $laporan->latitude && $laporan->longitude;
+    $mapReports = $hasLocation ? collect([[
+        'lat' => (float) $laporan->latitude,
+        'lng' => (float) $laporan->longitude,
+        'title' => $laporan->judul_laporan,
+        'category' => $laporan->kategori->nama ?? 'Laporan',
+        'status' => $laporan->status,
+        'urgency' => $laporan->urgensi,
+        'district' => $laporan->kecamatan ?? $laporan->alamat ?? '-',
+    ]]) : collect();
 @endphp
 
 <div class="p-8 max-w-7xl mx-auto pb-20">
@@ -106,19 +117,19 @@
             <!-- Location Map -->
             <div class="bg-white rounded-2xl border border-slate-200/60 p-6 shadow-sm">
                 <h3 class="text-lg font-bold text-slate-800 mb-4">Lokasi Kejadian</h3>
-                <div class="w-full h-64 bg-slate-200 rounded-xl mb-4 flex items-center justify-center">
-                    @if($laporan->latitude && $laporan->longitude)
-                        <div class="text-center">
-                            <svg class="w-12 h-12 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
-                            <p class="text-xs text-slate-500">{{ $laporan->latitude }}, {{ $laporan->longitude }}</p>
-                        </div>
-                    @else
-                        <p class="text-slate-500">Lokasi GPS tidak tersedia</p>
-                    @endif
-                </div>
-                <p class="text-sm text-blue-600 font-medium">
-                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.658 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
-                    Alamat Lengkap: {{ $laporan->alamat }}
+                @if($hasLocation)
+                    <div
+                        id="laporan-map"
+                        class="h-64 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
+                        data-reports="{{ $mapReports->toJson(JSON_HEX_APOS | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) }}"
+                    ></div>
+                @else
+                    <div class="w-full h-64 bg-slate-200 rounded-xl mb-4 flex items-center justify-center">
+                        <p class="text-slate-500">Koordinat lokasi belum tersedia</p>
+                    </div>
+                @endif
+                <p class="mt-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-700">
+                    <b>Alamat Lengkap:</b> {{ $laporan->alamat ?? ($laporan->kecamatan ?? '-') }}
                 </p>
             </div>
 

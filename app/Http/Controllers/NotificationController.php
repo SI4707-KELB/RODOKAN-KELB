@@ -17,6 +17,17 @@ class NotificationController extends Controller
         return view('notifications.index', compact('notifications'));
     }
 
+    public function show(string $id)
+    {
+        $notification = auth()->user()->notifications()->where('id', $id)->firstOrFail();
+
+        if ($notification->read_at === null) {
+            $notification->markAsRead();
+        }
+
+        return view('notifications.user_show', compact('notification'));
+    }
+
     public function markAsRead(string $id): JsonResponse|RedirectResponse
     {
         $notification = auth()->user()->notifications()->where('id', $id)->firstOrFail();
@@ -32,6 +43,29 @@ class NotificationController extends Controller
     public function markAllAsRead(): JsonResponse|RedirectResponse
     {
         auth()->user()->unreadNotifications->markAsRead();
+
+        if (request()->expectsJson()) {
+            return response()->json(['status' => 'success']);
+        }
+
+        return back();
+    }
+
+    public function destroy(string $id): JsonResponse|RedirectResponse
+    {
+        $notification = auth()->user()->notifications()->where('id', $id)->firstOrFail();
+        $notification->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json(['status' => 'success']);
+        }
+
+        return back();
+    }
+
+    public function destroyAll(): JsonResponse|RedirectResponse
+    {
+        auth()->user()->notifications()->delete();
 
         if (request()->expectsJson()) {
             return response()->json(['status' => 'success']);

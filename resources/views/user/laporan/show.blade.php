@@ -3,6 +3,18 @@
 @section('title', 'Detail Laporan - RODOKAN')
 
 @section('content')
+@php
+    $hasLocation = $laporan->latitude && $laporan->longitude;
+    $mapReports = $hasLocation ? collect([[
+        'lat' => (float) $laporan->latitude,
+        'lng' => (float) $laporan->longitude,
+        'title' => $laporan->judul_laporan,
+        'category' => $laporan->kategori->nama ?? 'Laporan',
+        'status' => $laporan->status,
+        'urgency' => $laporan->urgensi,
+        'district' => $laporan->kecamatan ?? $laporan->alamat ?? '-',
+    ]]) : collect();
+@endphp
 <div class="p-8 max-w-7xl mx-auto pb-20">
 
     @if(session('success') || session('error'))
@@ -102,7 +114,7 @@
                         <p class="text-[10px] text-slate-500 mb-1">Instansi Terkait</p>
                         <div class="flex items-center gap-2">
                             <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                            <span class="text-xs font-bold text-slate-800 truncate">BPBD Kota Bandung</span>
+                            <span class="text-xs font-bold text-slate-800 truncate">{{ $laporan->instansi->nama ?? 'Belum ditentukan' }}</span>
                         </div>
                     </div>
                 </div>
@@ -287,31 +299,18 @@
             <!-- Lokasi Kejadian (Map) -->
             <div class="bg-white border border-slate-200/60 rounded-xl p-6 md:p-8 shadow-sm">
                 <h2 class="text-sm font-bold text-slate-800 mb-4">Lokasi Kejadian</h2>
-                
-                <div class="w-full h-64 bg-slate-900 rounded-xl relative overflow-hidden mb-4 shadow-inner border border-slate-200">
-                    <!-- Map Graphic Placeholder -->
-                    <div class="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-                    <svg class="absolute inset-0 w-full h-full text-yellow-600/20" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <pattern id="street-grid" width="30" height="30" patternUnits="userSpaceOnUse">
-                                <path d="M 30 0 L 0 0 0 30" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                            </pattern>
-                        </defs>
-                        <rect width="100%" height="100%" fill="url(#street-grid)" />
-                        <!-- Diagonal lines mimicking roads -->
-                        <path d="M0,50 Q100,100 200,50 T400,100 T600,0" fill="none" stroke="currentColor" stroke-width="2"/>
-                        <path d="M0,150 Q150,50 300,150 T600,100" fill="none" stroke="currentColor" stroke-width="1"/>
-                        <circle cx="200" cy="100" r="150" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="4 4" />
-                        <circle cx="200" cy="100" r="100" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="4 4" />
-                        <circle cx="200" cy="100" r="50" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="4 4" />
-                    </svg>
 
-                    <!-- Ping Point -->
-                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
-                        <div class="w-6 h-6 bg-blue-600 border-4 border-white rounded-full shadow-lg"></div>
-                        <div class="w-16 h-16 bg-blue-500/30 rounded-full absolute -top-5 -left-5 animate-ping"></div>
+                @if($hasLocation)
+                    <div
+                        id="laporan-map"
+                        class="h-64 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 mb-4"
+                        data-reports="{{ $mapReports->toJson(JSON_HEX_APOS | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) }}"
+                    ></div>
+                @else
+                    <div class="w-full h-64 bg-slate-100 rounded-xl mb-4 flex items-center justify-center border border-slate-200">
+                        <p class="text-sm text-slate-400 font-semibold">Koordinat lokasi belum tersedia</p>
                     </div>
-                </div>
+                @endif
 
                 <div class="bg-blue-50/50 border border-blue-100 rounded-lg p-4">
                     <p class="text-xs leading-relaxed text-blue-900">
@@ -435,7 +434,7 @@
                         </div>
                         <div class="pt-1 flex-1">
                             <h4 class="text-xs font-bold {{ in_array($laporan->status, ['Diproses', 'Selesai', 'Darurat', 'Ditindaklanjuti']) ? 'text-slate-800' : 'text-slate-400' }} mb-0.5">Diteruskan ke Instansi</h4>
-                            <p class="text-[10px] {{ in_array($laporan->status, ['Diproses', 'Selesai', 'Darurat', 'Ditindaklanjuti']) ? 'text-slate-500' : 'text-slate-400' }} leading-snug mb-1">Laporan diteruskan ke instansi terkait</p>
+                            <p class="text-[10px] {{ in_array($laporan->status, ['Diproses', 'Selesai', 'Darurat', 'Ditindaklanjuti']) ? 'text-slate-500' : 'text-slate-400' }} leading-snug mb-1">{{ $laporan->instansi ? "Diteruskan ke {$laporan->instansi->nama}" : 'Laporan diteruskan ke instansi terkait' }}</p>
                         </div>
                     </div>
 
@@ -488,7 +487,7 @@
                     </div>
                     <div class="flex flex-col gap-1.5 pt-1">
                         <span class="text-xs text-slate-500">Instansi Penanganan</span>
-                        <span class="text-sm font-bold text-slate-800">BPBD Kota Bandung</span>
+                        <span class="text-sm font-bold text-slate-800">{{ $laporan->instansi->nama ?? 'Belum ditentukan' }}</span>
                     </div>
                     <div class="flex flex-col gap-1.5 pt-2 border-t border-slate-100">
                         <span class="text-xs text-slate-500">Status Saat Ini</span>
@@ -609,7 +608,7 @@
                     <a href="{{ route('laporan.create') }}" class="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm">
                         Laporkan Kejadian Serupa
                     </a>
-                    <a href="{{ route('laporan.public') }}" class="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 rounded-lg text-xs font-bold transition-colors">
+                    <a href="{{ route('laporan.publik') }}" class="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 rounded-lg text-xs font-bold transition-colors">
                         Lihat Laporan Lainnya
                     </a>
                 </div>

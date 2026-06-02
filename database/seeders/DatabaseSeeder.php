@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             KategoriSeeder::class,
             EvidenceSeeder::class,
+            InstansiSeeder::class,
         ]);
     }
 }

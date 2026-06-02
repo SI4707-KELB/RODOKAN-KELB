@@ -160,7 +160,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                 </div>
-                                <input type="text" name="alamat" value="{{ old('alamat') }}" placeholder="Contoh: Jl. Soekarno-Hatta No. 123, Kec. Dayeuhkolot, Bandung" class="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400">
+                                <input type="text" id="alamat" name="alamat" value="{{ old('alamat') }}" placeholder="Contoh: Jl. Soekarno-Hatta No. 123, Kec. Dayeuhkolot, Bandung" class="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400">
                             </div>
                             @error('alamat')
                                 <p class="text-[10px] text-red-500 mt-1.5 font-medium">{{ $message }}</p>

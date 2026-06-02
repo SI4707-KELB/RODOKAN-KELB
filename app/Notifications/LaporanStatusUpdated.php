@@ -24,7 +24,7 @@ class LaporanStatusUpdated extends Notification
 
     public function toDatabase(object $notifiable): array
     {
-        return [
+        $data = [
             'laporan_id' => $this->laporan->id,
             'judul_laporan' => $this->laporan->judul_laporan,
             'status_sebelumnya' => $this->statusSebelumnya,
@@ -33,5 +33,14 @@ class LaporanStatusUpdated extends Notification
             'message' => "Status laporan \"{$this->laporan->judul_laporan}\" diperbarui dari {$this->statusSebelumnya} menjadi {$this->statusBaru}.",
             'url' => route('laporan.show', $this->laporan->id),
         ];
+
+        if ($this->laporan->relationLoaded('instansi') && $this->laporan->instansi) {
+            $data['instansi_id'] = $this->laporan->instansi->id;
+            $data['instansi_name'] = $this->laporan->instansi->nama;
+        } elseif ($this->laporan->instansi_id) {
+            $data['instansi_id'] = $this->laporan->instansi_id;
+        }
+
+        return $data;
     }
 }
