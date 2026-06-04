@@ -775,5 +775,61 @@
         </section>
     </main>
 
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Brand -->
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-9 h-9 bg-white rounded-lg flex items-center justify-center overflow-hidden border border-blue-100">
+                            <img src="{{ asset('images/logo-mark.png') }}" alt="Logo RODOKAN" class="w-8 h-8 object-contain">
+                        </div>
+                        <span class="font-bold text-xl tracking-tight text-gray-900">RODOKAN</span>
+                    </div>
+                    <p class="text-sm text-gray-500 leading-relaxed max-w-md">
+                        RODOKAN (Report & Observasi Darurat Kota) adalah platform pelaporan keluhan dan kejadian publik yang membantu masyarakat menyampaikan laporan secara cepat, transparan, dan terkoordinasi.
+                    </p>
+                </div>
+
+                <!-- Navigasi -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-900 mb-3">Navigasi</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li><a href="#dashboard" class="hover:text-blue-600 transition">Dashboard</a></li>
+                        <li><a href="#laporan" class="hover:text-blue-600 transition">Laporan</a></li>
+                        <li><a href="#panduan" class="hover:text-blue-600 transition">Panduan</a></li>
+                        <li><a href="{{ route('login') }}" class="hover:text-blue-600 transition">Login</a></li>
+                        <li><a href="{{ route('register') }}" class="hover:text-blue-600 transition">Register</a></li>
+                    </ul>
+                </div>
+
+                <!-- Kontak -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-900 mb-3">Kontak</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            <span>cs@rodokan.id</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.49 4.49a1 1 0 01-.5 1.21l-2.26 1.13a11 11 0 005.52 5.52l1.13-2.26a1 1 0 011.21-.5l4.49 1.49a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.72 21 3 14.28 3 6V5z"></path></svg>
+                            <span>(022) 1234-5678</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <span>Kota Bandung, Jawa Barat</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+                <p>&copy; {{ date('Y') }} RODOKAN. Seluruh hak cipta dilindungi.</p>
+                <p>Dibuat untuk pelayanan publik yang lebih baik.</p>
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>
