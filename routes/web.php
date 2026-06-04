@@ -65,6 +65,7 @@ Route::middleware('auth')->group(function () {
     
     // User Pengaturan
     Route::get('/pengaturan', [\App\Http\Controllers\User\PengaturanController::class, 'index'])->name('user.pengaturan.index');
+    Route::put('/pengaturan', [\App\Http\Controllers\User\PengaturanController::class, 'update'])->name('user.pengaturan.update');
 
     // Admin Only Routes within Auth
     Route::middleware('admin')->group(function () {
@@ -83,6 +84,7 @@ Route::middleware('auth')->group(function () {
 // Admin Routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     // Admin Laporan Management
+    Route::get('/peta-sebaran', [AdminLaporanController::class, 'petaSebaran'])->name('admin.peta.index');
     Route::prefix('laporan')->group(function () {
         Route::get('/', [AdminLaporanController::class, 'index'])->name('admin.laporan.index');
         Route::get('/{id}', [AdminLaporanController::class, 'show'])->name('admin.laporan.show');

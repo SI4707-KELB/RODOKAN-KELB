@@ -17,6 +17,13 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { font-family: 'Inter', sans-serif; }
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-none {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased selection:bg-blue-500 selection:text-white">
@@ -50,7 +57,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main id="dashboard" class="scroll-mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main id="dashboard" class="scroll-mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
         @php
             $isGempaSignifikan = $gempa && (float) ($gempa['Magnitude'] ?? 0) >= 4.5;
@@ -82,10 +89,10 @@
         @endif
 
         <!-- Dashboard Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
             
             <!-- Left Column (Span 7) -->
-            <div class="lg:col-span-7 space-y-6">
+            <div class="lg:col-span-7 space-y-4">
                 
                 <!-- Filter & Pencarian -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
@@ -205,10 +212,111 @@
                     <a href="#" class="block text-center mt-4 text-xs font-medium text-blue-600 hover:text-blue-800">Lihat Semua Trending &gt;</a>
                 </div>
 
+                <!-- Distribusi Kategori Laporan -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                            Distribusi Kategori
+                        </h3>
+                        <span class="text-[10px] font-bold bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full uppercase tracking-wide">{{ $totalLaporan }} total</span>
+                    </div>
+                    <div class="space-y-3">
+                        @php
+                            $katColors = ['bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-red-500', 'bg-purple-500', 'bg-cyan-500', 'bg-pink-500'];
+                            $katBgColors = ['bg-blue-50', 'bg-emerald-50', 'bg-amber-50', 'bg-red-50', 'bg-purple-50', 'bg-cyan-50', 'bg-pink-50'];
+                            $katTextColors = ['text-blue-700', 'text-emerald-700', 'text-amber-700', 'text-red-700', 'text-purple-700', 'text-cyan-700', 'text-pink-700'];
+                            $maxKat = $kategoriStats->max('total') ?: 1;
+                        @endphp
+                        @forelse($kategoriStats as $index => $kat)
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full {{ $katColors[$index % count($katColors)] }} shrink-0"></span>
+                                    <span class="text-xs font-semibold text-gray-700">{{ $kat['nama'] }}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold {{ $katTextColors[$index % count($katTextColors)] }} {{ $katBgColors[$index % count($katBgColors)] }} px-1.5 py-0.5 rounded">{{ $kat['total'] }}</span>
+                                    <span class="text-[10px] text-gray-400 font-medium w-10 text-right">{{ $totalLaporan > 0 ? round(($kat['total'] / $totalLaporan) * 100, 1) : 0 }}%</span>
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="h-1.5 rounded-full {{ $katColors[$index % count($katColors)] }} transition-all duration-700" style="width: {{ ($kat['total'] / $maxKat) * 100 }}%"></div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="text-xs text-gray-400 text-center py-4">Belum ada data kategori</div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Top 5 Kecamatan -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    <h3 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Top 5 Kecamatan
+                    </h3>
+                    <div class="space-y-2.5">
+                        @forelse($topKecamatan as $index => $kec)
+                        <div class="flex items-center gap-3 p-2.5 rounded-lg {{ $index === 0 ? 'bg-blue-50 border border-blue-100' : 'bg-gray-50/50 border border-gray-100/80' }} transition-all hover:shadow-sm">
+                            <div class="w-7 h-7 rounded-lg {{ $index === 0 ? 'bg-blue-600 text-white' : ($index === 1 ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-600') }} flex items-center justify-center text-xs font-black shrink-0">
+                                {{ $index + 1 }}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-bold text-gray-800 truncate">{{ $kec->kecamatan }}</h4>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="text-sm font-extrabold {{ $index === 0 ? 'text-blue-600' : 'text-gray-800' }}">{{ $kec->total }}</span>
+                                <span class="text-[10px] text-gray-400 font-medium ml-0.5">laporan</span>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="text-xs text-gray-400 text-center py-4">Belum ada data kecamatan</div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Distribusi Minggu Ini -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            Distribusi Minggu Ini
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{{ $mingguIni }} laporan</span>
+                            @if($trendMinggu >= 0)
+                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                                    +{{ $trendMinggu }}%
+                                </span>
+                            @else
+                                <span class="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                    {{ $trendMinggu }}%
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="flex items-end gap-2 h-32">
+                        @foreach($mingguData as $d)
+                        <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                            <span class="text-[10px] font-bold {{ $d['total'] > 0 ? 'text-blue-600' : 'text-slate-300' }}">{{ $d['total'] }}</span>
+                            <div class="w-full rounded-lg transition-all duration-500 hover:opacity-80" 
+                                 style="height: {{ max(($d['total'] / $maxMinggu) * 100, 4) }}%; 
+                                        background: {{ $d['total'] > 0 ? 'linear-gradient(180deg, #3b82f6, #2563eb)' : '#f1f5f9' }};">
+                            </div>
+                            <span class="text-[10px] font-semibold text-slate-500">{{ $d['hari'] }}</span>
+                            <span class="text-[8px] text-slate-400 -mt-0.5">{{ $d['label'] }}</span>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
             </div>
 
             <!-- Right Column (Span 5) -->
-            <div class="lg:col-span-5 space-y-6">
+            <div class="lg:col-span-5 flex flex-col gap-4">
                 
                 <!-- Stats Grid -->
                 <div class="grid grid-cols-2 gap-4">
@@ -269,25 +377,49 @@
                     $temp = $cuaca['current']['temperature_2m'] ?? '-';
 
                     $tz = 'Asia/Jakarta';
-                    $now = \Carbon\Carbon::now($tz)->minute(0)->second(0);
+                    $now = \Carbon\Carbon::now($tz);
                     $hourly = $cuaca['hourly'] ?? [];
                     $hourlyTimes = $hourly['time'] ?? [];
-                    $nextHours = [];
+
+                    $daysMap = [
+                        'Sun' => 'Min', 'Mon' => 'Sen', 'Tue' => 'Sel', 'Wed' => 'Rab',
+                        'Thu' => 'Kam', 'Fri' => 'Jum', 'Sat' => 'Sab'
+                    ];
+                    $daysMapFull = [
+                        'Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
+                        'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'
+                    ];
+                    $monthsMap = [
+                        'Jan' => 'Jan', 'Feb' => 'Feb', 'Mar' => 'Mar', 'Apr' => 'Apr', 'May' => 'Mei', 'Jun' => 'Jun',
+                        'Jul' => 'Jul', 'Aug' => 'Agt', 'Sep' => 'Sep', 'Oct' => 'Okt', 'Nov' => 'Nov', 'Dec' => 'Des'
+                    ];
+
+                    $daysData = [];
                     if (count($hourlyTimes) > 0) {
-                        $lastIdx = count($hourlyTimes) - 1;
-                        $nowIndex = null;
                         foreach ($hourlyTimes as $i => $t) {
-                            $h = \Carbon\Carbon::parse($t, $tz);
-                            if ($h->gte($now)) {
-                                $nowIndex = $i;
-                                break;
+                            $hTime = \Carbon\Carbon::parse($t, $tz);
+                            $dateKey = $hTime->format('Y-m-d');
+                            
+                            // For today, start showing from current hour. For other days show full day.
+                            if ($hTime->isToday() && $hTime->format('H') < $now->format('H')) {
+                                continue;
                             }
-                        }
-                        if ($nowIndex === null) $nowIndex = 0;
-                        $endIdx = min($nowIndex + 5, $lastIdx);
-                        for ($i = $nowIndex; $i <= $endIdx; $i++) {
-                            $nextHours[] = [
-                                'time' => $hourly['time'][$i] ?? '',
+                            
+                            if (!isset($daysData[$dateKey])) {
+                                $engDay = $hTime->format('D');
+                                $engMonth = $hTime->format('M');
+                                $indDay = $daysMap[$engDay] ?? $engDay;
+                                $dayLabel = $indDay . ', ' . $hTime->format('d') . ' ' . ($monthsMap[$engMonth] ?? $engMonth);
+
+                                $daysData[$dateKey] = [
+                                    'date' => $hTime,
+                                    'label' => $hTime->isToday() ? 'Hari Ini' : ($hTime->isTomorrow() ? 'Besok' : $dayLabel),
+                                    'hours' => []
+                                ];
+                            }
+                            
+                            $daysData[$dateKey]['hours'][] = [
+                                'time' => $hTime,
                                 'temp' => $hourly['temperature_2m'][$i] ?? '-',
                                 'code' => $hourly['weather_code'][$i] ?? 0,
                                 'rain' => $hourly['precipitation_probability'][$i] ?? 0,
@@ -295,53 +427,145 @@
                             ];
                         }
                     }
+                    // Limit to 5 days
+                    $daysData = array_slice($daysData, 0, 5, true);
                 @endphp
-                <div class="bg-white border border-slate-200 rounded-xl p-4">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-bold text-slate-800">Cuaca Bandung</h3>
-                        <span class="text-xs text-slate-400">Sekarang</span>
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                    <!-- Current Weather Header -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                                <span class="relative flex h-2 w-2">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                                </span>
+                                Cuaca Bandung
+                            </h3>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Prakiraan 5 Hari Per Jam</p>
+                        </div>
+                        <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-semibold">Real-time</span>
                     </div>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-3xl font-bold text-slate-900">{{ $temp }}°C</span>
-                        <span class="text-sm text-slate-500">{{ $wmoMain[$code] ?? 'Cerah' }}</span>
+
+                    <!-- Current Temp Info -->
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-4xl font-extrabold text-slate-900 tracking-tight">{{ $temp }}°C</span>
+                            <span class="text-sm font-semibold text-slate-500">{{ $wmoMain[$code] ?? 'Cerah' }}</span>
+                        </div>
+                        <div class="text-right text-xs text-slate-400 leading-tight">
+                            <div>Kelembaban: {{ $cuaca['current']['relative_humidity_2m'] ?? '-' }}%</div>
+                            <div class="mt-1">Angin: {{ $cuaca['current']['wind_speed_10m'] ?? '-' }} km/h</div>
+                        </div>
                     </div>
-                    @if(!empty($nextHours))
-                    <div class="mt-4 pt-3 border-t border-slate-100">
-                        <p class="text-xs font-semibold text-slate-500 mb-3">Prakiraan Per Jam</p>
-                        <div class="space-y-1.5">
-                            @foreach($nextHours as $h)
-                            @php
-                                $hTime = \Carbon\Carbon::parse($h['time'], $tz);
-                                $wmoIcon = match((int) $h['code']) {
-                                    0 => '○', 1 => '◑', 2 => '◐', 3 => '●',
-                                    45, 48 => '≡', 51,53,55 => 'ᐧ', 61,63,65,80,81,82 => 'ᨗ',
-                                    95,96,99 => '⚡', default => '○',
-                                };
-                            @endphp
-                            <div class="flex items-center gap-3 py-2 px-3 rounded-lg {{ $loop->first ? 'bg-blue-50' : 'hover:bg-slate-50' }}">
-                                <div class="w-12 text-xs font-medium {{ $loop->first ? 'text-blue-600' : 'text-slate-500' }}">{{ $loop->first ? 'Sekarang' : $hTime->format('H:i') }}</div>
-                                <div class="w-6 text-center text-sm">{{ $wmoIcon }}</div>
-                                <div class="w-10 text-sm font-semibold text-slate-800">{{ $h['temp'] }}°</div>
-                                <div class="flex-1 text-xs text-slate-600">{{ $wmoMain[$h['code']] ?? '-' }}</div>
-                                <div class="w-14 text-right text-xs {{ ($h['rain'] ?? 0) > 50 ? 'text-blue-600 font-semibold' : 'text-slate-400' }}">{{ $h['rain'] ?? 0 }}%</div>
-                            </div>
+
+                    <!-- Day Tabs -->
+                    <div class="border-b border-slate-100 mb-4 pb-2">
+                        <div class="flex gap-1.5 overflow-x-auto scrollbar-none" id="weather-tabs">
+                            @foreach($daysData as $dateStr => $dayInfo)
+                            <button type="button" 
+                                    class="weather-tab-btn px-2.5 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all duration-200 {{ $loop->first ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700' }}" 
+                                    data-target="day-panel-{{ $loop->index }}">
+                                {{ $dayInfo['label'] }}
+                            </button>
                             @endforeach
                         </div>
                     </div>
-                    @endif
-                    <div class="mt-3 pt-3 border-t border-slate-100 grid grid-cols-2 gap-1 text-center text-xs">
-                        @foreach(array_slice($cuaca['daily']['time'] ?? [], 0, 2) as $i => $day)
+
+                    <!-- Hour Panels -->
+                    <div id="weather-panels" class="mb-5">
+                        @foreach($daysData as $dateStr => $dayInfo)
+                        <div id="day-panel-{{ $loop->index }}" 
+                             class="weather-panel-content transition-all duration-300 {{ $loop->first ? 'block' : 'hidden' }}">
+                            
+                            <!-- Horizontal Scroll Hour List -->
+                            <div class="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none select-none">
+                                @forelse($dayInfo['hours'] as $h)
+                                @php
+                                    $wmoIcon = match((int) $h['code']) {
+                                        0 => '☀️', 1, 2 => '⛅', 3 => '☁️',
+                                        45, 48 => '🌫️', 
+                                        51, 53, 55 => '🌦️', 
+                                        61, 63, 65, 80, 81, 82 => '🌧️',
+                                        95, 96, 99 => '⛈️', 
+                                        default => '☀️',
+                                    };
+                                @endphp
+                                <div class="flex flex-col items-center justify-between p-2.5 bg-slate-50/70 rounded-xl min-w-[68px] border border-slate-100/80 hover:border-blue-200 hover:bg-blue-50/20 transition-all duration-300">
+                                    <span class="text-[9px] font-bold text-slate-400">{{ $h['time']->format('H:i') }}</span>
+                                    <span class="text-lg my-2 filter drop-shadow-sm select-none">{{ $wmoIcon }}</span>
+                                    <span class="text-xs font-black text-slate-800">{{ $h['temp'] }}°</span>
+                                    <span class="text-[9px] font-bold text-blue-500 flex items-center gap-0.5 mt-1.5 leading-none">
+                                        💧{{ $h['rain'] }}%
+                                    </span>
+                                </div>
+                                @empty
+                                <div class="w-full text-center text-xs text-slate-400 py-4">Data tidak tersedia</div>
+                                @endforelse
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    <!-- 5-Day Summary List at bottom -->
+                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                        <p class="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Ringkasan Harian</p>
+                        @foreach($daysData as $dateStr => $dayInfo)
                         @php
-                            $max = $cuaca['daily']['temperature_2m_max'][$i] ?? '-';
-                            $min = $cuaca['daily']['temperature_2m_min'][$i] ?? '-';
+                            $dayIdx = $loop->index;
+                            $max = $cuaca['daily']['temperature_2m_max'][$dayIdx] ?? '-';
+                            $min = $cuaca['daily']['temperature_2m_min'][$dayIdx] ?? '-';
+                            $dayCode = $cuaca['daily']['weather_code'][$dayIdx] ?? 0;
+                            $dayIcon = match((int) $dayCode) {
+                                0 => '☀️', 1, 2 => '⛅', 3 => '☁️',
+                                45, 48 => '🌫️', 
+                                51, 53, 55 => '🌦️', 
+                                61, 63, 65, 80, 81, 82 => '🌧️',
+                                95, 96, 99 => '⛈️', 
+                                default => '☀️',
+                            };
+                            $engDayFull = $dayInfo['date']->format('l');
+                            $dayLabelName = $dayInfo['date']->isToday() ? 'Hari Ini' : ($dayInfo['date']->isTomorrow() ? 'Besok' : ($daysMapFull[$engDayFull] ?? $engDayFull));
                         @endphp
-                        <div>
-                            <div class="text-slate-500 font-medium">{{ \Carbon\Carbon::parse($day)->format('D') }}</div>
-                            <div class="text-slate-800 font-semibold mt-0.5">{{ $max }}° / {{ $min }}°</div>
+                        <div class="flex items-center justify-between text-xs py-0.5">
+                            <span class="w-24 font-bold text-slate-600 capitalize">{{ $dayLabelName }}</span>
+                            <span class="text-base w-8 text-center">{{ $dayIcon }}</span>
+                            <span class="text-slate-400 font-semibold w-14 text-center text-[10px] truncate" title="{{ $wmoMain[$dayCode] ?? 'Cerah' }}">{{ $wmoMain[$dayCode] ?? 'Cerah' }}</span>
+                            <span class="text-slate-800 font-black text-right w-16 text-[11px]">{{ $max }}° / <span class="text-slate-400 font-medium">{{ $min }}°</span></span>
                         </div>
                         @endforeach
                     </div>
                 </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const tabButtons = document.querySelectorAll('.weather-tab-btn');
+                        const panels = document.querySelectorAll('.weather-panel-content');
+
+                        tabButtons.forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                // Remove active styles from all buttons
+                                tabButtons.forEach(b => {
+                                    b.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+                                    b.classList.add('bg-slate-50', 'text-slate-500', 'hover:bg-slate-100', 'hover:text-slate-700');
+                                });
+
+                                // Add active styles to current button
+                                btn.classList.remove('bg-slate-50', 'text-slate-500', 'hover:bg-slate-100', 'hover:text-slate-700');
+                                btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+
+                                // Hide all panels
+                                panels.forEach(p => p.classList.add('hidden'));
+
+                                // Show the active panel
+                                const targetId = btn.getAttribute('data-target');
+                                const targetPanel = document.getElementById(targetId);
+                                if (targetPanel) {
+                                    targetPanel.classList.remove('hidden');
+                                }
+                            });
+                        });
+                    });
+                </script>
                 @endif
 
                 <!-- Aksi Cepat -->
@@ -360,7 +584,7 @@
                 </div>
 
                 <!-- Laporan Publik Terbaru -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex-1">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-semibold text-gray-800">Laporan Publik Terbaru</h3>
                         <a href="#" class="text-xs text-blue-600 font-medium flex items-center gap-1 hover:text-blue-800">
@@ -412,7 +636,7 @@
         </div>
 
         <!-- Laporan -->
-        <section id="laporan" class="scroll-mt-24 mt-12">
+        <section id="laporan" class="scroll-mt-24 mt-8">
             <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-6">
                 <div>
                     <p class="text-sm font-semibold text-blue-600 mb-2">Laporan Publik</p>
@@ -425,7 +649,7 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div class="lg:col-span-2 bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
                     <div class="p-5 border-b border-gray-100 flex items-center justify-between">
                         <h3 class="font-semibold text-gray-900">Daftar Laporan Terkini</h3>
@@ -500,7 +724,7 @@
         </section>
 
         <!-- Panduan -->
-        <section id="panduan" class="scroll-mt-24 mt-12 mb-8">
+        <section id="panduan" class="scroll-mt-24 mt-8 mb-8">
             <div class="bg-white border border-gray-100 rounded-xl shadow-sm p-6 md:p-8">
                 <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between mb-8">
                     <div>
@@ -514,7 +738,7 @@
                     </a>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                     <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                         <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>

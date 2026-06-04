@@ -273,110 +273,23 @@
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Kategori Item -->
+                    @php $colors = ['bg-blue-500', 'bg-teal-500', 'bg-red-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-sky-500', 'bg-yellow-500']; @endphp
+                    @forelse($kategoris as $i => $k)
                     <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors">
                         <div>
                             <div class="flex items-center gap-2 mb-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                                <h3 class="text-sm font-bold text-slate-800">Infrastruktur</h3>
+                                <span class="w-2.5 h-2.5 rounded-full {{ $colors[$i % count($colors)] }}"></span>
+                                <h3 class="text-sm font-bold text-slate-800">{{ $k->nama }}</h3>
                             </div>
-                            <p class="text-xs text-slate-500 ml-4.5">Total Laporan: <span class="font-semibold text-slate-700">245</span></p>
+                            <p class="text-xs text-slate-500 ml-4.5">Total Laporan: <span class="font-semibold text-slate-700">{{ $k->laporans_count }}</span></p>
                         </div>
                         <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
                             <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
                         </button>
                     </div>
-                    <!-- Kategori Item -->
-                    <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span>
-                                <h3 class="text-sm font-bold text-slate-800">Kesehatan</h3>
-                            </div>
-                            <p class="text-xs text-slate-500 ml-4.5">Total Laporan: <span class="font-semibold text-slate-700">89</span></p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                    <!-- Kategori Item -->
-                    <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                                <h3 class="text-sm font-bold text-slate-800">Bencana Alam</h3>
-                            </div>
-                            <p class="text-xs text-slate-500 ml-4.5">Total Laporan: <span class="font-semibold text-slate-700">34</span></p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                    <!-- Kategori Item -->
-                    <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-                                <h3 class="text-sm font-bold text-slate-800">Lingkungan</h3>
-                            </div>
-                            <p class="text-xs text-slate-500 ml-4.5">Total Laporan: <span class="font-semibold text-slate-700">156</span></p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                    <!-- Kategori Item -->
-                    <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
-                                <h3 class="text-sm font-bold text-slate-800">Pelayanan Publik</h3>
-                            </div>
-                            <p class="text-xs text-slate-500 ml-4.5">Total Laporan: <span class="font-semibold text-slate-700">112</span></p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                    <!-- Kategori Item -->
-                    <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
-                                <h3 class="text-sm font-bold text-slate-800">Keamanan</h3>
-                            </div>
-                            <p class="text-xs text-slate-500 ml-4.5">Total Laporan: <span class="font-semibold text-slate-700">78</span></p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                    <!-- Kategori Item -->
-                    <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
-                                <h3 class="text-sm font-bold text-slate-800">Kebersihan</h3>
-                            </div>
-                            <p class="text-xs text-slate-500 ml-4.5">Total Laporan: <span class="font-semibold text-slate-700">198</span></p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
-                    <!-- Kategori Item -->
-                    <div class="border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
-                                <h3 class="text-sm font-bold text-slate-800">Penerangan Jalan</h3>
-                            </div>
-                            <p class="text-xs text-slate-500 ml-4.5">Total Laporan: <span class="font-semibold text-slate-700">67</span></p>
-                        </div>
-                        <button type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-green-500 transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                        </button>
-                    </div>
+                    @empty
+                    <div class="col-span-2 text-center py-8 text-sm text-slate-500">Belum ada kategori</div>
+                    @endforelse
                 </div>
             </div>
 

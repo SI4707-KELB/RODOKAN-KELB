@@ -87,7 +87,7 @@
                     <!-- Stats overlay on map -->
                     <div class="absolute top-4 left-4 bg-red-600 text-white px-3 py-2 rounded-xl shadow-lg z-[20]">
                         <div class="text-[10px] font-bold tracking-wide uppercase opacity-90 mb-0.5">Aktif Sekarang</div>
-                        <div class="text-xl font-extrabold leading-none">12</div>
+                        <div class="text-xl font-extrabold leading-none">{{ $totalAktif }}</div>
                     </div>
                     
                     <!-- Legend overlay -->
@@ -339,24 +339,21 @@
                 maxZoom: 20
             }).addTo(map);
 
-            // Add dummy markers matching the image
-            var blueMarkers = [
-                [-6.9175, 107.6191],
-                [-6.89, 107.61],
-                [-6.90, 107.65]
-            ];
-            
-            var yellowMarkers = [
-                [-6.93, 107.63],
-                [-6.88, 107.58]
-            ];
+            // Render actual report markers on the map
+            var reports = @json($petaLaporan);
 
-            var purpleMarkers = [
-                [-6.95, 107.59]
-            ];
+            function getStatusColor(status) {
+                switch(status) {
+                    case 'Selesai': return '#22c55e';
+                    case 'Diproses':
+                    case 'Ditindaklanjuti': return '#3b82f6';
+                    case 'Menunggu': return '#eab308';
+                    case 'Darurat': return '#ef4444';
+                    default: return '#94a3b8';
+                }
+            }
 
-            function createMarker(coord, color) {
-                // Outer circle for halo effect
+            function createMarker(coord, color, title) {
                 L.circleMarker(coord, {
                     radius: 12,
                     fillColor: color,
@@ -364,9 +361,8 @@
                     weight: 0,
                     opacity: 1,
                     fillOpacity: 0.2
-                }).addTo(map);
+                }).addTo(map).bindTooltip(title, { direction: 'top', offset: [0, -10] });
                 
-                // Inner dot
                 L.circleMarker(coord, {
                     radius: 4,
                     fillColor: color,
@@ -377,25 +373,22 @@
                 }).addTo(map);
             }
 
-            blueMarkers.forEach(function(coord) { createMarker(coord, "#3b82f6"); });
-            yellowMarkers.forEach(function(coord) { createMarker(coord, "#eab308"); });
-            purpleMarkers.forEach(function(coord) { createMarker(coord, "#a855f7"); });
-            
-            // Special red marker
-            L.circleMarker([-6.92, 107.60], {
-                radius: 14,
-                fillColor: "#ef4444",
-                color: "transparent",
-                weight: 0,
-                fillOpacity: 0.2
-            }).addTo(map);
-            L.circleMarker([-6.92, 107.60], {
-                radius: 5,
-                fillColor: "#ef4444",
-                color: "#ffffff",
-                weight: 2,
-                fillOpacity: 1
-            }).addTo(map);
+            reports.forEach(function(r) {
+                if (r.latitude && r.longitude) {
+                    createMarker([r.latitude, r.longitude], getStatusColor(r.status), r.judul_laporan);
+                }
+            });
+
+            if (reports.length > 0) {
+                var group = L.featureGroup(reports.filter(function(r) {
+                    return r.latitude && r.longitude;
+                }).map(function(r) {
+                    return L.circleMarker([r.latitude, r.longitude]);
+                }));
+                if (group.getLayers().length > 0) {
+                    map.fitBounds(group.getBounds().pad(0.2));
+                }
+            }
         }
     });
 </script>
