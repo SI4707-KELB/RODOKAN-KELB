@@ -7,7 +7,13 @@
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-2xl font-extrabold text-slate-900 mb-1">Selamat Datang, {{ auth()->user()->name ?? 'Ahmad Rizki' }}</h1>
-        <p class="text-slate-500 text-sm">Anda telah membuat {{ $totalLaporanku ?? 3 }} laporan bulan ini. Terima kasih atas partisipasi aktif Anda dalam menjaga keselamatan masyarakat.</p>
+        <p class="text-slate-500 text-sm">
+            @if(($totalLaporanku ?? 0) === 0)
+                Ayo buat laporan pertama Anda dan mulai berkontribusi untuk masyarakat!
+            @else
+                Anda telah membuat {{ $totalLaporanku }} laporan bulan ini. Terima kasih atas partisipasi aktif Anda dalam menjaga keselamatan masyarakat.
+            @endif
+        </p>
     </div>
 
     <!-- Main Grid -->
@@ -48,7 +54,7 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
                     </div>
                     <div class="text-xs font-medium text-slate-500 mb-1">Komentar Diterima</div>
-                    <div class="text-2xl font-bold text-slate-900">24</div>
+                    <div class="text-2xl font-bold text-slate-900">{{ $komentarDiterima ?? 0 }}</div>
                 </div>
             </div>
 
@@ -152,62 +158,16 @@
                         </div>
                     </div>
                     @empty
-                    <!-- Dummy Items if Empty to show design -->
-                    <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all group">
-                        <div class="w-full sm:w-40 h-28 rounded-xl overflow-hidden flex-shrink-0 relative">
-                            <img src="https://images.unsplash.com/photo-1542082873-c1d0176861eb?auto=format&fit=crop&w=500&q=80" alt="Banjir" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="flex flex-col items-center justify-center text-center py-10 px-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50">
+                        <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m9-7a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
-                        <div class="flex-1 min-w-0 flex flex-col py-1">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 uppercase tracking-wide border border-red-100">Bencana Alam</span>
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-600 uppercase tracking-wide border border-green-100">Terverifikasi</span>
-                            </div>
-                            <h4 class="font-bold text-slate-800 text-base truncate mb-1">Banjir di Jalan Soekarno-Hatta</h4>
-                            <div class="flex items-center justify-between mt-auto">
-                                <div class="flex items-center text-xs text-slate-500 gap-4">
-                                    <div class="flex items-center gap-1.5">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                        Kec. Dayeuhkolot, Bandung
-                                    </div>
-                                    <div class="flex items-center gap-1.5">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        18 Apr 2026
-                                    </div>
-                                </div>
-                                <a href="#" class="text-blue-600 hover:text-blue-700 text-xs font-bold flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                    Detail
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all group">
-                        <div class="w-full sm:w-40 h-28 rounded-xl overflow-hidden flex-shrink-0 relative">
-                            <img src="https://images.unsplash.com/photo-1596701062351-8c2c14d1fdd0?auto=format&fit=crop&w=500&q=80" alt="Pohon" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <div class="flex-1 min-w-0 flex flex-col py-1">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 uppercase tracking-wide border border-red-100">Bencana Alam</span>
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 uppercase tracking-wide border border-slate-200">Selesai</span>
-                            </div>
-                            <h4 class="font-bold text-slate-800 text-base truncate mb-1">Pohon tumbang menghalangi jalan</h4>
-                            <div class="flex items-center justify-between mt-auto">
-                                <div class="flex items-center text-xs text-slate-500 gap-4">
-                                    <div class="flex items-center gap-1.5">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                        Jl. Cihampelas, Bandung
-                                    </div>
-                                    <div class="flex items-center gap-1.5">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        17 Apr 2026
-                                    </div>
-                                </div>
-                                <a href="#" class="text-blue-600 hover:text-blue-700 text-xs font-bold flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                    Detail
-                                </a>
-                            </div>
-                        </div>
+                        <h4 class="font-bold text-slate-800 text-base mb-1">Belum ada laporan</h4>
+                        <p class="text-xs text-slate-500 mb-4 max-w-xs">Anda belum membuat laporan apapun. Buat laporan pertama Anda untuk berpartisipasi.</p>
+                        <a href="{{ route('laporan.create') }}" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Buat Laporan Pertama
+                        </a>
                     </div>
                     @endforelse
                 </div>
@@ -215,7 +175,7 @@
         </div>
 
         <!-- Right Column -->
-        <div class="space-y-6">
+        <div class="h-full flex flex-col gap-6">
             
             <!-- Call to Action Banner -->
             <div class="bg-blue-600 rounded-2xl p-6 text-white shadow-md relative overflow-hidden">
@@ -282,33 +242,27 @@
             </div>
 
             <!-- Laporan Publik Terbaru -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex-1 flex flex-col">
                 <h3 class="font-bold text-slate-800 mb-5">Laporan Publik Terbaru</h3>
-                
+
                 <div class="space-y-4">
-                    <!-- Item 1 -->
-                    <div class="border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-                        <h4 class="font-bold text-sm text-slate-800 mb-1 leading-snug">Tanah longsor menutup akses jalan</h4>
-                        <div class="text-[11px] text-slate-500 mb-2">Tanah Longsor • Bogor</div>
+                    @forelse($laporanPublikTerbaru ?? [] as $lap)
+                    <a href="{{ route('laporan.show', $lap->id) }}" class="block border-b border-slate-100 pb-4 last:border-0 last:pb-0 hover:bg-slate-50/50 -mx-2 px-2 rounded-lg transition-colors">
+                        <h4 class="font-bold text-sm text-slate-800 mb-1 leading-snug line-clamp-2">{{ $lap->judul_laporan }}</h4>
+                        <div class="text-[11px] text-slate-500 mb-2">{{ $lap->kategori->nama ?? 'Lainnya' }}@if($lap->kecamatan) • {{ $lap->kecamatan }}@endif</div>
                         <div class="flex items-center gap-3 text-[11px] font-medium text-slate-400">
-                            <div class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg> 8</div>
-                            <div class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> 18</div>
-                            <div>2 jam lalu</div>
+                            <div class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg> {{ $lap->komentars_count }}</div>
+                            <div class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> {{ $lap->upvotes_count }}</div>
+                            <div>{{ $lap->created_at->diffForHumans() }}</div>
                         </div>
+                    </a>
+                    @empty
+                    <div class="text-center py-6 text-xs text-slate-500">
+                        Belum ada laporan publik terbaru.
                     </div>
-                    
-                    <!-- Item 2 -->
-                    <div class="border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-                        <h4 class="font-bold text-sm text-slate-800 mb-1 leading-snug">Kebakaran hutan di Gunung Tangkuban Perahu</h4>
-                        <div class="text-[11px] text-slate-500 mb-2">Kebakaran Hutan • Bandung Barat</div>
-                        <div class="flex items-center gap-3 text-[11px] font-medium text-slate-400">
-                            <div class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg> 15</div>
-                            <div class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> 32</div>
-                            <div>4 jam lalu</div>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
-                
+
                 <div class="mt-5 text-center">
                     <a href="{{ route('laporan.publik') }}" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center justify-center gap-1 transition-colors">
                         Lihat Semua <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>

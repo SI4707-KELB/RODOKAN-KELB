@@ -571,16 +571,18 @@
                             @if($userCrowdVerification->komentar)
                                 <p class="text-sm text-slate-700">"{{ $userCrowdVerification->komentar }}"</p>
                             @endif
-                            <form action="{{ route('laporan.crowd_verifikasi', $laporan->id) }}" method="POST" class="grid gap-3 sm:grid-cols-2">
-                                @csrf
-                                <input type="hidden" name="is_valid" value="1">
-                                <button type="submit" class="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-700">Ubah jadi Valid</button>
-                            </form>
-                            <form action="{{ route('laporan.crowd_verifikasi', $laporan->id) }}" method="POST" class="grid gap-3 sm:grid-cols-2">
-                                @csrf
-                                <input type="hidden" name="is_valid" value="0">
-                                <button type="submit" class="w-full rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-rose-700">Ubah jadi Tidak Valid</button>
-                            </form>
+                            <div class="grid gap-3 sm:grid-cols-2">
+                                <form action="{{ route('laporan.crowd_verifikasi', $laporan->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="is_valid" value="1">
+                                    <button type="submit" class="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-700">Ubah jadi Valid</button>
+                                </form>
+                                <form action="{{ route('laporan.crowd_verifikasi', $laporan->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="is_valid" value="0">
+                                    <button type="submit" class="w-full rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-rose-700">Ubah jadi Tidak Valid</button>
+                                </form>
+                            </div>
                         </div>
                     @else
                         <form action="{{ route('laporan.crowd_verifikasi', $laporan->id) }}" method="POST" class="space-y-3">

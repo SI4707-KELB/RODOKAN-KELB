@@ -25,14 +25,19 @@ class DashboardController extends Controller
             $totalLaporanku = $laporanku->count();
             $laporanSelesai = $laporanku->where('status', 'Selesai')->count();
             $laporanDiproses = $laporanku->whereIn('status', ['Menunggu', 'Diproses', 'Darurat', 'Ditindaklanjuti'])->count();
+            $komentarDiterima = \App\Models\Komentar::whereIn('laporan_id', $laporanku->pluck('id'))->count();
             $partisipasiSkor = min($totalLaporanku * 10, 100);
             $totalAktif = Laporan::whereIn('status', ['Menunggu', 'Diproses', 'Darurat', 'Ditindaklanjuti'])->count();
             $petaLaporan = Laporan::select('id', 'judul_laporan', 'status', 'latitude', 'longitude')
-                ->where('user_id', auth()->id())
                 ->whereNotNull('latitude')
                 ->whereNotNull('longitude')
                 ->get();
-            return view('user.dashboard.index', compact('laporanku', 'totalLaporanku', 'laporanSelesai', 'laporanDiproses', 'partisipasiSkor', 'totalAktif', 'petaLaporan'));
+            $laporanPublikTerbaru = Laporan::withCount(['komentars', 'upvotes'])
+                ->with('kategori')
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+            return view('user.dashboard.index', compact('laporanku', 'totalLaporanku', 'laporanSelesai', 'laporanDiproses', 'komentarDiterima', 'partisipasiSkor', 'totalAktif', 'petaLaporan', 'laporanPublikTerbaru'));
         }
 
         // 1. Summary Statistics
