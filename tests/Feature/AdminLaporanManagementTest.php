@@ -341,4 +341,18 @@ class AdminLaporanManagementTest extends TestCase
         // Default is 15 per page
         $response->assertSee('pagination');
     }
+
+    /**
+     * Test 16: Admin dapat membuka halaman peta sebaran
+     */
+    public function test_admin_can_view_peta_sebaran()
+    {
+        $response = $this->actingAs($this->admin)
+            ->get('/admin/peta-sebaran');
+
+        $response->assertStatus(200);
+        $response->assertSee('Peta Sebaran Laporan');
+        $response->assertSee('Total Marker');
+        $response->assertSee('Status Penanganan');
+    }
 }
