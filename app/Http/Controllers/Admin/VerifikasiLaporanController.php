@@ -10,6 +10,7 @@ use App\Services\LaporanStatusService;
 use App\Services\ValidasiLaporanService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Models\AuditLog;
 
 class VerifikasiLaporanController extends Controller
 {
@@ -202,6 +203,15 @@ class VerifikasiLaporanController extends Controller
             ],
         );
 
+        AuditLog::create([
+            'user_id' => $request->admin_id,
+            'aksi' => 'Verifikasi Laporan',
+            'model_type' => Laporan::class,
+            'model_id' => $laporan->id,
+            'new_values' => json_encode(['status' => 'Terverifikasi', 'catatan' => $request->catatan_verifikasi]),
+            'ip_address' => $request->ip(),
+        ]);
+
         return response()->json([
             'status' => 'success',
             'message' => 'Laporan berhasil diverifikasi',
@@ -236,6 +246,15 @@ class VerifikasiLaporanController extends Controller
                 'waktu_verifikasi' => Carbon::now(),
             ],
         );
+
+        AuditLog::create([
+            'user_id' => $request->admin_id,
+            'aksi' => 'Tolak Laporan',
+            'model_type' => Laporan::class,
+            'model_id' => $laporan->id,
+            'new_values' => json_encode(['status' => 'Ditolak', 'alasan' => $request->alasan_penolakan]),
+            'ip_address' => $request->ip(),
+        ]);
 
         return response()->json([
             'status' => 'success',
