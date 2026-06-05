@@ -10,6 +10,7 @@ use App\Http\Controllers\User\DonasiController as UserDonasiController;
 use App\Http\Controllers\Admin\VerifikasiLaporanController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\KategoriController as AdminKategoriController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\KomentarController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UpvoteController;
@@ -115,4 +116,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     // Admin Pengaturan Management
     Route::get('/pengaturan', [\App\Http\Controllers\Admin\PengaturanController::class, 'index'])->name('admin.pengaturan.index');
+
+    // Admin Audit Log
+    Route::get('/audit-log', [AuditLogController::class, 'index'])->name('admin.audit-log.index');
 });
