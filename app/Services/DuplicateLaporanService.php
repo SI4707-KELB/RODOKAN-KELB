@@ -31,13 +31,16 @@ class DuplicateLaporanService
 
         if ($alamat !== '') {
             $alamatToken = Str::limit($alamat, 40, '');
-            $query->where(function ($q) use ($alamat, $alamatToken) {
+            $query->where(function ($q) use ($alamatToken) {
                 $q->where('alamat', 'like', '%'.$alamatToken.'%')
                     ->orWhere('kecamatan', 'like', '%'.$alamatToken.'%');
             });
+        } elseif ($judul !== '') {
+            $judulToken = Str::limit($judul, 30, '');
+            $query->where('judul_laporan', 'like', '%'.$judulToken.'%');
         }
 
-        $candidates = $query->orderByDesc('created_at')->limit(30)->get();
+        $candidates = $query->orderByDesc('created_at')->limit(50)->get();
 
         return $candidates
             ->map(function (Laporan $laporan) use ($judul, $deskripsi, $latitude, $longitude) {
@@ -54,7 +57,7 @@ class DuplicateLaporanService
                     'url' => route('laporan.show', $laporan->id),
                 ];
             })
-            ->filter(fn (array $item) => $item['similarity'] >= 55)
+            ->filter(fn (array $item) => $item['similarity'] >= 40)
             ->sortByDesc('similarity')
             ->take($limit)
             ->values();
@@ -76,6 +79,13 @@ class DuplicateLaporanService
                 $titlePercent
             );
             $scores[] = (int) round($titlePercent);
+
+            $inputTitleWords = $this->significantWords($judul);
+            $existingTitleWords = $this->significantWords($laporan->judul_laporan ?? '');
+            if (count($inputTitleWords) > 0) {
+                $titleOverlap = count(array_intersect($inputTitleWords, $existingTitleWords));
+                $scores[] = (int) round(($titleOverlap / count($inputTitleWords)) * 100);
+            }
         }
 
         if ($deskripsi !== '' && $laporan->deskripsi) {
