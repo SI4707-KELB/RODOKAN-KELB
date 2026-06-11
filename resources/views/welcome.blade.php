@@ -153,8 +153,20 @@
                         aria-label="Peta Sebaran Laporan Kota Bandung"
                     ></div>
 
-                    <h4 class="font-semibold text-gray-800 text-sm mb-1">Peta Sebaran Laporan</h4>
-                    <p class="text-xs text-gray-400 mb-4">Kota Bandung, Jawa Barat</p>
+                    <div class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-orange-100 bg-orange-50/60 px-3 py-2">
+                        <div class="flex items-center gap-2 text-xs font-semibold text-orange-800">
+                            <span class="h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.75)]"></span>
+                            Heatmap Kepadatan
+                        </div>
+                        <div class="flex items-center gap-2 text-[11px] font-medium text-gray-500">
+                            <span>Rendah</span>
+                            <span class="h-2 w-24 rounded-full bg-gradient-to-r from-yellow-200 via-orange-400 to-red-800"></span>
+                            <span>Tinggi</span>
+                        </div>
+                    </div>
+
+                    <h4 class="font-semibold text-gray-800 text-sm mb-1">Peta Sebaran & Heatmap Laporan</h4>
+                    <p class="text-xs text-gray-400 mb-4">Area merah menunjukkan lokasi dengan laporan terbanyak.</p>
                     
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-2 text-xs text-gray-600">
                         <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Bencana Alam</div>
