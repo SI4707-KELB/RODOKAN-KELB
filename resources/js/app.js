@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import 'leaflet.heat';
 import 'leaflet.markercluster';
 
 const BANDUNG_AREA_CENTER = [-6.9586, 107.4812];
@@ -87,6 +88,24 @@ const createClusterIcon = (cluster) => {
     });
 };
 
+const createReportHeatLayer = (reports) => L.heatLayer(reports.map((report) => [
+    Number(report.lat),
+    Number(report.lng),
+    0.45,
+]), {
+    blur: 26,
+    gradient: {
+        0.18: '#fde68a',
+        0.42: '#fb923c',
+        0.68: '#ef4444',
+        1: '#991b1b',
+    },
+    max: 1,
+    maxZoom: 16,
+    minOpacity: 0.28,
+    radius: 36,
+});
+
 const popupContentFor = (report) => `
     <div class="laporan-map-popup">
         <div class="laporan-map-popup__title">${escapeHtml(report.title || 'Laporan Warga')}</div>
@@ -115,6 +134,7 @@ const initializeClusterReportMap = () => {
     });
 
     const reports = validReportsFrom(element);
+    const heatLayer = reports.length > 0 ? createReportHeatLayer(reports) : null;
     const clusters = L.markerClusterGroup({
         chunkedLoading: true,
         chunkInterval: 120,
@@ -138,6 +158,7 @@ const initializeClusterReportMap = () => {
         clusters.addLayer(marker);
     });
 
+    heatLayer?.addTo(map);
     map.addLayer(clusters);
 
     if (reports.length > 0) {
