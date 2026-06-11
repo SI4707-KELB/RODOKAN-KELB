@@ -3,8 +3,8 @@
 @section('title', 'Notifikasi - RODOKAN')
 
 @php
-$unread = $notifications->filter(fn($n) => $n->read_at === null);
-$read = $notifications->filter(fn($n) => $n->read_at !== null);
+$unread = $unreadNotifications ?? collect();
+$read = $readNotifications ?? collect();
 
 $iconByStatus = [
     'Selesai' => ['bg' => 'bg-green-500', 'svg' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>'],
@@ -27,7 +27,7 @@ $defaultIcon = ['bg' => 'bg-blue-500', 'svg' => '<path stroke-linecap="round" st
                 Anda memiliki <strong>{{ $unread->count() }}</strong> notifikasi yang belum dibaca
             </p>
         </div>
-        @if($notifications->isNotEmpty())
+        @if($unread->isNotEmpty() || $read->isNotEmpty())
         <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm font-medium">
             @if($unread->isNotEmpty())
             <button type="button" id="mark-all-read" class="text-blue-600 hover:text-blue-700 transition-colors whitespace-nowrap">Tandai Semua Dibaca</button>
@@ -37,7 +37,7 @@ $defaultIcon = ['bg' => 'bg-blue-500', 'svg' => '<path stroke-linecap="round" st
         @endif
     </div>
 
-    @if($notifications->isEmpty())
+    @if($unread->isEmpty() && $read->isEmpty())
         <div class="text-center py-12 sm:py-16 text-slate-400">
             <svg class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
             <p class="text-xs sm:text-sm font-medium mt-2">Belum ada notifikasi</p>
@@ -58,7 +58,7 @@ $defaultIcon = ['bg' => 'bg-blue-500', 'svg' => '<path stroke-linecap="round" st
                                 <svg class="w-4 h-4 sm:w-[18px] sm:h-[18px] md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">{!! $notifIcon['svg'] !!}</svg>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-sm font-bold text-slate-900 truncate">{{ $data['message'] ?? 'Notifikasi' }}</h4>
+                                <h4 class="text-xs sm:text-sm font-bold text-slate-900 truncate">{{ $data['title'] ?? $data['message'] ?? 'Notifikasi' }}</h4>
                                 <p class="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1 mb-1 sm:mb-2 line-clamp-2">{{ $data['catatan'] ?? 'Status laporan diperbarui.' }}</p>
                                 <div class="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-medium text-slate-500">
                                     <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -90,7 +90,7 @@ $defaultIcon = ['bg' => 'bg-blue-500', 'svg' => '<path stroke-linecap="round" st
                                 <svg class="w-4 h-4 sm:w-[18px] sm:h-[18px] md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">{!! $notifIcon['svg'] !!}</svg>
                             </div>
                             <div class="min-w-0">
-                                <h4 class="text-xs sm:text-sm font-bold text-slate-600 truncate">{{ $data['message'] ?? 'Notifikasi' }}</h4>
+                                <h4 class="text-xs sm:text-sm font-bold text-slate-600 truncate">{{ $data['title'] ?? $data['message'] ?? 'Notifikasi' }}</h4>
                                 <p class="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1 mb-1 sm:mb-2 line-clamp-2">{{ $data['catatan'] ?? 'Status laporan diperbarui.' }}</p>
                                 <div class="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-medium text-slate-400">
                                     <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
