@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Komentar;
 use App\Models\Laporan;
+use App\Services\NotificationDispatcherService;
+use Illuminate\Http\Request;
 
 class KomentarController extends Controller
 {
+    public function __construct(
+        protected NotificationDispatcherService $notificationDispatcher,
+    ) {}
+
     public function store(Request $request, $laporan_id)
     {
         $request->validate([
@@ -16,11 +21,13 @@ class KomentarController extends Controller
 
         $laporan = Laporan::findOrFail($laporan_id);
 
-        Komentar::create([
+        $komentar = Komentar::create([
             'laporan_id' => $laporan->id,
             'user_id' => auth()->id(),
             'isi_komentar' => $request->komentar,
         ]);
+
+        $this->notificationDispatcher->notifyAdminsOnKomentar($komentar);
 
         return back()->with('success', 'Komentar berhasil ditambahkan.');
     }

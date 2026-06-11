@@ -4,17 +4,35 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 
 class NotificationController extends Controller
 {
     public function index()
     {
-        $notifications = auth()->user()
-            ->notifications()
-            ->paginate(20);
+        $user = auth()->user();
+        $isAdmin = $user->role === 'admin';
 
-        return view('notifications.index', compact('notifications'));
+        $unreadNotifications = $user->notifications()->whereNull('read_at')->latest()->get();
+        $readNotifications = $user->notifications()->whereNotNull('read_at')->latest()->limit(50)->get();
+        $notifications = $user->notifications()->latest()->paginate(20);
+
+        $stats = $this->buildStats($unreadNotifications);
+
+        if ($isAdmin) {
+            return view('notifications.admin_index', compact(
+                'notifications',
+                'unreadNotifications',
+                'readNotifications',
+                'stats',
+            ));
+        }
+
+        return view('notifications.user_index', compact(
+            'notifications',
+            'unreadNotifications',
+            'readNotifications',
+        ));
     }
 
     public function show(string $id)
@@ -23,6 +41,10 @@ class NotificationController extends Controller
 
         if ($notification->read_at === null) {
             $notification->markAsRead();
+        }
+
+        if (auth()->user()->role === 'admin' && isset($notification->data['category'])) {
+            return redirect($notification->data['url'] ?? route('notifications.index'));
         }
 
         return view('notifications.user_show', compact('notification'));
@@ -72,5 +94,19 @@ class NotificationController extends Controller
         }
 
         return back();
+    }
+
+    private function buildStats($unreadNotifications): array
+    {
+        $byCategory = fn (string $category) => $unreadNotifications
+            ->filter(fn (DatabaseNotification $n) => ($n->data['category'] ?? '') === $category)
+            ->count();
+
+        return [
+            'unread' => $unreadNotifications->count(),
+            'darurat' => $byCategory('darurat'),
+            'verifikasi' => $byCategory('verifikasi'),
+            'instansi' => $byCategory('instansi'),
+        ];
     }
 }

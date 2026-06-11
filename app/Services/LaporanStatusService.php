@@ -5,10 +5,15 @@ namespace App\Services;
 use App\Models\Laporan;
 use App\Models\StatusHistory;
 use App\Models\User;
+use App\Notifications\AdminNotification;
 use App\Notifications\LaporanStatusUpdated;
 
 class LaporanStatusService
 {
+    public function __construct(
+        protected NotificationDispatcherService $notificationDispatcher,
+    ) {}
+
     public function updateStatus(
         Laporan $laporan,
         string $statusBaru,
@@ -35,9 +40,31 @@ class LaporanStatusService
             'catatan' => $catatan,
         ]);
 
-        $this->notifyOwner($laporan->fresh(), $statusSebelumnya, $statusBaru, $catatan);
+        $fresh = $laporan->fresh(['instansi']);
+
+        $this->notifyOwner($fresh, $statusSebelumnya, $statusBaru, $catatan);
+        $this->notifyAdminsIfNeeded($fresh, $statusSebelumnya, $statusBaru);
 
         return $laporan;
+    }
+
+    private function notifyAdminsIfNeeded(Laporan $laporan, string $statusSebelumnya, string $statusBaru): void
+    {
+        if ($statusBaru === 'Darurat') {
+            $this->notificationDispatcher->notifyAllAdmins(
+                new AdminNotification(
+                    category: 'darurat',
+                    title: 'Laporan Ditandai Darurat',
+                    message: "Laporan \"{$laporan->judul_laporan}\" memerlukan penanganan segera.",
+                    laporan: $laporan,
+                )
+            );
+        }
+
+        if ($statusBaru === 'Ditindaklanjuti' && $laporan->instansi_id) {
+            $instansiName = $laporan->instansi?->nama ?? 'Instansi terkait';
+            $this->notificationDispatcher->notifyAdminsOnInstansiUpdate($laporan, $instansiName, $statusBaru);
+        }
     }
 
     private function notifyOwner(Laporan $laporan, string $statusSebelumnya, string $statusBaru, ?string $catatan): void

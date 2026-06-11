@@ -150,9 +150,10 @@
                     <div class="max-h-80 overflow-y-auto divide-y divide-slate-100">
                         @forelse($navbarNotifications ?? [] as $notification)
                             @php $data = $notification->data; @endphp
-                            <a href="{{ $data['url'] ?? route('notifications.index') }}" class="block px-4 py-3 hover:bg-slate-50 transition-colors {{ $notification->read_at ? '' : 'bg-blue-50/40' }}">
-                                <p class="text-xs font-semibold text-slate-800 leading-snug">{{ $data['message'] ?? 'Status laporan diperbarui' }}</p>
-                                <p class="text-[10px] text-slate-500 mt-1">{{ $notification->created_at->diffForHumans() }}</p>
+                            <a href="{{ route('notifications.show', $notification->id) }}" class="block px-4 py-3 hover:bg-slate-50 transition-colors {{ $notification->read_at ? '' : 'bg-blue-50/40' }}">
+                                <p class="text-xs font-semibold text-slate-800 leading-snug">{{ $data['title'] ?? $data['message'] ?? 'Notifikasi' }}</p>
+                                <p class="text-[10px] text-slate-500 mt-1 line-clamp-2">{{ $data['message'] ?? '' }}</p>
+                                <p class="text-[10px] text-slate-400 mt-0.5">{{ $notification->created_at->diffForHumans() }}</p>
                             </a>
                         @empty
                             <div class="px-4 py-8 text-center text-xs text-slate-400">Belum ada notifikasi</div>

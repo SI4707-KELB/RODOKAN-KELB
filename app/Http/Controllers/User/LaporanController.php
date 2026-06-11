@@ -4,12 +4,14 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Services\DuplicateLaporanService;
+use App\Services\NotificationDispatcherService;
 use Illuminate\Http\Request;
 
 class LaporanController extends Controller
 {
     public function __construct(
         protected DuplicateLaporanService $duplicateService,
+        protected NotificationDispatcherService $notificationDispatcher,
     ) {}
     public function create()
     {
@@ -104,6 +106,8 @@ class LaporanController extends Controller
                 ]);
             }
         }
+
+        $this->notificationDispatcher->notifyAdminsOnNewLaporan($laporan->fresh());
 
         return redirect()->route('dashboard')->with('success', 'Laporan berhasil dikirim!');
     }
