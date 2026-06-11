@@ -226,6 +226,7 @@ const initializeReportLocationPicker = () => {
                 .then((data) => {
                     if (data?.display_name) {
                         alamatInput.value = data.display_name;
+                        alamatInput.dispatchEvent(new Event('input', { bubbles: true }));
                     }
                 })
                 .catch(() => {});
@@ -252,6 +253,8 @@ const initializeReportLocationPicker = () => {
         coordinateOutput.textContent = coordinateText(latLng);
         map.setView(latLng, Math.max(map.getZoom(), zoom));
         reverseGeocode(latLng);
+        latitudeInput.dispatchEvent(new Event('change', { bubbles: true }));
+        longitudeInput.dispatchEvent(new Event('change', { bubbles: true }));
     };
 
     if (hasInitialCoordinate) {

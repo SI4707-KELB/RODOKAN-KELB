@@ -89,10 +89,14 @@
         <p class="text-xs mt-1">Notifikasi akan muncul saat ada laporan baru, komentar, atau update status.</p>
     </div>
   @else
-    <div class="space-y-6">
+    <div id="notif-filter-empty" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-12 text-center text-slate-400 mb-6">
+        <p class="text-sm font-medium">Tidak ada notifikasi untuk filter ini</p>
+    </div>
+
+    <div class="space-y-6" id="notif-panels">
         @if($unreadNotifications->isNotEmpty())
-        <div id="panel-belum-dibaca" class="notif-panel-group bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-groups="semua,belum-dibaca,darurat,verifikasi,komentar,instansi,biasa">
-            <h2 class="text-base font-bold text-slate-800 mb-6 flex items-center gap-2">
+        <div id="panel-belum-dibaca" class="notif-panel-group bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-panel="unread">
+            <h2 class="notif-section-heading text-base font-bold text-slate-800 mb-6 flex items-center gap-2">
                 <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                 Belum Dibaca ({{ $unreadNotifications->count() }})
             </h2>
@@ -105,8 +109,8 @@
         @endif
 
         @if($readNotifications->isNotEmpty())
-        <div id="panel-sudah-dibaca" class="notif-panel-group bg-white rounded-2xl border border-slate-200 shadow-sm p-6 block" data-groups="semua,sudah-dibaca">
-            <h2 class="text-base font-bold text-slate-800 mb-6 flex items-center gap-2">
+        <div id="panel-sudah-dibaca" class="notif-panel-group bg-white rounded-2xl border border-slate-200 shadow-sm p-6 block" data-panel="read">
+            <h2 class="notif-section-heading text-base font-bold text-slate-800 mb-6 flex items-center gap-2">
                 <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 Sudah Dibaca ({{ $readNotifications->count() }})
             </h2>
@@ -123,20 +127,66 @@
 
 @push('scripts')
 <script>
+    const CATEGORY_TABS = ['darurat', 'verifikasi', 'komentar', 'instansi', 'biasa'];
+
     function switchNotifTab(tabId) {
-        document.querySelectorAll('.notif-panel-group').forEach(group => {
-            const groups = group.getAttribute('data-groups').split(',');
-            group.style.display = groups.includes(tabId) ? 'block' : 'none';
-        });
+        const isCategoryTab = CATEGORY_TABS.includes(tabId);
 
         document.querySelectorAll('.notif-item').forEach(item => {
-            const itemType = item.getAttribute('data-type');
-            if (tabId === 'semua' || tabId === 'belum-dibaca' || tabId === 'sudah-dibaca') {
-                item.style.display = 'block';
+            const itemType = item.dataset.type;
+            const isUnread = item.dataset.read === 'unread';
+            let show = false;
+
+            if (tabId === 'semua') {
+                show = true;
+            } else if (tabId === 'belum-dibaca') {
+                show = isUnread;
+            } else if (tabId === 'sudah-dibaca') {
+                show = !isUnread;
             } else {
-                item.style.display = itemType === tabId ? 'block' : 'none';
+                show = itemType === tabId;
+            }
+
+            item.style.display = show ? 'block' : 'none';
+        });
+
+        document.querySelectorAll('.notif-panel-group').forEach(group => {
+            const panel = group.dataset.panel;
+            const hasVisibleItems = [...group.querySelectorAll('.notif-item')]
+                .some(item => item.style.display !== 'none');
+
+            if (tabId === 'semua') {
+                group.style.display = hasVisibleItems ? 'block' : 'none';
+            } else if (tabId === 'belum-dibaca') {
+                group.style.display = (panel === 'unread' && hasVisibleItems) ? 'block' : 'none';
+            } else if (tabId === 'sudah-dibaca') {
+                group.style.display = (panel === 'read' && hasVisibleItems) ? 'block' : 'none';
+            } else if (isCategoryTab) {
+                group.style.display = hasVisibleItems ? 'block' : 'none';
             }
         });
+
+        document.querySelectorAll('.notif-section-heading').forEach(heading => {
+            const panel = heading.closest('.notif-panel-group')?.dataset.panel;
+            let showHeading = false;
+
+            if (tabId === 'semua') {
+                showHeading = true;
+            } else if (tabId === 'belum-dibaca') {
+                showHeading = panel === 'unread';
+            } else if (tabId === 'sudah-dibaca') {
+                showHeading = panel === 'read';
+            }
+
+            heading.style.display = showHeading ? '' : 'none';
+        });
+
+        const emptyState = document.getElementById('notif-filter-empty');
+        const anyVisible = [...document.querySelectorAll('.notif-item')]
+            .some(item => item.style.display !== 'none');
+        if (emptyState) {
+            emptyState.classList.toggle('hidden', anyVisible);
+        }
 
         document.querySelectorAll('.notif-tab-btn').forEach(btn => {
             btn.classList.remove('text-blue-600', 'border-blue-600');

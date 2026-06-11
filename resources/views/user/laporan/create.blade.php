@@ -405,7 +405,7 @@
             const latitude = form.querySelector('[name="latitude"]')?.value || '';
             const longitude = form.querySelector('[name="longitude"]')?.value || '';
 
-            if (judul.length < 5 && deskripsi.length < 20) {
+            if (judul.length < 3 && deskripsi.length < 10 && alamat.length < 5) {
                 duplicateAlert.classList.add('hidden');
                 duplicateSidebar.classList.add('hidden');
                 return;

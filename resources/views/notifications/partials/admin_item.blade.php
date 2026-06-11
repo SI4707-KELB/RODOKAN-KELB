@@ -25,7 +25,7 @@
     $iconPath = $icons[$category] ?? $icons['biasa'];
 @endphp
 
-<div class="notif-item relative {{ $style['panel'] }} rounded-xl border p-4 {{ $isUnread ? 'pl-5' : '' }} overflow-hidden group" data-type="{{ $category }}">
+<div class="notif-item relative {{ $style['panel'] }} rounded-xl border p-4 {{ $isUnread ? 'pl-5' : '' }} overflow-hidden group" data-type="{{ $category }}" data-read="{{ $isUnread ? 'unread' : 'read' }}">
     @if($isUnread && $style['bar'])
         <div class="absolute left-0 top-0 bottom-0 w-1 {{ $style['bar'] }} rounded-l-xl"></div>
     @endif
